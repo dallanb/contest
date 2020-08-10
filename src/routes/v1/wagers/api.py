@@ -4,44 +4,44 @@ from .schema import *
 from ..base import Base
 from ....common.response import DataResponse
 from ....common.auth import check_user
-from ....models import Wager, Contest
+from ....models import Contest, Contest
 
 
-class WagersAPI(Base):
+class ContestsAPI(Base):
     def __init__(self):
         Base.__init__(self)
 
     @marshal_with(DataResponse.marshallable())
     def get(self, uuid):
-        wagers = self.find(model=Wager, uuid=uuid, not_found=self.code.NOT_FOUND)
+        contests = self.find(model=Contest, uuid=uuid, not_found=self.code.NOT_FOUND)
         return DataResponse(
             data={
-                'wagers': self.dump(
+                'contests': self.dump(
                     schema=dump_schema,
-                    instance=wagers.items[0]
+                    instance=contests.items[0]
                 )
             }
         )
 
 
-class WagersListAPI(Base):
+class ContestsListAPI(Base):
     def __init__(self):
         Base.__init__(self)
 
     @marshal_with(DataResponse.marshallable())
     def get(self):
         data = self.clean(schema=fetch_all_schema, instance=request.args)
-        wagers = self.find(model=Wager, **data)
+        contests = self.find(model=Contest, **data)
         return DataResponse(
             data={
                 '_metadata': self.prepare_metadata(
-                    total_count=wagers.total,
-                    page_count=len(wagers.items),
+                    total_count=contests.total,
+                    page_count=len(contests.items),
                     page=data['page'],
                     per_page=data['per_page']),
-                'wagers': self.dump(
+                'contests': self.dump(
                     schema=dump_many_schema,
-                    instance=wagers.items,
+                    instance=contests.items,
                     params={
                         'include': data['include']
                     }
@@ -53,13 +53,13 @@ class WagersListAPI(Base):
     @check_user
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        wager = self.init(model=Wager, status='pending', owner_uuid=g.user)
+        wager = self.init(model=Contest, status='pending', owner_uuid=g.user)
         contest = self.init(model=Contest, contest_uuid=data['contest_uuid'], wager=wager)
         wager = self.save(instance=wager)
         _ = self.save(instance=contest)
         return DataResponse(
             data={
-                'wagers': self.dump(
+                'contests': self.dump(
                     schema=dump_schema,
                     instance=wager
                 )

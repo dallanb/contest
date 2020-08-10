@@ -1,5 +1,5 @@
-from sqlalchemy_utils import UUIDType, generic_repr
-from .. import db, ma
+from sqlalchemy_utils import UUIDType
+from .. import db
 from .mixins import BaseMixin
 from ..common import ContestStatusEnum
 
@@ -12,6 +12,7 @@ class Contest(db.Model, BaseMixin):
 
     # Relationship
     contest_status = db.relationship("ContestStatus")
+    participants = db.relationship("Participant", back_populates="contest", lazy="noload")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

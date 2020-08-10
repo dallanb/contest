@@ -4,17 +4,17 @@ from marshmallow_enum import EnumField
 from ....common import ParticipantStatusEnum
 
 
-class CreateWagerSchema(Schema):
+class CreateContestSchema(Schema):
     contest_uuid = fields.UUID()
 
 
-class DumpWagerSchema(Schema):
+class DumpContestSchema(Schema):
     uuid = fields.UUID()
     ctime = fields.Integer()
     mtime = fields.Integer()
     owner_uuid = fields.UUID()
     status = EnumField(ParticipantStatusEnum)
-    parties = fields.List(fields.Nested('DumpPartySchema', exclude=('wager',)))
+    parties = fields.List(fields.Nested('DumpPartySchema', exclude=('contest',)))
 
     def get_attribute(self, obj, attr, default):
         if attr == 'parties':
@@ -30,14 +30,14 @@ class DumpWagerSchema(Schema):
         return data
 
 
-class FetchAllWagerSchema(Schema):
+class FetchAllContestSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
     include = fields.DelimitedList(fields.String(), required=False, missing=[])
     owner_uuid = fields.UUID(required=False)
 
 
-create_schema = CreateWagerSchema()
-dump_schema = DumpWagerSchema()
-dump_many_schema = DumpWagerSchema(many=True)
-fetch_all_schema = FetchAllWagerSchema()
+create_schema = CreateContestSchema()
+dump_schema = DumpContestSchema()
+dump_many_schema = DumpContestSchema(many=True)
+fetch_all_schema = FetchAllContestSchema()
