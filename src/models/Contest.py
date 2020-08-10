@@ -1,16 +1,17 @@
 from sqlalchemy_utils import UUIDType, generic_repr
 from .. import db, ma
 from .mixins import BaseMixin
+from ..common import ContestStatusEnum
 
 
 class Contest(db.Model, BaseMixin):
-    contest_uuid = db.Column(UUIDType(binary=False), nullable=False)
+    owner_uuid = db.Column(UUIDType(binary=False), nullable=False)
 
     # FK
-    wager_uuid = db.Column(UUIDType(binary=False), db.ForeignKey('wager.uuid'), nullable=False)
+    status = db.Column(db.Enum(ContestStatusEnum), db.ForeignKey('contest_status.name'), nullable=False)
 
     # Relationship
-    wager = db.relationship("Wager")
+    contest_status = db.relationship("ContestStatus")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

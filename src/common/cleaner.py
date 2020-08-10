@@ -1,9 +1,6 @@
-import re
-from uuid import UUID, uuid4
+from uuid import UUID
 from sqlalchemy.orm.base import object_mapper
 from sqlalchemy.orm.exc import UnmappedInstanceError
-from iso4217 import Currency
-
 
 def is_mapped(v):
     if v is None:
@@ -55,14 +52,6 @@ def is_int(v, min_count=0, max_count=9999999999):
     return v
 
 
-def is_email(v):
-    if v is None:
-        return v
-    if not re.search('[^@]+@[^@]+\.[^@]+', v):
-        return None
-    return v
-
-
 def is_enum(v, enum_class):
     if v is None:
         return v
@@ -105,16 +94,6 @@ def is_hash(v):
     if v is None:
         return v
     if not is_int(v, min_count=None, max_count=None):
-        return None
-    return v
-
-
-def is_currency(v):
-    if v is None:
-        return v
-    try:
-        Currency(v)
-    except ValueError:
         return None
     return v
 
