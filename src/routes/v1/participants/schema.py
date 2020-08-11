@@ -4,11 +4,11 @@ from webargs import fields
 from ....common import ParticipantStatusEnum
 
 
-class CreateContestSchema(Schema):
+class CreateParticipantSchema(Schema):
     user_uuid = fields.UUID(required=True)
 
 
-class DumpContestSchema(Schema):
+class DumpParticipantSchema(Schema):
     status = EnumField(ParticipantStatusEnum)
     uuid = fields.UUID()
     ctime = fields.Integer()
@@ -31,7 +31,7 @@ class DumpContestSchema(Schema):
         return data
 
 
-class FetchAllContestSchema(Schema):
+class FetchAllParticipantSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
     expand = fields.DelimitedList(fields.String(), required=False, missing=[])
@@ -39,7 +39,7 @@ class FetchAllContestSchema(Schema):
     user_uuid = fields.UUID(required=False)
 
 
-create_schema = CreateContestSchema()
-dump_schema = DumpContestSchema()
-dump_many_schema = DumpContestSchema(many=True)
-fetch_all_schema = FetchAllContestSchema()
+create_schema = CreateParticipantSchema()
+dump_schema = DumpParticipantSchema()
+dump_many_schema = DumpParticipantSchema(many=True)
+fetch_all_schema = FetchAllParticipantSchema()

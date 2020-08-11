@@ -2,7 +2,6 @@ from .. import api
 from .v1 import PingAPI
 from .v1 import ContestsAPI, ContestsListAPI
 from .v1 import ParticipantsAPI, ParticipantsListAPI
-from .v1 import StakesAPI, StakesListAPI
 
 # Ping
 api.add_resource(PingAPI, '/ping', methods=['GET'])
