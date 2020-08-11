@@ -56,7 +56,7 @@ class ParticipantsListAPI(Base):
     def post(self, uuid):
         data = self.clean(schema=create_schema, instance=request.get_json())
         contests = self.find(model=Contest, uuid=uuid, not_found=self.code.NOT_FOUND)
-        participant = self.init(model=Participant, user_uuid=data['user_uuid'], party=contests.items[0],
+        participant = self.init(model=Participant, user_uuid=data['user_uuid'], contest=contests.items[0],
                                 status="pending")
         participant = self.save(instance=participant)
         return DataResponse(
