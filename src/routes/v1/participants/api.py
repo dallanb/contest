@@ -4,7 +4,7 @@ from .schema import *
 from ..base import Base
 from ....common.response import DataResponse
 from ....common.auth import check_user
-from ....models import Participant, Party
+from ....models import Participant, Contest
 
 
 class ParticipantsAPI(Base):
@@ -55,8 +55,8 @@ class ParticipantsListAPI(Base):
     @check_user
     def post(self, uuid):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        parties = self.find(model=Party, uuid=uuid, not_found=self.code.NOT_FOUND)
-        participant = self.init(model=Participant, user_uuid=data['user_uuid'], party=parties.items[0],
+        contests = self.find(model=Contest, uuid=uuid, not_found=self.code.NOT_FOUND)
+        participant = self.init(model=Participant, user_uuid=data['user_uuid'], party=contests.items[0],
                                 status="pending")
         participant = self.save(instance=participant)
         return DataResponse(

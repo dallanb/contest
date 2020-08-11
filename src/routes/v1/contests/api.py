@@ -4,7 +4,7 @@ from .schema import *
 from ..base import Base
 from ....common.response import DataResponse
 from ....common.auth import check_user
-from ....models import Contest, Contest
+from ....models import Contest, Sport
 
 
 class ContestsAPI(Base):
@@ -53,15 +53,15 @@ class ContestsListAPI(Base):
     @check_user
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        wager = self.init(model=Contest, status='pending', owner_uuid=g.user)
-        contest = self.init(model=Contest, contest_uuid=data['contest_uuid'], wager=wager)
-        wager = self.save(instance=wager)
-        _ = self.save(instance=contest)
+        contest = self.init(model=Contest, status='pending', owner_uuid=g.user)
+        sport = self.init(model=Sport, sport_uuid=data['sport_uuid'], contest=contest)
+        contest = self.save(instance=contest)
+        _ = self.save(instance=sport)
         return DataResponse(
             data={
                 'contests': self.dump(
                     schema=dump_schema,
-                    instance=wager
+                    instance=contest
                 )
             }
         )

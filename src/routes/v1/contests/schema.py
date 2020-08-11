@@ -1,11 +1,12 @@
 from marshmallow import validate, Schema, post_dump
 from webargs import fields
 from marshmallow_enum import EnumField
-from ....common import ParticipantStatusEnum
+from ....common import ContestStatusEnum
 
 
 class CreateContestSchema(Schema):
-    contest_uuid = fields.UUID()
+    owner_uuid = fields.UUID()
+    sport_uuid = fields.UUID()
 
 
 class DumpContestSchema(Schema):
@@ -13,11 +14,11 @@ class DumpContestSchema(Schema):
     ctime = fields.Integer()
     mtime = fields.Integer()
     owner_uuid = fields.UUID()
-    status = EnumField(ParticipantStatusEnum)
-    parties = fields.List(fields.Nested('DumpPartySchema', exclude=('contest',)))
+    status = EnumField(ContestStatusEnum)
+    participants = fields.List(fields.Nested('DumpParticipantSchema'))
 
     def get_attribute(self, obj, attr, default):
-        if attr == 'parties':
+        if attr == 'participants':
             return getattr(obj, attr, default) if any(
                 attr in include for include in self.context.get('include', [])) else None
         else:
@@ -25,8 +26,8 @@ class DumpContestSchema(Schema):
 
     @post_dump
     def make_obj(self, data, **kwargs):
-        if data.get('parties', False) is None:
-            del data['parties']
+        if data.get('participants', False) is None:
+            del data['participants']
         return data
 
 
