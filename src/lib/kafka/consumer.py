@@ -1,16 +1,16 @@
 import multiprocessing
 
-from flask import g
 from kafka import KafkaConsumer
 
 
 class Consumer(multiprocessing.Process):
-    def __init__(self, host, port, topics):
+    def __init__(self, host, port, topics, event_listener):
         multiprocessing.Process.__init__(self)
         self.stop_event = multiprocessing.Event()
         self.host = host
         self.port = port
         self.topics = topics
+        self.event_listener = event_listener
 
     def stop(self):
         self.stop_event.set()
@@ -20,7 +20,8 @@ class Consumer(multiprocessing.Process):
         consumer.subscribe(self.topics)
 
         while not self.stop_event.is_set():
-            for message in consumer:
+            for event in consumer:
+                self.event_listener(event=event)
                 if self.stop_event.is_set():
                     break
 

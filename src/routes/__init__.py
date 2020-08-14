@@ -7,7 +7,7 @@ from .v1 import ParticipantsAPI, ParticipantsListAPI
 api.add_resource(PingAPI, '/ping', methods=['GET'])
 
 # Contests
-api.add_resource(ContestsAPI, '/contests/<uuid:uuid>', endpoint="wager")
+api.add_resource(ContestsAPI, '/contests/<uuid:uuid>', endpoint="contest")
 api.add_resource(ContestsListAPI, '/contests', endpoint="contests")
 
 # Participants

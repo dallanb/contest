@@ -1,37 +1,12 @@
-from ..models import Sport as SportModel
-from ..common.db import find, save, init, destroy, count
-from ..common.cache import cache, unmemoize
+import logging
+from .base import Base
 
 
-@cache.memoize(timeout=1000)
-def count_sport():
-    return count(SportModel)
+class Sport(Base):
+    def __init__(self):
+        Base.__init__(self)
+        self.logger = logging.getLogger(__name__)
 
-
-def find_sport(**kwargs):
-    return find(model=SportModel, **kwargs)
-
-
-def init_sport(**kwargs):
-    return init(model=SportModel, **kwargs)
-
-
-def save_sport(sport):
-    unmemoize(count_sport)
-    return save(instance=sport)
-
-
-def destroy_sport(sport):
-    unmemoize(count_sport)
-    return destroy(instance=sport)
-
-
-def dump_sport(schema, sport, params=None):
-    if params:
-        for k, v in params.items():
-            schema.context[k] = v
-    return schema.dump(sport)
-
-
-def clean_sport(schema, sport, **kwargs):
-    return schema.load(sport, **kwargs)
+    @classmethod
+    def handle_event(cls, key, data):
+        return

@@ -3,56 +3,47 @@ from flask_restful import Resource
 from http import HTTPStatus
 from marshmallow import ValidationError
 from ...common.error import ManualException
-from ...common.db import find, save, init, destroy, count
+from ...services import Base as Service
 
 
 class Base(Resource):
     def __init__(self):
+        self.service = Service()
         self.logger = g.logger.getLogger(__name__)
         self.code = HTTPStatus
 
-    @staticmethod
-    def count(model):
-        return count(model=model)
+    def count(self, model):
+        return self.service.count(model=model)
 
-    @staticmethod
-    def find(model, not_found=None, **kwargs):
-        instance = find(model=model, **kwargs)
+    def find(self, model, not_found=None, **kwargs):
+        instance = self.service.find(model=model, **kwargs)
         if not instance.total and not_found:
             Base.throw_error(http_code=not_found)
         return instance
 
-    @staticmethod
-    def init(model, **kwargs):
-        return init(model=model, **kwargs)
+    def init(self, model, **kwargs):
+        return self.service.init(model=model, **kwargs)
 
-    @staticmethod
-    def save(instance):
-        return save(instance=instance)
+    def save(self, instance):
+        return self.service.save(instance=instance)
 
-    @staticmethod
-    def destroy(instance):
-        return destroy(instance=instance)
+    def destroy(self, instance):
+        return self.service.destroy(instance=instance)
 
-    @staticmethod
-    def dump(schema, instance, params=None):
-        if params:
-            for k, v in params.items():
-                schema.context[k] = v
-        return schema.dump(instance)
+    def dump(self, schema, instance, params=None):
+        return self.service.dump(schema=schema, instance=instance, params=params)
 
-    @staticmethod
-    def clean(schema, instance, **kwargs):
+    def clean(self, schema, instance, **kwargs):
         try:
-            return schema.load(instance, **kwargs)
+            return self.service.clean(schema=schema, instance=instance, **kwargs)
         except ValidationError as err:
-            Base.throw_error(http_code=HTTPStatus.BAD_REQUEST, err=err.messages)
+            Base.throw_error(http_code=self.code.BAD_REQUEST, err=err.messages)
 
-    @staticmethod
-    def assign_attr(instance, attr):
-        for k, v in attr.items():
-            instance.__setattr__(k, v)
-        return instance
+    def assign_attr(self, instance, attr):
+        return self.service.assign_attr(instance=instance, attr=attr)
+
+    def notify(self, topic, value, key):
+        self.service.notify(topic=topic, value=value, key=key)
 
     @staticmethod
     def throw_error(http_code, **kwargs):

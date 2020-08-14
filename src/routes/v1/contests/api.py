@@ -57,6 +57,11 @@ class ContestsListAPI(Base):
         sport = self.init(model=Sport, sport_uuid=data['sport_uuid'], contest=contest)
         contest = self.save(instance=contest)
         _ = self.save(instance=sport)
+        _ = self.notify(
+            topic='contests',
+            value=contest.uuid,
+            key='contest_created'
+        )
         return DataResponse(
             data={
                 'contests': self.dump(
