@@ -1,16 +1,17 @@
 import pytest
-from src import services
+from src import services, model
 
 
 @pytest.fixture
 def create_contest():
     def _method(owner_uuid, sport_uuid):
-        contest = services.init_contest(owner_uuid=owner_uuid, status='pending')
+        base = services.Base()
+        contest = base.init(model=model.Contest, owner_uuid=owner_uuid, status='pending')
 
         # contest (possibly handle this asynchronously)
-        _ = services.init_sport(sport_uuid=sport_uuid, contest=contest)
+        _ = base.init(model=model.Sport, sport_uuid=sport_uuid, contest=contest)
 
-        contest = services.save_contest(contest)
+        contest = base.save(instance=contest)
         return contest
 
     return _method
