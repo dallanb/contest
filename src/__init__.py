@@ -33,6 +33,8 @@ logging.config.dictConfig(app.config['LOGGING_CONFIG'])
 from .models import *
 # import routes
 from .routes import *
+# import libs
+from .lib import *
 
 # import common
 from .common import (
@@ -54,6 +56,15 @@ if app.config['ENV'] != 'development':
         return ErrorResponse(code=error.code, msg=error.msg, err=error.err), error.code
 
 
+# before first request
+@app.before_first_request
+def handle_first_request():
+    g.config = app.config
+    g.logger = logging
+    consumer_task = Consumer()
+    consumer_task.start()
+
+
 # before each request
 @app.before_request
 def handle_request():
@@ -61,3 +72,4 @@ def handle_request():
     g.cache = cache
     g.db = db
     g.config = app.config
+    g.producer = Producer()
