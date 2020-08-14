@@ -10,5 +10,6 @@ class PingAPI(Base):
 
     @marshal_with(MessageResponse.marshallable())
     def get(self):
+        
         g.producer.send(topic='dallan', value=b'pong')
         return MessageResponse(message='pong')

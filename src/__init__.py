@@ -55,14 +55,16 @@ if app.config['ENV'] != 'development':
     def handle_manual_error(error):
         return ErrorResponse(code=error.code, msg=error.msg, err=error.err), error.code
 
+# kafka
+consumer_task = Consumer(host=app.config['KAFKA_HOST'], port=app.config['KAFKA_PORT'],
+                         topics=app.config['KAFKA_TOPICS'])
+producer_task = Producer(host=app.config['KAFKA_HOST'], port=app.config['KAFKA_PORT'])
 
-# before first request
+
 @app.before_first_request
 def handle_first_request():
-    g.config = app.config
-    g.logger = logging
-    consumer_task = Consumer()
     consumer_task.start()
+    producer_task.start()
 
 
 # before each request
@@ -72,4 +74,4 @@ def handle_request():
     g.cache = cache
     g.db = db
     g.config = app.config
-    g.producer = Producer()
+    g.producer = producer_task
