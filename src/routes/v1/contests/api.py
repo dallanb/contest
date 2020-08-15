@@ -4,16 +4,19 @@ from .schema import *
 from ..base import Base
 from ....common.response import DataResponse
 from ....common.auth import check_user
-from ....models import Contest, Sport
+from ....services import Contest, Sport
 
 
 class ContestsAPI(Base):
     def __init__(self):
         Base.__init__(self)
+        self.contest = Contest()
 
     @marshal_with(DataResponse.marshallable())
     def get(self, uuid):
-        contests = self.find(model=Contest, uuid=uuid, not_found=self.code.NOT_FOUND)
+        contests = self.contest.find(uuid=uuid)
+        if not contests.total:
+            self.throw_error(http_code=self.code.NOT_FOUND)
         return DataResponse(
             data={
                 'contests': self.dump(
@@ -27,11 +30,13 @@ class ContestsAPI(Base):
 class ContestsListAPI(Base):
     def __init__(self):
         Base.__init__(self)
+        self.contest = Contest()
+        self.sport = Sport()
 
     @marshal_with(DataResponse.marshallable())
     def get(self):
         data = self.clean(schema=fetch_all_schema, instance=request.args)
-        contests = self.find(model=Contest, **data)
+        contests = self.contest.find(**data)
         return DataResponse(
             data={
                 '_metadata': self.prepare_metadata(
@@ -53,15 +58,8 @@ class ContestsListAPI(Base):
     @check_user
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        contest = self.init(model=Contest, status='pending', owner_uuid=g.user)
-        sport = self.init(model=Sport, sport_uuid=data['sport_uuid'], contest=contest)
-        contest = self.save(instance=contest)
-        _ = self.save(instance=sport)
-        _ = self.notify(
-            topic='contests',
-            value=contest.uuid,
-            key='contest_created'
-        )
+        contest = self.contest.create(status='pending', owner_uuid=g.user)
+        _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
         return DataResponse(
             data={
                 'contests': self.dump(
