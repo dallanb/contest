@@ -1,5 +1,5 @@
 import pytest
-from src import services
+from src import services, models
 
 
 @pytest.fixture
