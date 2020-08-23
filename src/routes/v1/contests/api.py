@@ -14,14 +14,32 @@ class ContestsAPI(Base):
 
     @marshal_with(DataResponse.marshallable())
     def get(self, uuid):
-        contests = self.contest.find(uuid=uuid)
+        data = self.clean(schema=fetch_schema, instance=request.args)
+        contests = self.contest.find(uuid=uuid, **data)
         if not contests.total:
             self.throw_error(http_code=self.code.NOT_FOUND)
         return DataResponse(
             data={
                 'contests': self.dump(
                     schema=dump_schema,
-                    instance=contests.items[0]
+                    instance=contests.items[0],
+                    params={
+                        'include': data['include'],
+                        'expand': data['expand']
+                    }
+                )
+            }
+        )
+
+    @marshal_with(DataResponse.marshallable())
+    def put(self, uuid):
+        data = self.clean(schema=update_schema, instance=request.get_json())
+        contest = self.contest.update(uuid=uuid, **data)
+        return DataResponse(
+            data={
+                'contest': self.dump(
+                    schema=dump_schema,
+                    instance=contest
                 )
             }
         )
@@ -48,7 +66,8 @@ class ContestsListAPI(Base):
                     schema=dump_many_schema,
                     instance=contests.items,
                     params={
-                        'include': data['include']
+                        'include': data['include'],
+                        'expand': data['expand']
                     }
                 )
             }

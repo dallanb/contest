@@ -13,6 +13,7 @@ class Contest(db.Model, BaseMixin):
     # Relationship
     contest_status = db.relationship("ContestStatus")
     participants = db.relationship("Participant", back_populates="contest", lazy="noload")
+    sport = db.relationship("Sport", uselist=False, back_populates="contest")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

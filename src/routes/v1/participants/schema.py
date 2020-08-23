@@ -31,6 +31,10 @@ class DumpParticipantSchema(Schema):
         return data
 
 
+class UpdateParticipantsSchema(Schema):
+    status = fields.Str(required=True)
+
+
 class FetchAllParticipantSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
@@ -42,4 +46,5 @@ class FetchAllParticipantSchema(Schema):
 create_schema = CreateParticipantSchema()
 dump_schema = DumpParticipantSchema()
 dump_many_schema = DumpParticipantSchema(many=True)
+update_schema = UpdateParticipantsSchema()
 fetch_all_schema = FetchAllParticipantSchema()
