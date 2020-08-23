@@ -26,6 +26,19 @@ class ParticipantsAPI(Base):
             }
         )
 
+    @marshal_with(DataResponse.marshallable())
+    def put(self, uuid):
+        data = self.clean(schema=update_schema, instance=request.get_json())
+        participant = self.participant.update(uuid=uuid, **data)
+        return DataResponse(
+            data={
+                'participant': self.dump(
+                    schema=dump_schema,
+                    instance=participant
+                )
+            }
+        )
+
 
 class ParticipantsListAPI(Base):
     def __init__(self):

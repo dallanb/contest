@@ -10,7 +10,7 @@ class Sport(db.Model, BaseMixin):
     contest_uuid = db.Column(UUIDType(binary=False), db.ForeignKey('contest.uuid'), nullable=False)
 
     # Relationship
-    contest = db.relationship("Contest")
+    contest = db.relationship("Contest", back_populates="sport")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

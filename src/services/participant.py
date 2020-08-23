@@ -1,4 +1,5 @@
 import logging
+from http import HTTPStatus
 from .base import Base
 from ..models import Participant as ParticipantModel
 
@@ -14,4 +15,14 @@ class Participant(Base):
 
     def create(self, **kwargs):
         participant = self.init(model=self.participant_model, **kwargs)
+        return self.save(instance=participant)
+
+    def update(self, uuid, **kwargs):
+        participants = self.find(uuid=uuid)
+        if not participants.total:
+            self.error(code=HTTPStatus.NOT_FOUND)
+        return self.apply(instance=participants.items[0], **kwargs)
+
+    def apply(self, instance, **kwargs):
+        participant = self.assign_attr(instance=instance, attr=kwargs)
         return self.save(instance=participant)
