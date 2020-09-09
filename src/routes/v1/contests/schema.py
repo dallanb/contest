@@ -50,6 +50,8 @@ class FetchContestSchema(Schema):
 class FetchAllContestSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
+    limit = fields.Int(required=False, missing=None)
+    offset = fields.Int(required=False, missing=None)
     include = fields.DelimitedList(fields.String(), required=False, missing=[])
     expand = fields.DelimitedList(fields.String(), required=False, missing=[])
     owner_uuid = fields.UUID(required=False)

@@ -25,6 +25,7 @@ class Contest(Base):
         return self.apply(instance=contests.items[0], **kwargs)
 
     def apply(self, instance, **kwargs):
+        # if contest status is being updated we will trigger a notification
         notification = f'contest_{kwargs["status"]}' if kwargs.get('status') and instance.status != kwargs.get(
             'status') else None
         contest = self.assign_attr(instance=instance, attr=kwargs)
