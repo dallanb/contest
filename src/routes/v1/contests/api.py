@@ -1,10 +1,11 @@
 from flask import request, g
 from flask_restful import marshal_with
+
 from .schema import *
 from ..base import Base
-from ....common.response import DataResponse
 from ....common.auth import check_user
-from ....services import Contest, Sport
+from ....common.response import DataResponse
+from ....services import Contest, Sport, Participant
 
 
 class ContestsAPI(Base):
@@ -50,6 +51,7 @@ class ContestsListAPI(Base):
         Base.__init__(self)
         self.contest = Contest()
         self.sport = Sport()
+        self.participant = Participant()
 
     @marshal_with(DataResponse.marshallable())
     def get(self):
@@ -79,6 +81,11 @@ class ContestsListAPI(Base):
         data = self.clean(schema=create_schema, instance=request.get_json())
         contest = self.contest.create(status='pending', owner_uuid=g.user)
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
+
+        participants = data.pop('participants')
+        if participants:
+            for user_uuid in participants:
+                self.participant.create(user_uuid=user_uuid, status='pending', contest=contest)
         return DataResponse(
             data={
                 'contests': self.dump(
