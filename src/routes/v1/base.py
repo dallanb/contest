@@ -1,7 +1,9 @@
+from http import HTTPStatus
+
 from flask import g
 from flask_restful import Resource
-from http import HTTPStatus
 from marshmallow import ValidationError
+
 from ...common.error import ManualException
 from ...services import Base as Service
 
@@ -55,10 +57,5 @@ class Base(Resource):
         raise ManualException(code=code, msg=msg, err=err)
 
     @staticmethod
-    def prepare_metadata(total_count, page_count, page, per_page):
-        return {
-            'total_count': total_count,
-            'page_count': page_count,
-            'page': page,
-            'per_page': per_page
-        }
+    def prepare_metadata(**kwargs):
+        return dict(**kwargs)

@@ -1,8 +1,9 @@
-from marshmallow import validate, Schema, post_dump
-from webargs import fields
+from marshmallow import Schema, post_dump
 from marshmallow_enum import EnumField
-from ....common import ContestStatusEnum
+from webargs import fields
+
 from ..sports.schema import DumpSportsSchema
+from ....common import ContestStatusEnum
 
 
 class CreateContestSchema(Schema):
@@ -50,8 +51,6 @@ class FetchContestSchema(Schema):
 class FetchAllContestSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
-    limit = fields.Int(required=False, missing=None)
-    offset = fields.Int(required=False, missing=None)
     include = fields.DelimitedList(fields.String(), required=False, missing=[])
     expand = fields.DelimitedList(fields.String(), required=False, missing=[])
     owner_uuid = fields.UUID(required=False)

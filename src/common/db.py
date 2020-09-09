@@ -1,9 +1,11 @@
 import collections
+
 import inflect
 from sqlalchemy import inspect
-from ..common.error import *
-from ..common.cleaner import Cleaner
+
 from .. import db
+from ..common.cleaner import Cleaner
+from ..common.error import *
 
 
 class DB:

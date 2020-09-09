@@ -1,9 +1,10 @@
 from flask import request, g
 from flask_restful import marshal_with
+
 from .schema import *
 from ..base import Base
-from ....common.response import DataResponse
 from ....common.auth import check_user
+from ....common.response import DataResponse
 from ....services import Contest, Sport
 
 
