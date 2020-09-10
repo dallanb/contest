@@ -1,13 +1,15 @@
-from marshmallow import validate, Schema, post_dump
-from webargs import fields
+from marshmallow import Schema, post_dump
 from marshmallow_enum import EnumField
-from ....common import ContestStatusEnum
+from webargs import fields
+
 from ..sports.schema import DumpSportsSchema
+from ....common import ContestStatusEnum
 
 
 class CreateContestSchema(Schema):
     owner_uuid = fields.UUID()
     sport_uuid = fields.UUID()
+    participants = fields.List(fields.UUID(), missing=None)
 
 
 class DumpContestSchema(Schema):

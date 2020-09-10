@@ -12,7 +12,7 @@ app.config.from_object("src.config.Config")
 # cache
 cache = Cache(app, config=app.config['REDIS_CONFIG'])
 # cors
-CORS(app)
+CORS(app, supports_credentials=True)
 # db
 db = SQLAlchemy(app)
 # migrate
@@ -65,10 +65,11 @@ if app.config['ENV'] != 'development':
         return ErrorResponse(code=error.code, msg=error.msg, err=error.err), error.code
 
 
-@app.before_first_request
-def handle_first_request():
-    consumer.start()
-    producer.start()
+#
+# @app.before_first_request
+# def handle_first_request():
+#     consumer.start()
+#     producer.start()
 
 
 # before each request
