@@ -18,6 +18,7 @@ class DumpContestSchema(Schema):
     ctime = fields.Integer()
     mtime = fields.Integer()
     owner_uuid = fields.UUID()
+    name = fields.String()
     status = EnumField(ContestStatusEnum)
     participants = fields.List(fields.Nested('DumpParticipantSchema'))
     sport = fields.Nested(DumpSportsSchema, exclude=('contest',))
