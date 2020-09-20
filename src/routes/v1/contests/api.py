@@ -85,8 +85,10 @@ class ContestsListAPI(Base):
         participants = data.pop('participants')
         if participants:
             for user_uuid in participants:
-                status = 'active' if g.user == user_uuid else 'pending'
-                self.participant.create(user_uuid=user_uuid, status=status, contest=contest)
+                if g.user == user_uuid:
+                    self.participant.create_self(user_uuid=user_uuid, status='active', contest=contest)
+                else:
+                    self.participant.create_other(user_uuid=user_uuid, status='pending', contest=contest)
         return DataResponse(
             data={
                 'contests': self.dump(
