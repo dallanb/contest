@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, g
 from flask_restful import marshal_with
 
 from .schema import *
@@ -85,7 +85,8 @@ class ContestsListAPI(Base):
         participants = data.pop('participants')
         if participants:
             for user_uuid in participants:
-                self.participant.create(user_uuid=user_uuid, status='pending', contest=contest)
+                status = 'active' if g.user == user_uuid else 'pending'
+                self.participant.create(user_uuid=user_uuid, status=status, contest=contest)
         return DataResponse(
             data={
                 'contests': self.dump(
