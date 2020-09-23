@@ -2,6 +2,7 @@ from functools import wraps
 
 from ..common import ParticipantStatusEnum
 from ..models import Contest
+from ..common import DB
 
 
 class participant_notification:
@@ -48,7 +49,7 @@ class participant_notification:
     def update(self, prev_instance, new_instance):
         if prev_instance and prev_instance['status'].name != new_instance.status.name:
             key = f'participant_{new_instance.status.name}'
-            contests = Contest().find(uuid=str(new_instance.contest_uuid))
+            contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
             owner_uuid = contests.items[0].owner_uuid if contests.total else None
             value = {
                 'contest_uuid': str(new_instance.contest_uuid),
