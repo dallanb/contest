@@ -1,7 +1,9 @@
 import logging
+
 from http import HTTPStatus
 from .base import Base
 from ..models import Contest as ContestModel
+from ..decorators import contest_notification
 
 
 class Contest(Base):
@@ -13,9 +15,9 @@ class Contest(Base):
     def find(self, **kwargs):
         return Base.find(self, model=self.contest_model, **kwargs)
 
+    @contest_notification(operation='create')
     def create(self, **kwargs):
         contest = self.init(model=self.contest_model, **kwargs)
-        _ = self.notify(topic='contests', value={'uuid': str(contest.uuid)}, key='contest_created')
         return self.save(instance=contest)
 
     def update(self, uuid, **kwargs):
@@ -24,11 +26,8 @@ class Contest(Base):
             self.error(code=HTTPStatus.NOT_FOUND)
         return self.apply(instance=contests.items[0], **kwargs)
 
+    @contest_notification(operation='update')
     def apply(self, instance, **kwargs):
         # if contest status is being updated we will trigger a notification
-        notification = f'contest_{kwargs["status"]}' if kwargs.get('status') and instance.status != kwargs.get(
-            'status') else None
         contest = self.assign_attr(instance=instance, attr=kwargs)
-        if notification:
-            _ = self.notify(topic='contests', value={'uuid': str(contest.uuid)}, key=notification)
         return self.save(instance=contest)

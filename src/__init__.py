@@ -1,5 +1,4 @@
 from flask import Flask, g
-from flask_caching import Cache
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
@@ -66,11 +65,10 @@ if app.config['ENV'] != 'development':
         return ErrorResponse(code=error.code, msg=error.msg, err=error.err), error.code
 
 
-#
-# @app.before_first_request
-# def handle_first_request():
-#     consumer.start()
-#     producer.start()
+@app.before_first_request
+def handle_first_request():
+    consumer.start()
+    producer.start()
 
 
 # before each request
