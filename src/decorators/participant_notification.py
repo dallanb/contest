@@ -38,11 +38,13 @@ class participant_notification:
     def create(self, new_instance):
         if new_instance.status == ParticipantStatusEnum['pending']:
             key = 'participant_invited'
+            contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
+            owner_uuid = contests.items[0].owner_uuid if contests.total else None
             value = {
                 'contest_uuid': str(new_instance.contest_uuid),
                 'participant_uuid': str(new_instance.uuid),
                 'user_uuid': str(new_instance.user_uuid),
-                'owner_uuid': str(new_instance.contest.owner_uuid)
+                'owner_uuid': str(owner_uuid)
             }
             self.service.notify(topic=self.topic, value=value, key=key)
 
