@@ -79,13 +79,14 @@ class ContestsListAPI(Base):
     @check_user
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        contest = self.contest.create(status='pending', owner_uuid=g.user)
+        contest = self.contest.create(status='pending', owner_uuid=data['owner_uuid'], name=data['name'])
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
 
         participants = data.pop('participants')
         if participants:
             for user_uuid in participants:
-                self.participant.create(user_uuid=user_uuid, status='pending', contest=contest)
+                status = 'active' if g.user == user_uuid else 'pending'
+                self.participant.create(user_uuid=user_uuid, status=status, contest=contest)
         return DataResponse(
             data={
                 'contests': self.dump(

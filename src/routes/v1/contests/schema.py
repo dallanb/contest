@@ -9,6 +9,7 @@ from ....common import ContestStatusEnum
 class CreateContestSchema(Schema):
     owner_uuid = fields.UUID()
     sport_uuid = fields.UUID()
+    name = fields.String()
     participants = fields.List(fields.UUID(), missing=None)
 
 
@@ -17,6 +18,7 @@ class DumpContestSchema(Schema):
     ctime = fields.Integer()
     mtime = fields.Integer()
     owner_uuid = fields.UUID()
+    name = fields.String()
     status = EnumField(ContestStatusEnum)
     participants = fields.List(fields.Nested('DumpParticipantSchema'))
     sport = fields.Nested(DumpSportsSchema, exclude=('contest',))
@@ -41,7 +43,8 @@ class DumpContestSchema(Schema):
 
 
 class UpdateContestSchema(Schema):
-    status = fields.Str(required=True)
+    name = fields.Str(required=False)
+    status = fields.Str(required=False)
 
 
 class FetchContestSchema(Schema):

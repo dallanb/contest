@@ -1,14 +1,14 @@
 version: "3.2"
 
 services:
-  adminer:
-    container_name: adminer
-    build:
-      context: ${HUNCHO_DIR}/services/adminer
-      dockerfile: ${HUNCHO_DIR}/services/adminer/build/Dockerfile
-    restart: always
-    ports:
-      - 8090:8080
+#  adminer:
+#    container_name: adminer
+#    build:
+#      context: ${HUNCHO_DIR}/services/adminer
+#      dockerfile: ${HUNCHO_DIR}/services/adminer/build/Dockerfile
+#    restart: always
+#    ports:
+#      - 8090:8080
   contest:
     container_name: contest
     build:
@@ -32,24 +32,7 @@ services:
       timeout: 5s
       retries: 5
     depends_on:
-      - contest_cache
       - contest_db
-  contest_cache:
-    container_name: contest_cache
-    build:
-      context: ${HUNCHO_DIR}/services/redis
-      dockerfile: ${HUNCHO_DIR}/services/redis/build/Dockerfile
-    restart: unless-stopped
-    volumes:
-      - ${HUNCHO_DIR}/data/dev/contest_cache/redis_data:/var/lib/redis
-      - ${HUNCHO_DIR}/data/dev/contest_cache/redis.conf:/usr/local/etc/redis/redis.conf
-    env_file:
-      - ${HUNCHO_DIR}/env/dev/.env.contest_cache
-    healthcheck:
-      test: ["CMD", "redis-cli","ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
   contest_db:
     container_name: contest_db
     build:
@@ -80,3 +63,8 @@ services:
       - 80:80
     depends_on:
       - contest
+
+networks:
+  default:
+    external:
+      name: build_app-net
