@@ -32,7 +32,7 @@ class ParticipantsAPI(Base):
         participant = self.participant.update(uuid=uuid, **data)
         return DataResponse(
             data={
-                'participant': self.dump(
+                'participants': self.dump(
                     schema=dump_schema,
                     instance=participant
                 )
