@@ -34,7 +34,7 @@ class contest_notification:
 
     def create(self, new_instance):
         key = 'contest_created'
-        value = {'uuid': str(new_instance.uuid)}
+        value = {'uuid': str(new_instance.uuid), 'owner_uuid': str(new_instance.owner_uuid)}
         self.service.notify(topic=self.topic, value=value, key=key)
 
     def update(self, prev_instance, new_instance):
