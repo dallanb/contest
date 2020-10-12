@@ -38,7 +38,7 @@ class ContestsAPI(Base):
         contest = self.contest.update(uuid=uuid, **data)
         return DataResponse(
             data={
-                'contest': self.dump(
+                'contests': self.dump(
                     schema=dump_schema,
                     instance=contest
                 )
