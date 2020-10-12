@@ -17,6 +17,10 @@ class Config(object):
     KAFKA_HOST = os.getenv("KAFKA_HOST")
     KAFKA_PORT = os.getenv("KAFKA_PORT")
     KAFKA_TOPICS = os.getenv("KAFKA_TOPICS").split(",")
+    S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY")
+    S3_SECRET_KEY = os.getenv("S3_SECRET_KEY")
+    S3_BUCKET = os.getenv("S3_BUCKET")
+    S3_FILEPATH = os.getenv("S3_FILEPATH")
     REDIS_CONFIG = {
         'CACHE_TYPE': 'redis',
         'CACHE_REDIS_HOST': os.getenv("CACHE_HOST"),

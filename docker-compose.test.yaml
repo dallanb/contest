@@ -26,6 +26,7 @@ services:
       - ${HUNCHO_DIR}/services/contest/setup.py:/home/app/setup.py
     env_file:
       - ${HUNCHO_DIR}/env/test/.env.contest
+      - ${HUNCHO_DIR}/secrets/s3/credentials.txt
     healthcheck:
       test: curl --fail -s contest:5000/ping || exit 1
       interval: 60s
@@ -41,7 +42,7 @@ services:
 #      dockerfile: ${HUNCHO_DIR}/services/redis/build/Dockerfile
 #    restart: unless-stopped
 #    volumes:
-#      - ${HUNCHO_DIR}/data/test/contest_cache/redis_data:/var/lib/redis
+#      - ${HUNCHO_DIR}/data/test/contest_cache/redis_data:/var/libs/redis
 #      - ${HUNCHO_DIR}/data/test/contest_cache/redis.conf:/usr/local/etc/redis/redis.conf
 #    env_file:
 #      - ${HUNCHO_DIR}/env/test/.env.contest_cache
@@ -60,7 +61,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ${HUNCHO_DIR}/data/test/contest_db/data:/var/lib/postgresql/data/
+      - ${HUNCHO_DIR}/data/test/contest_db/data:/var/libs/postgresql/data/
     env_file:
       - ${HUNCHO_DIR}/env/test/.env.contest_db
     healthcheck:

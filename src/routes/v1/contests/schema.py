@@ -3,6 +3,8 @@ from marshmallow_enum import EnumField
 from webargs import fields
 
 from ..sports.schema import DumpSportsSchema
+from ..avatars.schema import DumpAvatarSchema
+
 from ....common import ContestStatusEnum
 
 
@@ -10,7 +12,9 @@ class CreateContestSchema(Schema):
     owner_uuid = fields.UUID()
     sport_uuid = fields.UUID()
     name = fields.String()
+    start_time = fields.Integer()
     participants = fields.List(fields.UUID(), missing=None)
+    avatar = fields.Nested(DumpAvatarSchema)
 
 
 class DumpContestSchema(Schema):
@@ -19,6 +23,7 @@ class DumpContestSchema(Schema):
     mtime = fields.Integer()
     owner_uuid = fields.UUID()
     name = fields.String()
+    start_time = fields.Integer()
     status = EnumField(ContestStatusEnum)
     participants = fields.List(fields.Nested('DumpParticipantSchema'))
     sport = fields.Nested(DumpSportsSchema, exclude=('contest',))
@@ -26,6 +31,9 @@ class DumpContestSchema(Schema):
     def get_attribute(self, obj, attr, default):
         if attr == 'participants':
             return getattr(obj, attr, default) if any(
+                attr in include for include in self.context.get('include', [])) else None
+        if attr == 'avatar':
+            return getattr(obj, attr, default) or {} if any(
                 attr in include for include in self.context.get('include', [])) else None
         if attr == 'sport':
             return getattr(obj, attr, default) if any(
@@ -37,6 +45,8 @@ class DumpContestSchema(Schema):
     def make_obj(self, data, **kwargs):
         if data.get('participants', False) is None:
             del data['participants']
+        if data.get('avatar', False) is None:
+            del data['avatar']
         if data.get('sport', False) is None:
             del data['sport']
         return data
@@ -45,6 +55,7 @@ class DumpContestSchema(Schema):
 class UpdateContestSchema(Schema):
     name = fields.Str(required=False)
     status = fields.Str(required=False)
+    start_time = fields.Integer(required=False)
 
 
 class FetchContestSchema(Schema):

@@ -28,6 +28,7 @@ services:
       - ${HUNCHO_DIR}/services/contest/setup.py:/home/app/setup.py
     env_file:
       - ${HUNCHO_DIR}/env/qaw/.env.contest
+      - ${HUNCHO_DIR}/secrets/s3/credentials.txt
     healthcheck:
       test: curl --fail -s contest:5000/ping || exit 1
       interval: 10s
@@ -45,7 +46,7 @@ services:
       args:
         POSTGRES_VERSION: 9.6
     volumes:
-      - ${HUNCHO_DIR}/data/qaw/contest_db/data:/var/lib/postgresql/data/
+      - ${HUNCHO_DIR}/data/qaw/contest_db/data:/var/libs/postgresql/data/
     env_file:
       - ${HUNCHO_DIR}/env/qaw/.env.contest_db
     healthcheck:
