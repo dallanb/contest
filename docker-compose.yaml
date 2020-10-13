@@ -1,14 +1,14 @@
 version: "3.2"
 
 services:
-#  adminer:
-#    container_name: adminer
-#    build:
-#      context: ${HUNCHO_DIR}/services/adminer
-#      dockerfile: ${HUNCHO_DIR}/services/adminer/build/Dockerfile
-#    restart: always
-#    ports:
-#      - 8090:8080
+  adminer:
+    container_name: adminer
+    image: adminer:latest
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - app-net
   contest:
     container_name: contest
     build:
@@ -34,13 +34,11 @@ services:
       retries: 5
     depends_on:
       - contest_db
+    networks:
+      - app-net
   contest_db:
     container_name: contest_db
-    build:
-      context: ${HUNCHO_DIR}/services/postgresql
-      dockerfile: ${HUNCHO_DIR}/services/postgresql/build/Dockerfile
-      args:
-        POSTGRES_VERSION: 9.6
+    image: postgres:9.6
     ports:
       - 5432:5432
     volumes:
@@ -52,6 +50,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 20
+    networks:
+      - app-net
   contest_proxy:
     container_name: contest_proxy
     build:
@@ -64,8 +64,9 @@ services:
       - 80:80
     depends_on:
       - contest
+    networks:
+      - app-net
 
 networks:
-  default:
-    external:
-      name: build_app-net
+  app-net:
+    driver: bridge
