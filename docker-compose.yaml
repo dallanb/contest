@@ -24,6 +24,8 @@ services:
       - ${HUNCHO_DIR}/services/contest/statics:/home/app/statics
       - ${HUNCHO_DIR}/services/contest/manage.py:/home/app/manage.py
       - ${HUNCHO_DIR}/services/contest/setup.py:/home/app/setup.py
+    ports:
+      - 20001:5000
     env_file:
       - ${HUNCHO_DIR}/env/dev/.env.contest
       - ${HUNCHO_DIR}/secrets/s3/credentials.txt
