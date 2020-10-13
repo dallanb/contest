@@ -3,9 +3,7 @@ version: "3.2"
 services:
   adminer:
     container_name: adminer
-    build:
-      context: ${HUNCHO_DIR}/services/adminer
-      dockerfile: ${HUNCHO_DIR}/services/adminer/build/Dockerfile
+    image: adminer:latest
     restart: always
     ports:
       - 8080:8080
@@ -28,6 +26,7 @@ services:
       - ${HUNCHO_DIR}/services/contest/setup.py:/home/app/setup.py
     env_file:
       - ${HUNCHO_DIR}/env/qaw/.env.contest
+      - ${HUNCHO_DIR}/secrets/s3/credentials.txt
     healthcheck:
       test: curl --fail -s contest:5000/ping || exit 1
       interval: 10s
@@ -39,13 +38,9 @@ services:
       - app-net
   contest_db:
     container_name: contest_db
-    build:
-      context: ${HUNCHO_DIR}/services/postgresql
-      dockerfile: ${HUNCHO_DIR}/services/postgresql/build/Dockerfile
-      args:
-        POSTGRES_VERSION: 9.6
+    image: postgres:9.6
     volumes:
-      - ${HUNCHO_DIR}/data/qaw/contest_db/data:/var/lib/postgresql/data/
+      - ${HUNCHO_DIR}/data/qaw/contest_db/data:/var/libs/postgresql/data/
     env_file:
       - ${HUNCHO_DIR}/env/qaw/.env.contest_db
     healthcheck:
@@ -70,6 +65,5 @@ services:
     networks:
       - app-net
 networks:
-    app-net:
-        external:
-            name: build_app-net
+  app-net:
+    driver: bridge

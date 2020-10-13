@@ -21,3 +21,16 @@ def generate_uuid():
 
 def camel_to_snake(s):
     return ''.join(['_' + c.lower() if c.isupper() else c for c in s]).lstrip('_')
+
+
+def file_extension(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1]
+
+
+def allowed_file(filename):
+    return file_extension(filename) in app.config["ALLOWED_EXTENSIONS"]
+
+
+def s3_object_name(filename):
+    return f"{app.config['S3_FILEPATH']}{filename}"

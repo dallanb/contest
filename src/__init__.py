@@ -30,7 +30,7 @@ import logging.config
 logging.config.dictConfig(app.config['LOGGING_CONFIG'])
 
 # import libs
-from .lib import *
+from .libs import *
 
 # event
 producer = Producer(host=app.config['KAFKA_HOST'], port=app.config['KAFKA_PORT'])
