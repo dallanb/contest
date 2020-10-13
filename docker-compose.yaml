@@ -41,8 +41,6 @@ services:
   contest_db:
     container_name: contest_db
     image: postgres:9.6
-    ports:
-      - 5432:5432
     volumes:
       - ${HUNCHO_DIR}/data/dev/contest_db/data:/var/libs/postgresql/data/
     env_file:
@@ -54,21 +52,6 @@ services:
       retries: 20
     networks:
       - app-net
-  contest_proxy:
-    container_name: contest_proxy
-    build:
-      context: ${HUNCHO_DIR}/services/contest/proxy
-      dockerfile: ${HUNCHO_DIR}/services/contest/proxy/build/Dockerfile
-    restart: on-failure
-    volumes:
-      - ${HUNCHO_DIR}/services/contest/statics/.:/usr/share/nginx/
-    ports:
-      - 80:80
-    depends_on:
-      - contest
-    networks:
-      - app-net
-
 networks:
   app-net:
     driver: bridge

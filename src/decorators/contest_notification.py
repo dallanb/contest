@@ -38,7 +38,7 @@ class contest_notification:
         self.service.notify(topic=self.topic, value=value, key=key)
 
     def update(self, prev_instance, new_instance):
-        if prev_instance and prev_instance['status'].name != new_instance.status.name:
+        if prev_instance and prev_instance.get('status') and prev_instance['status'].name != new_instance.status.name:
             key = f'contest_{new_instance.status.name}'
             value = {'uuid': str(new_instance.uuid), 'owner_uuid': str(new_instance.owner_uuid)}
             self.service.notify(topic=self.topic, value=value, key=key)

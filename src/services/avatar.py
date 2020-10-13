@@ -2,7 +2,7 @@ import logging
 from http import HTTPStatus
 from .. import app
 from .base import Base
-from ..models import ContestAvatar as ContestAvatarModel
+from ..models import Avatar as AvatarModel
 from ..libs import S3
 from ..common.utils import s3_object_name
 
@@ -12,7 +12,7 @@ class Avatar(Base):
         Base.__init__(self)
         self.logger = logging.getLogger(__name__)
         self.s3 = S3(aws_access_key_id=app.config['S3_ACCESS_KEY'], aws_secret_access_key=app.config['S3_SECRET_KEY'])
-        self.avatar_model = ContestAvatarModel
+        self.avatar_model = AvatarModel
 
     def find(self, **kwargs):
         return Base.find(self, model=self.avatar_model, **kwargs)

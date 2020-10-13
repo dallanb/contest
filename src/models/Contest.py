@@ -11,11 +11,11 @@ class Contest(db.Model, BaseMixin):
 
     # FK
     status = db.Column(db.Enum(ContestStatusEnum), db.ForeignKey('contest_status.name'), nullable=False)
-    avatar_uuid = db.Column(UUIDType(binary=False), db.ForeignKey('contest_avatar.uuid'), nullable=True)
+    avatar_uuid = db.Column(UUIDType(binary=False), db.ForeignKey('avatar.uuid'), nullable=True)
 
     # Relationship
     contest_status = db.relationship("ContestStatus")
-    contest_avatar = db.relationship("ContestAvatar", back_populates="contest", lazy="noload")
+    avatar = db.relationship("Avatar", back_populates="contest", lazy="noload")
     participants = db.relationship("Participant", back_populates="contest", lazy="noload")
     sport = db.relationship("Sport", uselist=False, back_populates="contest")
 

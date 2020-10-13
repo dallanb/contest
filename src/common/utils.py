@@ -1,6 +1,8 @@
 import uuid as UUID
 from time import time
 
+from .. import app
+
 
 def generate_hash(items):
     frozen = frozenset(items)
