@@ -17,7 +17,7 @@ class AvatarsAPI(Base):
     @marshal_with(DataResponse.marshallable())
     @check_user
     def post(self, uuid):
-        data = self.clean(schema=create_schema, instance=request.files)
+        data = self.clean(schema=create_schema, instance={**request.files.to_dict(), 'uuid': uuid})
 
         contests = self.contest.find(uuid=uuid, include=['avatar'])
         if not contests.total:
