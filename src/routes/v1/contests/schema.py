@@ -14,7 +14,6 @@ class CreateContestSchema(Schema):
     name = fields.String()
     start_time = fields.Integer()
     participants = fields.List(fields.UUID(), missing=None)
-    avatar = fields.Nested(DumpAvatarSchema)
 
 
 class DumpContestSchema(Schema):
@@ -26,6 +25,7 @@ class DumpContestSchema(Schema):
     start_time = fields.Integer()
     status = EnumField(ContestStatusEnum)
     participants = fields.List(fields.Nested('DumpParticipantSchema'))
+    avatar = fields.Nested(DumpAvatarSchema)
     sport = fields.Nested(DumpSportsSchema, exclude=('contest',))
 
     def get_attribute(self, obj, attr, default):

@@ -50,20 +50,6 @@ services:
       retries: 20
     networks:
       - app-net
-  contest_proxy:
-    container_name: contest_proxy
-    build:
-      context: ${HUNCHO_DIR}/services/contest/proxy
-      dockerfile: ${HUNCHO_DIR}/services/contest/proxy/build/Dockerfile
-    restart: on-failure
-    volumes:
-      - ${HUNCHO_DIR}/services/contest/statics/.:/usr/share/nginx/
-    ports:
-      - 80:80
-    depends_on:
-      - contest
-    networks:
-      - app-net
 networks:
   app-net:
     driver: bridge

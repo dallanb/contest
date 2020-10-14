@@ -79,7 +79,8 @@ class ContestsListAPI(Base):
     @check_user
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        contest = self.contest.create(status='pending', owner_uuid=data['owner_uuid'], name=data['name'])
+        contest = self.contest.create(status='pending', owner_uuid=data['owner_uuid'], name=data['name'],
+                                      start_time=data['start_time'])
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
 
         participants = data.pop('participants')
