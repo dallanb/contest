@@ -12,12 +12,13 @@ class CreateAvatarSchema(Schema):
 
     @pre_load
     def clean_avatar(self, in_data, **kwargs):
-        in_data = in_data.to_dict()
         avatar = in_data['avatar']
         assert allowed_file(avatar.filename), "Invalid file type"
         in_data['filename'] = secure_filename(avatar.filename)
-        in_data['s3_filename'] = f"{g.user}.{file_extension(avatar.filename)}"
+        in_data['s3_filename'] = f"{in_data['uuid']}.{file_extension(avatar.filename)}"
         in_data['avatar'].filename = in_data['s3_filename']
+        # remove uuid now that it has been used
+        del in_data['uuid']
         return in_data
 
 
