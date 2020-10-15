@@ -1,5 +1,4 @@
 import json
-import logging
 import threading
 import time
 
@@ -33,5 +32,4 @@ class Producer(threading.Thread):
         return self.producer.bootstrap_connected()
 
     def send(self, **kwargs):
-        logging.info("SENDING MESSAGE")
         self.producer.send(**kwargs)

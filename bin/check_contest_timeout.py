@@ -5,13 +5,16 @@ from datetime import datetime
 from src import Producer, Contest, app
 
 
-# delta is in minutes
+# delta is in days
 def check_contest_timeout(delta):
     logging.info('checking contest timeout')
-    expiry_time = datetime.now() + delta
-    timestamp = int(datetime.timestamp(expiry_time) * 1000)
+    current_time = datetime.now()
+    expiry_time = current_time + delta
 
-    contests = Contest.query.filter(Contest.start_time < timestamp).all()
+    timestamp = int(datetime.timestamp(current_time) * 1000)
+    expiry_timestamp = int(datetime.timestamp(expiry_time) * 1000)
+
+    contests = Contest.query.filter(Contest.start_time > timestamp, Contest.start_time < expiry_timestamp).all()
 
     # eventually attempt to run multiple threads in parallel?
     producer = Producer(host=app.config['KAFKA_HOST'], port=app.config['KAFKA_PORT'])

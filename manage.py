@@ -42,10 +42,8 @@ def initialize_statuses():
 
 
 def check_timeouts():
-    with app.app_context():
-        delta = datetime.timedelta(days=1)
-        check_contest_timeout(delta=delta)
-        return
+    delta = datetime.timedelta(days=1)
+    check_contest_timeout(delta=delta)
 
 
 @cli.command("init")
