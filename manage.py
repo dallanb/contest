@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from flask import g
@@ -42,8 +43,8 @@ def initialize_statuses():
 
 def check_timeouts():
     with app.app_context():
-        g.src = src
-        check_contest_timeout()
+        delta = datetime.timedelta(days=1)
+        check_contest_timeout(delta=delta)
         return
 
 
