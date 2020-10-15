@@ -1,6 +1,7 @@
+import json
+import logging
 import threading
 import time
-import json
 
 from kafka import KafkaProducer
 
@@ -15,7 +16,6 @@ class Producer(threading.Thread):
 
     def stop(self):
         self.stop_event.set()
-        self.producer = None
 
     def run(self):
         self.producer = KafkaProducer(bootstrap_servers=f"{self.host}:{self.port}", key_serializer=str.encode,
@@ -25,6 +25,13 @@ class Producer(threading.Thread):
             time.sleep(1)
 
         self.producer.close()
+        self.producer = None
+
+    def connected(self):
+        if not self.producer:
+            return False
+        return self.producer.bootstrap_connected()
 
     def send(self, **kwargs):
+        logging.info("SENDING MESSAGE")
         self.producer.send(**kwargs)

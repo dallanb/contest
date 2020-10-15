@@ -1,9 +1,12 @@
+import datetime
 import os
+
 from flask import g
 from flask.cli import FlaskGroup
-from src import app, db, common
-from bin import init_participant_status, init_contest_status
+
 import src
+from bin import init_participant_status, init_contest_status, check_contest_timeout
+from src import app, db, common
 
 cli = FlaskGroup(app)
 
@@ -38,6 +41,13 @@ def initialize_statuses():
         return
 
 
+def check_timeouts():
+    with app.app_context():
+        delta = datetime.timedelta(days=1)
+        check_contest_timeout(delta=delta)
+        return
+
+
 @cli.command("init")
 def init():
     full_init()
@@ -61,6 +71,11 @@ def flush_cache():
 @cli.command("init_status")
 def init_status():
     initialize_statuses()
+
+
+@cli.command("check_timeout")
+def check_timeout():
+    check_timeouts()
 
 
 if __name__ == "__main__":
