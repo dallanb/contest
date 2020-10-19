@@ -43,7 +43,7 @@ class Config(object):
                 'stream': 'ext://sys.stdout'
             },
             'debug_rotating_file_handler': {
-                'level': 'DEBUG',
+                'level': 'INFO',
                 'formatter': 'debug',
                 'class': 'logging.handlers.TimedRotatingFileHandler',
                 'filename': 'logs/tapir.log',
@@ -52,7 +52,7 @@ class Config(object):
                 'backupCount': 10
             },
             'error_file_handler': {
-                'level': 'WARNING',
+                'level': 'ERROR',
                 'formatter': 'error',
                 'class': 'logging.FileHandler',
                 'filename': 'logs/error.log',

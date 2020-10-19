@@ -1,5 +1,8 @@
 import uuid as UUID
 from time import time
+from datetime import datetime
+from rfc3339 import rfc3339
+
 
 from .. import app
 
@@ -36,3 +39,34 @@ def allowed_file(filename):
 
 def s3_object_name(filename):
     return f"{app.config['S3_FILEPATH']}{filename}"
+
+
+def request_formatter(request, response, start):
+    now = time()
+    duration = round(now - start, 2)
+    dt = datetime.fromtimestamp(now)
+    timestamp = rfc3339(dt, utc=True)
+
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    host = request.host.split(':', 1)[0]
+    args = dict(request.args)
+
+    log_params = [
+        ('method', request.method),
+        ('path', request.path),
+        ('status', response.status_code),
+        ('duration', duration),
+        ('time', timestamp),
+        ('ip', ip),
+        ('host', host,),
+        ('params', args)
+    ]
+
+    request_id = request.headers.get('X-Request-ID')
+    if request_id:
+        log_params.append(('request_id', request_id))
+
+    parts = []
+    for name, value in log_params:
+        parts.append(f"{name}={value}")
+    return " ".join(parts)

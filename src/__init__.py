@@ -1,4 +1,5 @@
-from flask import Flask, g
+from time import time
+from flask import Flask, g, request
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
@@ -56,14 +57,15 @@ if app.config['ENV'] != 'development':
     @app.errorhandler(Exception)
     @marshal_with(ErrorResponse.marshallable())
     def handle_error(error):
+        logging.error(error)
         return ErrorResponse(), 500
 
 
     @app.errorhandler(ManualException)
     @marshal_with(ErrorResponse.marshallable())
     def handle_manual_error(error):
+        logging.error(error)
         return ErrorResponse(code=error.code, msg=error.msg, err=error.err), error.code
-
 
 if app.config['ENV'] != 'development':
     @app.before_first_request
@@ -76,7 +78,4 @@ if app.config['ENV'] != 'development':
 @app.before_request
 def handle_request():
     g.logger = logging
-    g.cache = cache
-    g.db = db
-    g.config = app.config
-    g.producer = producer
+
