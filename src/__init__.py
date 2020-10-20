@@ -1,5 +1,4 @@
-from time import time
-from flask import Flask, g, request
+from flask import Flask, g
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
@@ -34,11 +33,11 @@ logging.config.dictConfig(app.config['LOGGING_CONFIG'])
 from .libs import *
 
 # event
-producer = Producer(host=app.config['KAFKA_HOST'], port=app.config['KAFKA_PORT'])
+producer = Producer(url=app.config['KAFKA_URL'])
 
 from .event import new_event_listener
 
-consumer = Consumer(host=app.config['KAFKA_HOST'], port=app.config['KAFKA_PORT'],
+consumer = Consumer(url=app.config['KAFKA_URL'],
                     topics=app.config['KAFKA_TOPICS'], event_listener=new_event_listener)
 
 # import models
@@ -78,4 +77,3 @@ if app.config['ENV'] != 'development':
 @app.before_request
 def handle_request():
     g.logger = logging
-
