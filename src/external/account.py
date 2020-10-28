@@ -8,6 +8,6 @@ class Account(Base):
         self.base_url = app.config['ACCOUNT_URL']
 
     def fetch_account(self, uuid):
-        url = f'{self.base_url}/accounts/{uuid}'
+        url = f'{self.base_url}/accounts/membership/{uuid}'
         res = self.get(url=url)
         return res.json()

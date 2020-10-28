@@ -12,8 +12,6 @@ class Event:
 
     @classmethod
     def send(cls, topic, value, key):
-        logging.info(producer)
-        logging.info(producer.producer)
         if producer.producer:
             producer.send(
                 topic=topic,

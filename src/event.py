@@ -1,4 +1,4 @@
-from .services import ContestMaterialized
+from .events import *
 
 
 def new_event_listener(event):
@@ -6,4 +6,4 @@ def new_event_listener(event):
     key = event.key
     data = event.value
     if topic == 'contests':
-        ContestMaterialized().handle_event(key=key, data=data)
+        Contest().handle_event(key=key, data=data)
