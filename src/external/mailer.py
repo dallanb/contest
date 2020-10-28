@@ -1,7 +1,8 @@
 import json
+
 from flask import g
 
-from . import Base
+from .base import Base
 
 
 class Mailer(Base):

@@ -4,6 +4,7 @@ from http import HTTPStatus
 from ..base import Base
 from ..contest import Contest as ContestService
 from ..participant import Participant as ParticipantService
+from ...external import Account as AccountExternal
 from ...models import ContestMaterialized as MaterializedModel
 
 
@@ -14,6 +15,7 @@ class ContestMaterialized(Base):
         self.contest_service = ContestService()
         self.participant_service = ParticipantService()
         self.materialized_model = MaterializedModel
+        self.account_external = AccountExternal()
 
     def find(self, **kwargs):
         return Base.find(self, model=self.materialized_model, **kwargs)
@@ -37,11 +39,16 @@ class ContestMaterialized(Base):
             contests = self.contest_service.find(uuid=data['uuid'])
             if contests.total:
                 contest = contests.items[0]
+                account_res = self.account_external.fetch_account(uuid=str(contest.owner_uuid))
+                account = account_res['data']['accounts']
                 self.create(
                     uuid=contest.uuid,
                     name=contest.name,
                     status=contest.status.name,
-                    participants={str(contest.owner_uuid): {}}
+                    participants={str(contest.owner_uuid): {
+                        'first_name': account['first_name'],
+                        'last_name': account['last_name']
+                    }}
                 )
         elif key == 'contest_ready' or key == 'contest_active' or key == 'contest_inactive':
             self.logger.info('contest updated')

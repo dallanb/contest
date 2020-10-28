@@ -35,9 +35,24 @@ services:
       timeout: 5s
       retries: 5
     depends_on:
+      - contest_cache
       - contest_db
     networks:
       - app-net
+  contest_cache:
+    container_name: contest_cache
+    image: redis:6
+    restart: unless-stopped
+    volumes:
+      - ${HUNCHO_DIR}/data/dev/contest_cache/redis_data:/var/libs/redis
+      - ${HUNCHO_DIR}/data/dev/contest_cache/redis.conf:/usr/local/etc/redis/redis.conf
+    env_file:
+      - ${HUNCHO_DIR}/env/dev/.env.contest_cache
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   contest_db:
     container_name: contest_db
     image: postgres:9.6
