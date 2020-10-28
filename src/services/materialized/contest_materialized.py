@@ -3,6 +3,7 @@ from http import HTTPStatus
 
 from ..base import Base
 from ..contest import Contest as ContestService
+from ..participant import Participant as ParticipantService
 from ...models import ContestMaterialized as MaterializedModel
 
 
@@ -11,6 +12,7 @@ class ContestMaterialized(Base):
         Base.__init__(self)
         self.logger = logging.getLogger(__name__)
         self.contest_service = ContestService()
+        self.participant_service = ParticipantService()
         self.materialized_model = MaterializedModel
 
     def find(self, **kwargs):
@@ -32,16 +34,30 @@ class ContestMaterialized(Base):
 
     def handle_event(self, key, data):
         if key == 'contest_created':
-            self.logger.info('contest created')
             contests = self.contest_service.find(uuid=data['uuid'])
             if contests.total:
                 contest = contests.items[0]
                 self.create(
                     uuid=contest.uuid,
                     name=contest.name,
-                    status=contest.status.name
+                    status=contest.status.name,
+                    participants={str(contest.owner_uuid): {}}
                 )
-        if key == 'contest_updated':
+        elif key == 'contest_updated':
             self.logger.info('contest updated')
-        if key == 'participant_invited':
-            self.logger.info('participant invited')
+        elif key == 'participant_active':
+            participants = self.participant_service.find(uuid=data['participant_uuid'])
+            if participants.total:
+                contests = self.find(uuid=data['contest_uuid'])
+                if contests.total:
+                    contest = contests.items[0]
+                    contest.participants[data['user_uuid']] = {}  # maybe fix this to conform to the rest of the code
+                    self.db.save(instance=contest)
+        elif key == 'avatar_created':
+            contests = self.contest_service.find(uuid=data['contest_uuid'])
+            if contests.total:
+                contest = contests.items[0]
+                self.update(
+                    uuid=contest.uuid,
+                    avatar=data['s3_filename']
+                )
