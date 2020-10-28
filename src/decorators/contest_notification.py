@@ -48,3 +48,7 @@ class contest_notification:
             value = {'uuid': str(args['avatar'].uuid), 'contest_uuid': str(new_instance.uuid),
                      's3_filename': str(args['avatar'].s3_filename)}
             self.service.notify(topic=self.topic, value=value, key=key)
+        if prev_instance and prev_instance.get('name') and prev_instance['name'] != new_instance.name:
+            key = 'name_updated'
+            value = {'uuid': str(new_instance.uuid), 'name': new_instance.name}
+            self.service.notify(topic=self.topic, value=value, key=key)

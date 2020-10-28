@@ -43,8 +43,23 @@ class ContestMaterialized(Base):
                     status=contest.status.name,
                     participants={str(contest.owner_uuid): {}}
                 )
-        elif key == 'contest_updated':
+        elif key == 'contest_ready' or key == 'contest_active' or key == 'contest_inactive':
             self.logger.info('contest updated')
+            contests = self.contest_service.find(uuid=data['uuid'])
+            if contests.total:
+                contest = contests.items[0]
+                self.update(
+                    uuid=contest.uuid,
+                    status=contest.status.name
+                )
+        elif key == 'name_updated':
+            contests = self.contest_service.find(uuid=data['uuid'])
+            if contests.total:
+                contest = contests.items[0]
+                self.update(
+                    uuid=contest.uuid,
+                    name=data['name']
+                )
         elif key == 'participant_active':
             participants = self.participant_service.find(uuid=data['participant_uuid'])
             if participants.total:
