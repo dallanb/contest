@@ -2,7 +2,6 @@ import logging
 from ..services import (Contest as ContestService,
                         ContestMaterialized as ContestMaterializedService,
                         Participant as ParticipantService)
-from ..external import Account as AccountExternal
 
 
 class Contest:
@@ -11,15 +10,13 @@ class Contest:
         self.contest_service = ContestService()
         self.contest_materialized_service = ContestMaterializedService()
         self.participant_service = ParticipantService()
-        self.account_external = AccountExternal()
 
     def handle_event(self, key, data):
         if key == 'contest_created':
             contests = self.contest_service.find(uuid=data['uuid'])
             if contests.total:
                 contest = contests.items[0]
-                account_res = self.account_external.fetch_account(uuid=str(contest.owner_uuid))
-                account = account_res['data']['membership']
+                account = self.participant_service.fetch_account(uuid=str(contest.owner_uuid))
                 self.contest_materialized_service.create(
                     uuid=contest.uuid,
                     name=contest.name,
@@ -54,8 +51,7 @@ class Contest:
                 contests = self.contest_materialized_service.find(uuid=data['contest_uuid'])
                 if contests.total:
                     contest = contests.items[0]
-                    account_res = self.account_external.fetch_account(uuid=str(participant.user_uuid))
-                    account = account_res['data']['membership']
+                    account = self.participant_service.fetch_account(uuid=str(participant.user_uuid))
                     contest.participants[data['user_uuid']] = {
                         'first_name': account['first_name'],
                         'last_name': account['last_name'],
