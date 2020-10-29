@@ -2,9 +2,11 @@ import logging
 from http import HTTPStatus
 
 from .base import Base
+from .. import cache
 from ..models import Participant as ParticipantModel
 from ..common import ParticipantStatusEnum
 from ..decorators import participant_notification
+from ..external import Account as AccountExternal
 
 
 class Participant(Base):
@@ -41,3 +43,9 @@ class Participant(Base):
             new_status] == ParticipantStatusEnum['pending']:
             self.error(code=HTTPStatus.BAD_REQUEST)
         return True
+
+    @staticmethod
+    @cache.memoize(300)
+    def fetch_account(uuid):
+        res = AccountExternal().fetch_account(uuid=uuid)
+        return res['data']['membership']

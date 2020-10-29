@@ -1,10 +1,11 @@
 import logging
 from http import HTTPStatus
-from .. import app
+
 from .base import Base
-from ..models import Avatar as AvatarModel
-from ..libs import S3
+from .. import app
 from ..common.utils import s3_object_name
+from ..libs import S3
+from ..models import Avatar as AvatarModel
 
 
 class Avatar(Base):

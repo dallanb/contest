@@ -12,6 +12,7 @@ class Config(object):
     SECRET_KEY = os.getenv("SECRET_KEY")
     KONG_URL = os.getenv("KONG_URL")
     MAILER_URL = os.getenv("MAILER_URL")
+    ACCOUNT_URL = os.getenv("ACCOUNT_URL")
     KAFKA_URL = os.getenv("KAFKA_URL")
     KAFKA_TOPICS = os.getenv("KAFKA_TOPICS").split(",")
     S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY")

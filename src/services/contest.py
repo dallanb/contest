@@ -1,9 +1,9 @@
 import logging
-
 from http import HTTPStatus
+
 from .base import Base
-from ..models import Contest as ContestModel
 from ..decorators import contest_notification
+from ..models import Contest as ContestModel
 
 
 class Contest(Base):

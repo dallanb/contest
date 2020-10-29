@@ -52,6 +52,16 @@ class DumpContestSchema(Schema):
         return data
 
 
+class DumpContestMaterializedSchema(Schema):
+    uuid = fields.UUID()
+    ctime = fields.Integer()
+    mtime = fields.Integer()
+    name = fields.String()
+    status = fields.String()
+    avatar = fields.String()
+    participants = fields.Dict()
+
+
 class UpdateContestSchema(Schema):
     name = fields.Str(required=False)
     status = fields.Str(required=False)
@@ -71,9 +81,16 @@ class FetchAllContestSchema(Schema):
     owner_uuid = fields.UUID(required=False)
 
 
+class FetchAllContestMaterializedSchema(Schema):
+    page = fields.Int(required=False, missing=1)
+    per_page = fields.Int(required=False, missing=10)
+
+
 create_schema = CreateContestSchema()
 dump_schema = DumpContestSchema()
 dump_many_schema = DumpContestSchema(many=True)
+dump_many_materialized_schema = DumpContestMaterializedSchema(many=True)
 update_schema = UpdateContestSchema()
 fetch_schema = FetchContestSchema()
 fetch_all_schema = FetchAllContestSchema()
+fetch_all_materialized_schema = FetchAllContestMaterializedSchema()

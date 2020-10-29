@@ -17,7 +17,7 @@ def check_contest_timeout(delta):
     contests = Contest.query.filter(Contest.start_time > timestamp, Contest.start_time < expiry_timestamp).all()
 
     # eventually attempt to run multiple threads in parallel?
-    producer = Producer(host=app.config['KAFKA_HOST'], port=app.config['KAFKA_PORT'])
+    producer = Producer(url=app.config['KAFKA_URL'])
     producer.start()
 
     connected = producer.connected()

@@ -1,0 +1,1 @@
+from .contest_materialized import ContestMaterialized
