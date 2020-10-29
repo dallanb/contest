@@ -8,9 +8,9 @@ from .v1 import AvatarsAPI
 api.add_resource(PingAPI, '/ping', methods=['GET'])
 
 # Contests
+api.add_resource(ContestsMaterializedListAPI, '/contests/materialized', endpoint="contests_materialized")
 api.add_resource(ContestsAPI, '/contests/<uuid:uuid>', endpoint="contest")
 api.add_resource(ContestsListAPI, '/contests', endpoint="contests")
-api.add_resource(ContestsMaterializedListAPI, '/contests/materialized', endpoint="contests_materialized")
 
 # Avatars
 api.add_resource(AvatarsAPI, '/contests/<uuid>/avatars', endpoint="avatar")
