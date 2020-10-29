@@ -5,7 +5,7 @@ from .schema import *
 from ..base import Base
 from ....common.auth import check_user
 from ....common.response import DataResponse
-from ....services import Contest, Sport, Participant
+from ....services import Contest, Sport, Participant, ContestMaterialized
 
 
 class ContestsAPI(Base):
@@ -93,6 +93,30 @@ class ContestsListAPI(Base):
                 'contests': self.dump(
                     schema=dump_schema,
                     instance=contest
+                )
+            }
+        )
+
+
+class ContestsMaterializedListAPI(Base):
+    def __init__(self):
+        Base.__init__(self)
+        self.contest_materialized = ContestMaterialized()
+
+    @marshal_with(DataResponse.marshallable())
+    def get(self):
+        data = self.clean(schema=fetch_all_materialized_schema, instance=request.args)
+        contests = self.contest_materialized.find(**data)
+        return DataResponse(
+            data={
+                '_metadata': self.prepare_metadata(
+                    total_count=contests.total,
+                    page_count=len(contests.items),
+                    page=data['page'],
+                    per_page=data['per_page']),
+                'contests': self.dump(
+                    schema=dump_many_materialized_schema,
+                    instance=contests.items,
                 )
             }
         )

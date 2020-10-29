@@ -66,7 +66,7 @@ if app.config['ENV'] != 'development':
         logging.error(error)
         return ErrorResponse(code=error.code, msg=error.msg, err=error.err), error.code
 
-if app.config['ENV'] == 'development':
+if app.config['ENV'] != 'development':
     @app.before_first_request
     def handle_first_request():
         consumer.start()
