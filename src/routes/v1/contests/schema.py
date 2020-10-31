@@ -81,9 +81,14 @@ class FetchAllContestSchema(Schema):
     owner_uuid = fields.UUID(required=False)
 
 
+class _FetchAllContestMaterializedSchemaHasKeySchema(Schema):
+    participant = fields.UUID(required=False)
+
+
 class FetchAllContestMaterializedSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
+    key = fields.List(fields.Nested(_FetchAllContestMaterializedSchemaHasKeySchema))
 
 
 create_schema = CreateContestSchema()

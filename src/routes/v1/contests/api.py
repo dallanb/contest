@@ -4,7 +4,7 @@ from flask_restful import marshal_with
 from .schema import *
 from ..base import Base
 from ....common.auth import check_user
-from ....common.response import DataResponse
+from ....common.response import DataResponse, MessageResponse
 from ....services import Contest, Sport, Participant, ContestMaterialized
 
 
@@ -103,20 +103,23 @@ class ContestsMaterializedListAPI(Base):
         Base.__init__(self)
         self.contest_materialized = ContestMaterialized()
 
-    @marshal_with(DataResponse.marshallable())
+    # @marshal_with(DataResponse.marshallable())
+    @marshal_with(MessageResponse.marshallable())
     def get(self):
         data = self.clean(schema=fetch_all_materialized_schema, instance=request.args)
-        contests = self.contest_materialized.find(**data)
-        return DataResponse(
-            data={
-                '_metadata': self.prepare_metadata(
-                    total_count=contests.total,
-                    page_count=len(contests.items),
-                    page=data['page'],
-                    per_page=data['per_page']),
-                'contests': self.dump(
-                    schema=dump_many_materialized_schema,
-                    instance=contests.items,
-                )
-            }
-        )
+        self.logger.info(data)
+        return MessageResponse()
+        # contests = self.contest_materialized.find(**data)
+        # return DataResponse(
+        #     data={
+        #         '_metadata': self.prepare_metadata(
+        #             total_count=contests.total,
+        #             page_count=len(contests.items),
+        #             page=data['page'],
+        #             per_page=data['per_page']),
+        #         'contests': self.dump(
+        #             schema=dump_many_materialized_schema,
+        #             instance=contests.items,
+        #         )
+        #     }
+        # )

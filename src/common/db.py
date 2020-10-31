@@ -1,4 +1,5 @@
 import collections
+import logging
 
 import inflect
 from sqlalchemy import inspect
@@ -33,6 +34,11 @@ class DB:
             if k == 'lte':
                 for lte_k, lte_v in v:
                     query = query.filter(lte_k <= lte_v)
+            if k == 'has_key':
+                for has_key_k, has_key_v in v:
+                    logging.info(has_key_k)
+                    logging.info(has_key_v)
+                    # query = query.filter()
         for i, k in enumerate(expand):
             tables = k.split('.')
             options = db.lazyload(getattr(model, tables[0]))
