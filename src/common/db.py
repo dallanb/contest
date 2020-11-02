@@ -228,8 +228,7 @@ class DB:
     @classmethod
     # TODO: Consider using dataclass instead of a named tuple
     def find(cls, model, page=None, per_page=None, expand=[], include=[], nested=None, search=None, within=None,
-             has_key=None,
-             **kwargs):
+             has_key=None, **kwargs):
         filters = cls._generate_filters(model=model, nested=nested, search=search, within=within, has_key=has_key,
                                         **kwargs)
         query = cls._query_builder(model=model, filters=filters, include=include, expand=expand)
