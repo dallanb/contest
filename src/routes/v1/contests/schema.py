@@ -1,4 +1,6 @@
-from marshmallow import Schema, post_dump
+import logging
+
+from marshmallow import Schema, post_dump, pre_load
 from marshmallow_enum import EnumField
 from webargs import fields
 
@@ -81,9 +83,14 @@ class FetchAllContestSchema(Schema):
     owner_uuid = fields.UUID(required=False)
 
 
+class _FetchAllContestMaterializedHasKeySchema(Schema):
+    participant = fields.UUID(required=False)
+
+
 class FetchAllContestMaterializedSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
+    participants = fields.String(required=False, attribute="has_key.participants", data_key='participants')
 
 
 create_schema = CreateContestSchema()
