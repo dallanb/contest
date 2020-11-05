@@ -46,6 +46,14 @@ class Contest:
                     uuid=contest.uuid,
                     name=data['name']
                 )
+        elif key == 'start_time_updated':
+            contests = self.contest_service.find(uuid=data['uuid'])
+            if contests.total:
+                contest = contests.items[0]
+                self.contest_materialized_service.update(
+                    uuid=contest.uuid,
+                    start_time=data['start_time']
+                )
         elif key == 'participant_active':
             participants = self.participant_service.find(uuid=data['participant_uuid'])
             if participants.total:
