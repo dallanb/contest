@@ -52,3 +52,7 @@ class contest_notification:
             key = 'name_updated'
             value = {'uuid': str(new_instance.uuid), 'name': new_instance.name}
             self.service.notify(topic=self.topic, value=value, key=key)
+        if prev_instance and prev_instance.get('start_time') and prev_instance['start_time'] != new_instance.start_time:
+            key = 'start_time_updated'
+            value = {'uuid': str(new_instance.uuid), 'start_time': new_instance.start_time}
+            self.service.notify(topic=self.topic, value=value, key=key)
