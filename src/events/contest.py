@@ -1,4 +1,5 @@
 import logging
+
 from ..services import (Contest as ContestService,
                         ContestMaterialized as ContestMaterializedService,
                         Participant as ParticipantService)
@@ -21,6 +22,7 @@ class Contest:
                     uuid=contest.uuid,
                     name=contest.name,
                     status=contest.status.name,
+                    start_time=contest.start_time,
                     participants={str(contest.owner_uuid): {
                         'first_name': account['first_name'],
                         'last_name': account['last_name'],
