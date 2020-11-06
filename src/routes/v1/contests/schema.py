@@ -1,12 +1,9 @@
-import logging
-
-from marshmallow import Schema, post_dump, pre_load
+from marshmallow import Schema, post_dump
 from marshmallow_enum import EnumField
 from webargs import fields
 
-from ..sports.schema import DumpSportsSchema
 from ..avatars.schema import DumpAvatarSchema
-
+from ..sports.schema import DumpSportsSchema
 from ....common import ContestStatusEnum
 
 
@@ -62,6 +59,7 @@ class DumpContestMaterializedSchema(Schema):
     status = fields.String()
     avatar = fields.String()
     participants = fields.Dict()
+    start_time = fields.Integer()
 
 
 class UpdateContestSchema(Schema):
