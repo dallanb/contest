@@ -1,4 +1,5 @@
 import logging
+
 from ..services import (Contest as ContestService,
                         ContestMaterialized as ContestMaterializedService,
                         Participant as ParticipantService)
@@ -58,6 +59,9 @@ class Contest:
                         'score': None
                     }  # maybe fix this to conform to the rest of the code
                     self.contest_materialized_service.save(instance=contest)
+            self.contest_service.check_contest_status(uuid=data['contest_uuid'])
+        elif key == 'participant_inactive':
+            self.contest_service.check_contest_status(uuid=data['contest_uuid'])
         elif key == 'avatar_created':
             contests = self.contest_service.find(uuid=data['contest_uuid'])
             if contests.total:
