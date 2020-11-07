@@ -40,5 +40,5 @@ class Contest(Base):
                                             status=ParticipantStatusEnum.pending.name).first() is None:
             contests = self.find(uuid=uuid)
             contest = contests.items[0]
-            if contest.status == ContestStatusEnum.pending.name:
+            if ContestStatusEnum[contest.status.name] == ContestStatusEnum['pending']:
                 self.apply(instance=contest, status=ContestStatusEnum.ready.name)
