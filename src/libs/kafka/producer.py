@@ -12,12 +12,15 @@ class Producer(threading.Thread):
         self.producer = None
         self.url = url
 
+    daemon = True
+
     def stop(self):
         self.stop_event.set()
 
     def run(self):
         self.producer = KafkaProducer(bootstrap_servers=self.url, key_serializer=str.encode,
                                       value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+
 
         while not self.stop_event.is_set():
             time.sleep(1)

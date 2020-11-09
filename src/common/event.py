@@ -1,6 +1,4 @@
-import logging
-
-from .. import producer
+from flask import g
 
 
 class Event:
@@ -12,8 +10,14 @@ class Event:
 
     @classmethod
     def send(cls, topic, value, key):
-        if producer.producer:
-            producer.send(
+        # this has to be done because the producer thread is only available to flask api request and not
+        # internal requests made by the server so producer is being assigned globally in src/event.py and
+        # src/__init__.py
+        sender = None
+        if g.producer and g.producer.producer:
+            sender = g.producer
+        if sender:
+            sender.send(
                 topic=topic,
                 value=value,
                 key=key

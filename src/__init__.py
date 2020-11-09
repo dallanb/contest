@@ -40,6 +40,9 @@ from .event import new_event_listener
 consumer = Consumer(url=app.config['KAFKA_URL'],
                     topics=app.config['KAFKA_TOPICS'], event_listener=new_event_listener)
 
+producer.start()
+consumer.start()
+
 # import models
 from .models import *
 # import routes
@@ -66,14 +69,9 @@ if app.config['ENV'] != 'development':
         logging.error(error)
         return ErrorResponse(code=error.code, msg=error.msg, err=error.err), error.code
 
-if app.config['ENV'] != 'development':
-    @app.before_first_request
-    def handle_first_request():
-        consumer.start()
-        producer.start()
-
 
 # before each request
 @app.before_request
 def handle_request():
     g.logger = logging
+    g.producer = producer

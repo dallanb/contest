@@ -76,5 +76,9 @@ def check_timeout():
     check_timeouts()
 
 
+# @cli.command("stop_kafka")
+# def stop_kafka():
+
+
 if __name__ == "__main__":
     cli()
