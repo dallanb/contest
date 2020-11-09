@@ -31,7 +31,7 @@ services:
       - ${HUNCHO_DIR}/secrets/s3/credentials.txt
     healthcheck:
       test: curl --fail -s contest:5000/ping || exit 1
-      interval: 10s
+      interval: 60s
       timeout: 5s
       retries: 5
     depends_on:
