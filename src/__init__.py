@@ -62,28 +62,27 @@ from .event import new_event_listener
 consumer = Consumer(url=app.config['KAFKA_URL'],
                     topics=app.config['KAFKA_TOPICS'], event_listener=new_event_listener)
 
-
-@app.before_first_request
-def func():
-    consumer.start()
-
-
 if app.config['ENV'] != 'development':
     producer = Producer(url=app.config['KAFKA_URL'])
 
 
     @app.before_first_request
-    def handle_first_request():
-        # event
+    def func():
+        consumer.start()
         producer.start()
 
 
     @app.before_request
-    def handle_request():
+    def func():
         g.producer = producer
 else:
+    @app.before_first_request
+    def func():
+        consumer.start()
+
+
     @app.before_request
-    def init_kafka():
+    def func():
         g.producer = Producer(url=app.config['KAFKA_URL'])
         g.producer.start()
         while not g.producer.producer:
@@ -91,6 +90,6 @@ else:
 
 
     @app.after_request
-    def clean_kafka(response):
+    def func(response):
         g.producer.stop()
         return response
