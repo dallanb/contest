@@ -1,1 +1,1 @@
-from .contest_materialized import ContestMaterialized
+from .contest_materialized import ContestMaterialized as ContestMaterializedService

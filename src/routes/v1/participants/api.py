@@ -4,13 +4,13 @@ from .schema import *
 from ..base import Base
 from ....common.response import DataResponse
 from ....common.auth import check_user
-from ....services import Participant, Contest
+from ....services import ParticipantService, ContestService
 
 
 class ParticipantsAPI(Base):
     def __init__(self):
         Base.__init__(self)
-        self.participant = Participant()
+        self.participant = ParticipantService()
 
     @marshal_with(DataResponse.marshallable())
     def get(self, uuid):
@@ -43,8 +43,8 @@ class ParticipantsAPI(Base):
 class ParticipantsListAPI(Base):
     def __init__(self):
         Base.__init__(self)
-        self.participant = Participant()
-        self.contest = Contest()
+        self.participant = ParticipantService()
+        self.contest = ContestService()
 
     @marshal_with(DataResponse.marshallable())
     def get(self):

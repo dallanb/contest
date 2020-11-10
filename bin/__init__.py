@@ -1,3 +1,3 @@
 from .init_contest_status import init_contest_status
 from .init_participant_status import init_participant_status
-from .check_contest_timeout import check_contest_timeout
+from .check_contest_active import check_contest_active
