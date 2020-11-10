@@ -61,12 +61,21 @@ from .event import new_event_listener
 
 consumer = Consumer(url=app.config['KAFKA_URL'],
                     topics=app.config['KAFKA_TOPICS'], event_listener=new_event_listener)
-consumer.start()
+
+
+@app.before_first_request
+def func():
+    consumer.start()
+
 
 if app.config['ENV'] != 'development':
-    # event
     producer = Producer(url=app.config['KAFKA_URL'])
-    producer.start()
+
+
+    @app.before_first_request
+    def handle_first_request():
+        # event
+        producer.start()
 
 
     @app.before_request
