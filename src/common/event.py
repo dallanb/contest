@@ -1,3 +1,5 @@
+import logging
+
 from flask import g
 
 
@@ -10,12 +12,9 @@ class Event:
 
     @classmethod
     def send(cls, topic, value, key):
-        # this has to be done because the producer thread is only available to flask api request and not
-        # internal requests made by the server so producer is being assigned globally in src/event.py and
-        # src/__init__.py
-        while not g.producer.producer:
-            pass
-
+        if not g.producer.producer:
+            logging.error('Cannot send kafka message because producer process is non-existent')
+            return
         g.producer.send(
             topic=topic,
             value=value,

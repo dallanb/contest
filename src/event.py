@@ -11,6 +11,9 @@ def new_event_listener(event):
         key = event.key
         g.producer = Producer(url=app.config['KAFKA_URL'])
         g.producer.start()
+        # slower but safer
+        while not g.producer.producer:
+            pass
         data = event.value
         if topic == 'contests':
             Contest().handle_event(key=key, data=data)

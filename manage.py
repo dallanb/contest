@@ -5,7 +5,7 @@ from flask import g
 from flask.cli import FlaskGroup
 
 import src
-from bin import init_participant_status, init_contest_status, check_contest_timeout
+from bin import init_participant_status, init_contest_status, check_contest_active
 from src import app, db, common
 
 cli = FlaskGroup(app)
@@ -41,9 +41,10 @@ def initialize_statuses():
         return
 
 
-def check_timeouts():
-    delta = datetime.timedelta(days=1)
-    check_contest_timeout(delta=delta)
+def check_actives():
+    with app.app_context():
+        delta = datetime.timedelta(days=1)
+        check_contest_active(delta=delta)
 
 
 @cli.command("init")
@@ -71,9 +72,9 @@ def init_status():
     initialize_statuses()
 
 
-@cli.command("check_timeout")
-def check_timeout():
-    check_timeouts()
+@cli.command("check_active")
+def check_active():
+    check_actives()
 
 
 # @cli.command("stop_kafka")

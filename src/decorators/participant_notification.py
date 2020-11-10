@@ -1,8 +1,8 @@
 from functools import wraps
 
+from ..common import DB
 from ..common import ParticipantStatusEnum
 from ..models import Contest
-from ..common import DB
 
 
 class participant_notification:

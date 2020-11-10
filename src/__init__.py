@@ -33,6 +33,8 @@ logging.config.dictConfig(app.config['LOGGING_CONFIG'])
 from .models import *
 # import routes
 from .routes import *
+# import services
+from .services import *
 
 # import common
 from .common import (

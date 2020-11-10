@@ -1,7 +1,5 @@
 import logging
-from ..services import (Contest as ContestService,
-                        ContestMaterialized as ContestMaterializedService,
-                        Participant as ParticipantService)
+from ..services import ContestService, ContestMaterializedService, ParticipantService
 
 
 class Score:
