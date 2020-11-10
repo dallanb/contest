@@ -29,17 +29,6 @@ import logging.config
 
 logging.config.dictConfig(app.config['LOGGING_CONFIG'])
 
-# import libs
-from .libs import *
-
-# event
-producer = Producer(url=app.config['KAFKA_URL'])
-
-from .event import new_event_listener
-
-consumer = Consumer(url=app.config['KAFKA_URL'],
-                    topics=app.config['KAFKA_TOPICS'], event_listener=new_event_listener)
-
 # import models
 from .models import *
 # import routes
@@ -66,14 +55,33 @@ if app.config['ENV'] != 'development':
         logging.error(error)
         return ErrorResponse(code=error.code, msg=error.msg, err=error.err), error.code
 
+# import libs
+from .libs import *
+from .event import new_event_listener
+
+consumer = Consumer(url=app.config['KAFKA_URL'],
+                    topics=app.config['KAFKA_TOPICS'], event_listener=new_event_listener)
+consumer.start()
+
 if app.config['ENV'] != 'development':
-    @app.before_first_request
-    def handle_first_request():
-        consumer.start()
-        producer.start()
+    # event
+    producer = Producer(url=app.config['KAFKA_URL'])
+    producer.start()
 
 
-# before each request
-@app.before_request
-def handle_request():
-    g.logger = logging
+    @app.before_request
+    def handle_request():
+        g.producer = producer
+else:
+    @app.before_request
+    def init_kafka():
+        g.producer = Producer(url=app.config['KAFKA_URL'])
+        g.producer.start()
+        while not g.producer.producer:
+            pass
+
+
+    @app.after_request
+    def clean_kafka(response):
+        g.producer.stop()
+        return response

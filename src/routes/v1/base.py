@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 
 from flask import g
@@ -11,7 +12,7 @@ from ...services import Base as Service
 class Base(Resource):
     def __init__(self):
         self.service = Service()
-        self.logger = g.logger.getLogger(__name__)
+        self.logger = logging.getLogger(__name__)
         self.code = HTTPStatus
 
     def count(self, model):

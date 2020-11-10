@@ -1,4 +1,5 @@
 import json
+import logging
 import multiprocessing
 
 from kafka import KafkaConsumer
@@ -11,6 +12,8 @@ class Consumer(multiprocessing.Process):
         self.url = url
         self.topics = topics
         self.event_listener = event_listener
+
+    daemon = True
 
     def stop(self):
         self.stop_event.set()
