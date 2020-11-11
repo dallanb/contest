@@ -3,7 +3,7 @@ from flask_restful import marshal_with
 from .schema import *
 from ..base import Base
 from ....common.response import DataResponse
-from ....common.auth import check_user
+from ....common.auth import check_user, assign_user
 from ....services import ParticipantService, ContestService
 
 
@@ -59,18 +59,28 @@ class ParticipantsUserAPI(Base):
             }
         )
 
-    # @marshal_with(DataResponse.marshallable())
-    # def put(self, uuid):
-    #     data = self.clean(schema=update_schema, instance=request.get_json())
-    #     participant = self.participant.update(uuid=uuid, **data)
-    #     return DataResponse(
-    #         data={
-    #             'participants': self.dump(
-    #                 schema=dump_schema,
-    #                 instance=participant
-    #             )
-    #         }
-    #     )
+
+class ParticipantsMyUserAPI(Base):
+    def __init__(self):
+        Base.__init__(self)
+        self.participant = ParticipantService()
+
+    @assign_user
+    @marshal_with(DataResponse.marshallable())
+    def get(self, contest_uuid, me):
+        participants = self.participant.find(user_uuid=me, contest_uuid=contest_uuid)
+        if not participants.total:
+            participant = None
+        else:
+            participant = participants.items[0]
+        return DataResponse(
+            data={
+                'participants': self.dump(
+                    schema=dump_schema,
+                    instance=participant
+                )
+            }
+        )
 
 
 class ParticipantsListAPI(Base):
