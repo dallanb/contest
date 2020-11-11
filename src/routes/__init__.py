@@ -1,6 +1,6 @@
 from .. import api
 from .v1 import PingAPI
-from .v1 import ContestsAPI, ContestsListAPI, ContestsMaterializedListAPI
+from .v1 import ContestsAPI, ContestsListAPI, ContestsMaterializedAPI, ContestsMaterializedListAPI
 from .v1 import ParticipantsAPI, ParticipantsListAPI
 from .v1 import AvatarsAPI
 
@@ -8,6 +8,7 @@ from .v1 import AvatarsAPI
 api.add_resource(PingAPI, '/ping', methods=['GET'])
 
 # Contests
+api.add_resource(ContestsMaterializedAPI, '/contests/materialized/<uuid:uuid>', endpoint="contest_materialized")
 api.add_resource(ContestsMaterializedListAPI, '/contests/materialized', endpoint="contests_materialized")
 api.add_resource(ContestsAPI, '/contests/<uuid:uuid>', endpoint="contest")
 api.add_resource(ContestsListAPI, '/contests', endpoint="contests")

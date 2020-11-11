@@ -98,6 +98,26 @@ class ContestsListAPI(Base):
         )
 
 
+class ContestsMaterializedAPI(Base):
+    def __init__(self):
+        Base.__init__(self)
+        self.contest_materialized = ContestMaterializedService()
+
+    @marshal_with(DataResponse.marshallable())
+    def get(self, uuid):
+        contests = self.contest_materialized.find(uuid=uuid)
+        if not contests.total:
+            self.throw_error(http_code=self.code.NOT_FOUND)
+        return DataResponse(
+            data={
+                'contests': self.dump(
+                    schema=dump_materialized_schema,
+                    instance=contests.items[0],
+                )
+            }
+        )
+
+
 class ContestsMaterializedListAPI(Base):
     def __init__(self):
         Base.__init__(self)
