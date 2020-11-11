@@ -40,6 +40,39 @@ class ParticipantsAPI(Base):
         )
 
 
+class ParticipantsUserAPI(Base):
+    def __init__(self):
+        Base.__init__(self)
+        self.participant = ParticipantService()
+
+    @marshal_with(DataResponse.marshallable())
+    def get(self, contest_uuid, user_uuid):
+        participants = self.participant.find(user_uuid=user_uuid, contest_uuid=contest_uuid)
+        if not participants.total:
+            self.throw_error(http_code=self.code.NOT_FOUND)
+        return DataResponse(
+            data={
+                'participants': self.dump(
+                    schema=dump_schema,
+                    instance=participants.items[0]
+                )
+            }
+        )
+
+    # @marshal_with(DataResponse.marshallable())
+    # def put(self, uuid):
+    #     data = self.clean(schema=update_schema, instance=request.get_json())
+    #     participant = self.participant.update(uuid=uuid, **data)
+    #     return DataResponse(
+    #         data={
+    #             'participants': self.dump(
+    #                 schema=dump_schema,
+    #                 instance=participant
+    #             )
+    #         }
+    #     )
+
+
 class ParticipantsListAPI(Base):
     def __init__(self):
         Base.__init__(self)
