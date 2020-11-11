@@ -18,6 +18,7 @@ api.add_resource(AvatarsAPI, '/contests/<uuid>/avatars', endpoint="avatar")
 
 # Participants
 api.add_resource(ParticipantsAPI, '/participants/<uuid:uuid>', endpoint="participant")
-api.add_resource(ParticipantsUserAPI, '/contests/<uuid:contest_uuid>/participants/user/<uuid:user_uuid>',
+# cannot type check this on uuid because the uuid may actually be the keyword 'me'
+api.add_resource(ParticipantsUserAPI, '/contests/<uuid:contest_uuid>/participants/user/<uuid>',
                  endpoint="participant_user")
 api.add_resource(ParticipantsListAPI, '/contests/<uuid:uuid>/participants', '/participants', endpoint="participants")

@@ -3,7 +3,7 @@ from flask_restful import marshal_with
 from .schema import *
 from ..base import Base
 from ....common.response import DataResponse
-from ....common.auth import check_user
+from ....common.auth import check_user, assign_user
 from ....services import ParticipantService, ContestService
 
 
@@ -45,9 +45,10 @@ class ParticipantsUserAPI(Base):
         Base.__init__(self)
         self.participant = ParticipantService()
 
+    @assign_user
     @marshal_with(DataResponse.marshallable())
-    def get(self, contest_uuid, user_uuid):
-        participants = self.participant.find(user_uuid=user_uuid, contest_uuid=contest_uuid)
+    def get(self, contest_uuid, uuid):
+        participants = self.participant.find(user_uuid=uuid, contest_uuid=contest_uuid)
         if not participants.total:
             self.throw_error(http_code=self.code.NOT_FOUND)
         return DataResponse(
