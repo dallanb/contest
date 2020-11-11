@@ -94,6 +94,7 @@ class FetchAllContestMaterializedSchema(Schema):
 create_schema = CreateContestSchema()
 dump_schema = DumpContestSchema()
 dump_many_schema = DumpContestSchema(many=True)
+dump_materialized_schema = DumpContestMaterializedSchema()
 dump_many_materialized_schema = DumpContestMaterializedSchema(many=True)
 update_schema = UpdateContestSchema()
 fetch_schema = FetchContestSchema()
