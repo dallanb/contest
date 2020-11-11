@@ -1,9 +1,8 @@
 import logging
+import time
 from datetime import datetime
 
-from flask import g
-
-from src import Producer, Contest, app, ContestService
+from src import Contest, ContestService
 # delta is in days
 from src.common import ContestStatusEnum
 
@@ -21,18 +20,10 @@ def check_contest_active(delta):
     contests = contest_service.contest_model.query.filter(Contest.start_time > timestamp,
                                                           Contest.start_time < expiry_timestamp).all()
 
-    # eventually attempt to run multiple threads in parallel?
-    g.producer = Producer(url=app.config['KAFKA_URL'])
-    g.producer.start()
-
-    while not g.producer.connected():
-        pass
-
     for contest in contests:
         if ContestStatusEnum[contest.status.name] == ContestStatusEnum['ready']:
             contest_service.apply(instance=contest, status=ContestStatusEnum.active.name)
 
-    g.producer.stop(timeout=5)
-
+    time.sleep(1)
     logging.info("done checking contest active")
     return
