@@ -1,10 +1,8 @@
 import datetime
 import os
 
-from flask import g
 from flask.cli import FlaskGroup
 
-import src
 from bin import init_participant_status, init_contest_status, check_contest_active
 from src import app, db, common
 
@@ -34,17 +32,14 @@ def clear_cache():
 
 
 def initialize_statuses():
-    with app.app_context():
-        g.src = src
-        init_contest_status(status_enums=common.ContestStatusEnum)
-        init_participant_status(status_enums=common.ParticipantStatusEnum)
-        return
+    init_contest_status(status_enums=common.ContestStatusEnum)
+    init_participant_status(status_enums=common.ParticipantStatusEnum)
+    return
 
 
 def check_actives():
-    with app.app_context():
-        delta = datetime.timedelta(days=1)
-        check_contest_active(delta=delta)
+    delta = datetime.timedelta(days=1)
+    check_contest_active(delta=delta)
 
 
 @cli.command("init")
@@ -75,10 +70,6 @@ def init_status():
 @cli.command("check_active")
 def check_active():
     check_actives()
-
-
-# @cli.command("stop_kafka")
-# def stop_kafka():
 
 
 if __name__ == "__main__":

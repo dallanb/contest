@@ -1,4 +1,4 @@
-from flask import Flask, g
+from flask import Flask
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
@@ -61,8 +61,7 @@ if app.config['ENV'] != 'development':
 from .libs import *
 from .event import new_event_listener
 
-consumer = Consumer(url=app.config['KAFKA_URL'],
-                    topics=app.config['KAFKA_TOPICS'], event_listener=new_event_listener)
+consumer = Consumer(topics=app.config['KAFKA_TOPICS'], event_listener=new_event_listener)
 
 
 @app.before_first_request
