@@ -1,7 +1,7 @@
 from .. import api
 from .v1 import PingAPI
 from .v1 import ContestsAPI, ContestsListAPI, ContestsMaterializedAPI, ContestsMaterializedListAPI
-from .v1 import ParticipantsAPI, ParticipantsListAPI
+from .v1 import ParticipantsAPI, ParticipantsUserAPI, ParticipantsListAPI
 from .v1 import AvatarsAPI
 
 # Ping
@@ -18,4 +18,6 @@ api.add_resource(AvatarsAPI, '/contests/<uuid>/avatars', endpoint="avatar")
 
 # Participants
 api.add_resource(ParticipantsAPI, '/participants/<uuid:uuid>', endpoint="participant")
+api.add_resource(ParticipantsUserAPI, '/contests/<uuid:contest_uuid>/participants/user/<uuid:user_uuid>',
+                 endpoint="participant_user")
 api.add_resource(ParticipantsListAPI, '/contests/<uuid:uuid>/participants', '/participants', endpoint="participants")
