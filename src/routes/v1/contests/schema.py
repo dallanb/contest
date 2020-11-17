@@ -1,6 +1,6 @@
 from marshmallow import Schema, post_dump
 from marshmallow_enum import EnumField
-from webargs import fields, validate
+from webargs import fields
 
 from ..avatars.schema import DumpAvatarSchema
 from ..sports.schema import DumpSportsSchema
@@ -24,6 +24,7 @@ class DumpContestSchema(Schema):
     name = fields.String()
     start_time = fields.Integer()
     status = EnumField(ContestStatusEnum)
+    location_uuid = fields.UUID()
     participants = fields.List(fields.Nested('DumpParticipantSchema'))
     avatar = fields.Nested(DumpAvatarSchema)
     sport = fields.Nested(DumpSportsSchema, exclude=('contest',))
@@ -59,6 +60,7 @@ class DumpContestMaterializedSchema(Schema):
     name = fields.String()
     status = fields.String()
     avatar = fields.String()
+    location = fields.UUID()
     participants = fields.Dict()
     start_time = fields.Integer()
 
