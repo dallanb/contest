@@ -5,7 +5,7 @@ from .schema import *
 from ..base import Base
 from ....common.auth import check_user
 from ....common.response import DataResponse
-from ....services import ContestService, SportService, ParticipantService, ContestMaterializedService, LocationService
+from ....services import ContestService, SportService, ParticipantService, ContestMaterializedService
 
 
 class ContestsAPI(Base):
@@ -52,7 +52,6 @@ class ContestsListAPI(Base):
         self.contest = ContestService()
         self.sport = SportService()
         self.participant = ParticipantService()
-        self.location = LocationService()
 
     @marshal_with(DataResponse.marshallable())
     def get(self):
@@ -80,9 +79,8 @@ class ContestsListAPI(Base):
     @check_user
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        location = self.location.create(location_uuid=data['location_uuid'])
         contest = self.contest.create(status='pending', owner_uuid=data['owner_uuid'], name=data['name'],
-                                      start_time=data['start_time'], location=location)
+                                      start_time=data['start_time'], location_uuid=data['location_uuid'])
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
         participants = data.pop('participants')
         if participants:
