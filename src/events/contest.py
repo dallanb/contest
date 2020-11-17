@@ -21,6 +21,7 @@ class Contest:
                     name=contest.name,
                     status=contest.status.name,
                     start_time=contest.start_time,
+                    location=contest.location_uuid,
                     participants={str(contest.owner_uuid): {
                         'first_name': account['first_name'],
                         'last_name': account['last_name'],
