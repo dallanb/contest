@@ -10,6 +10,7 @@ from ....common import ContestStatusEnum
 class CreateContestSchema(Schema):
     owner_uuid = fields.UUID()
     sport_uuid = fields.UUID()
+    location_uuid = fields.UUID()
     name = fields.String()
     start_time = fields.Integer()
     participants = fields.List(fields.UUID(), missing=None)
