@@ -12,4 +12,5 @@ class ContestStatusEnum(enum.Enum):
 class ParticipantStatusEnum(enum.Enum):
     pending = 1
     active = 2
-    inactive = 3
+    completed = 3
+    inactive = 4
