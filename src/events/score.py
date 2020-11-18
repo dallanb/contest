@@ -1,4 +1,5 @@
 import logging
+
 from ..services import ContestService, ContestMaterializedService, ParticipantService
 
 
@@ -14,5 +15,6 @@ class Score:
             contests = self.contest_materialized_service.find(uuid=data['contest_uuid'])
             if contests.total:
                 contest = contests.items[0]
-                contest.participants[data['participant_uuid']]['score'] = data['strokes']
+                contest.participants[data['participant_uuid']]['strokes'] = data['strokes']
+                contest.participants[data['participant_uuid']]['score'] = data['score']
                 self.contest_materialized_service.save(instance=contest)
