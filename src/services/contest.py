@@ -45,8 +45,8 @@ class Contest(Base):
         contest = contests.items[0]
 
         if ContestStatusEnum[contest.status.name] == ContestStatusEnum['pending'] and not counts.get(
-                ParticipantStatusEnum[contest.status.name], -1):
+                ParticipantStatusEnum[contest.status.name]):
             self.apply(instance=contest, status=ContestStatusEnum.ready.name)
         elif ContestStatusEnum[contest.status.name] == ContestStatusEnum[
-            'active'] and not counts.get(ParticipantStatusEnum[contest.status.name], -1):
+            'active'] and not counts.get(ParticipantStatusEnum[contest.status.name]):
             self.apply(instance=contest, status=ContestStatusEnum.completed.name)
