@@ -25,7 +25,8 @@ class Contest:
                     participants={str(contest.owner_uuid): {
                         'first_name': account['first_name'],
                         'last_name': account['last_name'],
-                        'score': None
+                        'score': None,
+                        'strokes': None,
                     }}
                 )
         elif key == 'contest_ready' or key == 'contest_active' or key == 'contest_inactive':
@@ -64,7 +65,8 @@ class Contest:
                     contest.participants[data['user_uuid']] = {
                         'first_name': account['first_name'],
                         'last_name': account['last_name'],
-                        'score': None
+                        'score': None,
+                        'strokes': None
                     }  # maybe fix this to conform to the rest of the code
                     self.contest_materialized_service.save(instance=contest)
             self.contest_service.check_contest_status(uuid=data['contest_uuid'])
