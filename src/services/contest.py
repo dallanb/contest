@@ -1,5 +1,6 @@
 import logging
 from http import HTTPStatus
+from sqlalchemy import func
 
 from .base import Base
 from ..common import ParticipantStatusEnum, ContestStatusEnum
@@ -36,9 +37,16 @@ class Contest(Base):
 
     # Check and update contest status if all participants associated with the contest have responded
     def check_contest_status(self, uuid):
-        if ParticipantModel.query.filter_by(contest_uuid=uuid,
-                                            status=ParticipantStatusEnum.pending.name).first() is None:
-            contests = self.find(uuid=uuid)
-            contest = contests.items[0]
-            if ContestStatusEnum[contest.status.name] == ContestStatusEnum['pending']:
-                self.apply(instance=contest, status=ContestStatusEnum.ready.name)
+        status_counts = ParticipantModel.query.with_entities(ParticipantModel.status,
+                                                             func.count(ParticipantModel.status)).filter_by(
+            contest_uuid=uuid).group_by(ParticipantModel.status).all()
+        counts = dict(status_counts)
+        contests = self.find(uuid=uuid)
+        contest = contests.items[0]
+
+        if ContestStatusEnum[contest.status.name] == ContestStatusEnum['pending'] and not counts.get(
+                ParticipantStatusEnum[contest.status.name], -1):
+            self.apply(instance=contest, status=ContestStatusEnum.ready.name)
+        elif ContestStatusEnum[contest.status.name] == ContestStatusEnum[
+            'active'] and not counts.get(ParticipantStatusEnum[contest.status.name], -1):
+            self.apply(instance=contest, status=ContestStatusEnum.completed.name)

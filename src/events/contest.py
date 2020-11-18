@@ -73,6 +73,8 @@ class Contest:
             self.contest_service.check_contest_status(uuid=data['contest_uuid'])
         elif key == 'participant_inactive':
             self.contest_service.check_contest_status(uuid=data['contest_uuid'])
+        elif key == 'participant_completed':
+            self.contest_service.check_contest_status(uuid=data['contest_uuid'])
         elif key == 'avatar_created':
             contests = self.contest_service.find(uuid=data['contest_uuid'])
             if contests.total:
