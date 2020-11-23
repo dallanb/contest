@@ -81,6 +81,25 @@ class ContestsListAPI(Base):
         data = self.clean(schema=create_schema, instance=request.get_json())
         contest = self.contest.create(status='pending', owner_uuid=data['owner_uuid'], name=data['name'],
                                       start_time=data['start_time'], location_uuid=data['location_uuid'])
+        # contest_materialized = self.contest_materialized.create()
+        # contests = self.contest_service.find(uuid=data['uuid'])
+        # if contests.total:
+        #     contest = contests.items[0]
+        #     account = self.participant_service.fetch_account(uuid=str(contest.owner_uuid))
+        #     self.contest_materialized_service.create(
+        #         uuid=contest.uuid,
+        #         name=contest.name,
+        #         status=contest.status.name,
+        #         start_time=contest.start_time,
+        #         owner=contest.owner_uuid,
+        #         location=contest.location_uuid,
+        #         participants={str(contest.owner_uuid): {
+        #             'first_name': account['first_name'],
+        #             'last_name': account['last_name'],
+        #             'score': None,
+        #             'strokes': None,
+        #         }}
+        #     )
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
         participants = data.pop('participants')
         if participants:
