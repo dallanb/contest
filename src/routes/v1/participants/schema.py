@@ -42,6 +42,7 @@ class FetchAllParticipantSchema(Schema):
     include = fields.DelimitedList(fields.String(), required=False, missing=[])
     user_uuid = fields.UUID(required=False)
     status = fields.Str(required=False)
+    contest_uuid = fields.UUID(required=False)
 
 
 create_schema = CreateParticipantSchema()

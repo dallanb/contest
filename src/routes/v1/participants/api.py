@@ -90,8 +90,8 @@ class ParticipantsListAPI(Base):
         self.contest = ContestService()
 
     @marshal_with(DataResponse.marshallable())
-    def get(self):
-        data = self.clean(schema=fetch_all_schema, instance=request.args)
+    def get(self, **kwargs):
+        data = self.clean(schema=fetch_all_schema, instance={**request.args, **kwargs})
         participants = self.participant.find(**data)
         return DataResponse(
             data={
