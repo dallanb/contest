@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from .base import Base
 from .. import app
-from ..common.utils import s3_object_name
+from ..common.utils import s3_object_name, get_image_data
 from ..libs import S3
 from ..models import Avatar as AvatarModel
 
@@ -45,16 +45,20 @@ class Avatar(Base):
             self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
         return result
 
-    def upload_fileobj(self, file):
+    def upload_fileobj(self, file, filename):
+        file_obj = get_image_data(file=file)
         result = self.s3.upload_obj(
-            file=file,
+            file=file_obj,
             bucket=app.config['S3_BUCKET'],
-            object_name=s3_object_name(file.filename),
+            object_name=s3_object_name(filename),
             extra_args={
-                "ACL": "public-read",
-                "ContentType": file.content_type
+                "ACL": "public-read"
             }
         )
         if not result:
             self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
         return
+
+    @staticmethod
+    def generate_s3_filename(contest_uuid):
+        return f"{contest_uuid}.jpeg"
