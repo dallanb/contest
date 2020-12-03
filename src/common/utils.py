@@ -1,8 +1,10 @@
+import base64
 import uuid as UUID
-from time import time
 from datetime import datetime
-from rfc3339 import rfc3339
+from io import BytesIO
+from time import time
 
+from rfc3339 import rfc3339
 
 from .. import app
 
@@ -35,6 +37,14 @@ def file_extension(filename):
 
 def allowed_file(filename):
     return file_extension(filename) in app.config["ALLOWED_EXTENSIONS"]
+
+
+def get_image_data(file):
+    starter = file.find(',')
+    image_data = file[starter + 1:]
+    image_data = bytes(image_data, encoding="ascii")
+    return BytesIO(base64.b64decode(image_data))
+
 
 
 def s3_object_name(filename):
