@@ -1,3 +1,4 @@
+import concurrent.futures
 import logging
 from http import HTTPStatus
 
@@ -44,8 +45,18 @@ class Participant(Base):
             self.error(code=HTTPStatus.BAD_REQUEST)
         return True
 
+    # possibly turn this into a decorator (the caching part)
     @staticmethod
-    @cache.memoize(300)
     def fetch_account(uuid):
+        hit = cache.get(uuid)
+        if hit:
+            return hit
         res = AccountExternal().fetch_account(uuid=uuid)
-        return res['data']['membership']
+        membership = res['data']['membership']
+        cache.set(uuid, membership, 3600)
+        return membership
+
+    def fetch_accounts(self, uuids):
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            executor.map(self.fetch_account, uuids)
+        return
