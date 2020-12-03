@@ -85,6 +85,8 @@ class ContestsListAPI(Base):
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
         participants = data.pop('participants')
         if participants:
+            str_participants = [str(participant) for participant in participants]
+            self.participant.fetch_accounts(uuids=str_participants)
             for user_uuid in participants:
                 status = 'active' if g.user == user_uuid else 'pending'
                 self.participant.create(user_uuid=user_uuid, status=status, contest=contest)
