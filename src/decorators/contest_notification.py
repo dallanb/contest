@@ -36,12 +36,13 @@ class contest_notification:
     def create(self, new_instance):
         key = 'contest_created'
         value = {'uuid': str(new_instance.uuid), 'owner_uuid': str(new_instance.owner_uuid)}
-        self.service.notify(topic=self.topic, value=value, key=key)
+        self.service.notify(topic=self.topic, value=value, key=key, )
 
     def update(self, prev_instance, new_instance, args):
         if prev_instance and prev_instance.get('status') and prev_instance['status'].name != new_instance.status.name:
             key = f'contest_{new_instance.status.name}'
-            value = {'uuid': str(new_instance.uuid), 'owner_uuid': str(new_instance.owner_uuid)}
+            value = {'uuid': str(new_instance.uuid), 'owner_uuid': str(new_instance.owner_uuid),
+                     'message': self.generate_message(key=key, contest=new_instance)}
             self.service.notify(topic=self.topic, value=value, key=key)
         if args.get('avatar'):
             key = 'avatar_created'
@@ -56,3 +57,14 @@ class contest_notification:
             key = 'start_time_updated'
             value = {'uuid': str(new_instance.uuid), 'start_time': new_instance.start_time}
             self.service.notify(topic=self.topic, value=value, key=key)
+
+    @staticmethod
+    def generate_message(key, **kwargs):
+        if key == 'contest_ready':
+            contest = kwargs.get('contest')
+            return f"{contest.name} is ready"
+        elif key == 'contest_active':
+            contest = kwargs.get('contest')
+            return f"{contest.name} is active"
+        else:
+            return ''
