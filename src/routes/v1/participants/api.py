@@ -1,9 +1,10 @@
 from flask import request
 from flask_restful import marshal_with
+
 from .schema import *
 from ..base import Base
-from ....common.response import DataResponse
 from ....common.auth import check_user, assign_user
+from ....common.response import DataResponse
 from ....services import ParticipantService, ContestService
 
 
@@ -119,6 +120,7 @@ class ParticipantsListAPI(Base):
         contests = self.contest.find(uuid=uuid)
         if not contests.total:
             self.throw_error(http_code=self.code.NOT_FOUND)
+        self.participant.fetch_account(uuid=str(data['user_uuid']))
         participant = self.participant.create(user_uuid=data['user_uuid'], contest=contests.items[0],
                                               status="pending")
         return DataResponse(
