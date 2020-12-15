@@ -3,11 +3,10 @@ import logging
 from http import HTTPStatus
 
 from .base import Base
-from .. import cache
-from ..models import Participant as ParticipantModel
 from ..common import ParticipantStatusEnum
 from ..decorators import participant_notification
 from ..external import Account as AccountExternal
+from ..models import Participant as ParticipantModel
 
 
 class Participant(Base):
@@ -46,14 +45,13 @@ class Participant(Base):
         return True
 
     # possibly turn this into a decorator (the caching part)
-    @staticmethod
-    def fetch_account(uuid):
-        hit = cache.get(uuid)
+    def fetch_account(self, uuid):
+        hit = self.cache.get(uuid)
         if hit:
             return hit
         res = AccountExternal().fetch_account(uuid=uuid)
         membership = res['data']['membership']
-        cache.set(uuid, membership, 3600)
+        self.cache.set(uuid, membership, 3600)
         return membership
 
     def fetch_accounts(self, uuids):
