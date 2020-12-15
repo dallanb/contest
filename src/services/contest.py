@@ -58,6 +58,6 @@ class Contest(Base):
         if hit:
             return hit
         res = CourseExternal().fetch_course(uuid=uuid)
-        location = res['data']['membership']
+        location = res['data']['courses']
         self.cache.set(uuid, location, 3600)
         return location
