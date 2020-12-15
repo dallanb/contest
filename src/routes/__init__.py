@@ -22,4 +22,4 @@ api.add_resource(ParticipantsUserAPI, '/contests/<uuid:contest_uuid>/participant
                  endpoint="participant_user")
 api.add_resource(ParticipantsMyUserAPI, '/contests/<uuid:contest_uuid>/participants/user/me',
                  endpoint="participant_my_user")
-api.add_resource(ParticipantsListAPI, '/contests/<uuid:uuid>/participants', '/participants', endpoint="participants")
+api.add_resource(ParticipantsListAPI, '/contests/<uuid:contest_uuid>/participants', '/participants', endpoint="participants")

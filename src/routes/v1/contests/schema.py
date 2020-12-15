@@ -59,7 +59,7 @@ class DumpContestMaterializedSchema(Schema):
     name = fields.String()
     status = fields.String()
     avatar = fields.String()
-    location = fields.UUID()
+    location = fields.String()
     owner = fields.UUID()
     participants = fields.Dict()
     start_time = fields.Integer()

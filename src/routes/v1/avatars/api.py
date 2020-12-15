@@ -17,21 +17,18 @@ class AvatarsAPI(Base):
     @marshal_with(DataResponse.marshallable())
     @check_user
     def post(self, uuid):
-        data = self.clean(schema=create_schema, instance={**request.files.to_dict(), 'uuid': uuid})
+        data = self.clean(schema=create_schema, instance=request.form)
 
         contests = self.contest.find(uuid=uuid, include=['avatar'])
         if not contests.total:
             self.throw_error(http_code=self.code.NOT_FOUND)
 
         avatar = contests.items[0].avatar
-        if avatar:
-            # preserve original s3_filename but replace the filename to the filename of the new file
-            data['avatar'].filename = avatar.s3_filename
-            _ = self.avatar.upload_fileobj(file=data['avatar'])
-            avatar = self.avatar.apply(instance=avatar, filename=avatar.filename)
-        else:
-            _ = self.avatar.upload_fileobj(file=data['avatar'])
-            avatar = self.avatar.create(filename=data['filename'], s3_filename=data['s3_filename'])
+
+        s3_filename = self.avatar.generate_s3_filename(contest_uuid=str(uuid))
+        _ = self.avatar.upload_fileobj(file=data['avatar'], filename=s3_filename)
+        if not avatar:
+            avatar = self.avatar.create(s3_filename=s3_filename)
             self.contest.apply(instance=contests.items[0], avatar=avatar)
         return DataResponse(
             data={

@@ -85,17 +85,21 @@ class ContestsListAPI(Base):
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
         participants = data.pop('participants')
         if participants:
+            str_participants = [str(participant) for participant in participants]
+            self.participant.fetch_accounts(uuids=str_participants)
             for user_uuid in participants:
                 status = 'active' if g.user == user_uuid else 'pending'
                 self.participant.create(user_uuid=user_uuid, status=status, contest=contest)
 
         account = self.participant.fetch_account(uuid=str(g.user))
+        location = self.contest.fetch_location(uuid=str(contest.location_uuid))
         # instead of creating materialized contest asynchronously we will create it when the contest is created
         self.contest_materialized.create(
             uuid=contest.uuid, name=contest.name, status=contest.status.name, start_time=contest.start_time,
-            owner=contest.owner_uuid, location=contest.location_uuid, participants={str(contest.owner_uuid): {
-                'first_name': account['first_name'],
-                'last_name': account['last_name'],
+            owner=contest.owner_uuid, location=location.get('name', ''), participants={str(contest.owner_uuid): {
+                'uuid': str(contest.owner_uuid),
+                'first_name': account.get('first_name', ''),
+                'last_name': account.get('last_name', ''),
                 'score': None,
                 'strokes': None,
             }}

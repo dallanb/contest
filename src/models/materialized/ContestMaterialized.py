@@ -20,7 +20,7 @@ class ContestMaterialized(db.Model):
     start_time = db.Column(db.BigInteger, nullable=False)
     avatar = db.Column(db.String, nullable=True)
     owner = db.Column(UUIDType(binary=False), nullable=False)
-    location = db.Column(UUIDType(binary=False), nullable=False)
+    location = db.Column(db.String, nullable=False)
     participants = db.Column(mutable_json_type(dbtype=JSONB, nested=True))
 
     def __init__(self, *args, **kwargs):
