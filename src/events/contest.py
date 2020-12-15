@@ -47,6 +47,7 @@ class Contest:
                     contest = contests.items[0]
                     account = self.participant_service.fetch_account(uuid=str(participant.user_uuid))
                     contest.participants[data['user_uuid']] = {
+                        'uuid': data['user_uuid'],
                         'first_name': account['first_name'],
                         'last_name': account['last_name'],
                         'score': None,
