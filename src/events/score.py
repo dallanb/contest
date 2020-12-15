@@ -16,7 +16,5 @@ class Score:
             if contests.total:
                 contest = contests.items[0]
                 contest.participants[data['participant_uuid']]['strokes'] = data['strokes']
-                contest.participants[data['participant_uuid']]['prev_score'] = \
-                contest.participants[data['participant_uuid']]['score']
                 contest.participants[data['participant_uuid']]['score'] = data['score']
                 self.contest_materialized_service.save(instance=contest)

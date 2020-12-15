@@ -96,6 +96,7 @@ class ContestsListAPI(Base):
         self.contest_materialized.create(
             uuid=contest.uuid, name=contest.name, status=contest.status.name, start_time=contest.start_time,
             owner=contest.owner_uuid, location=contest.location_uuid, participants={str(contest.owner_uuid): {
+                'uuid': str(contest.owner_uuid),
                 'first_name': account['first_name'],
                 'last_name': account['last_name'],
                 'score': None,
