@@ -1,10 +1,12 @@
 import logging
 from http import HTTPStatus
+
 from sqlalchemy import func
 
 from .base import Base
 from ..common import ParticipantStatusEnum, ContestStatusEnum
 from ..decorators import contest_notification
+from ..external import Course as CourseExternal
 from ..models import Contest as ContestModel, Participant as ParticipantModel
 
 
@@ -50,3 +52,12 @@ class Contest(Base):
         elif ContestStatusEnum[contest.status.name] == ContestStatusEnum[
             'active'] and not counts.get(ParticipantStatusEnum[contest.status.name]):
             self.apply(instance=contest, status=ContestStatusEnum.completed.name)
+
+    def fetch_location(self, uuid):
+        hit = self.cache.get(uuid)
+        if hit:
+            return hit
+        res = CourseExternal().fetch_course(uuid=uuid)
+        location = res['data']['membership']
+        self.cache.set(uuid, location, 3600)
+        return location

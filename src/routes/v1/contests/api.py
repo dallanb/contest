@@ -92,10 +92,12 @@ class ContestsListAPI(Base):
                 self.participant.create(user_uuid=user_uuid, status=status, contest=contest)
 
         account = self.participant.fetch_account(uuid=str(g.user))
+        location = self.contest.fetch_location(uuid=contest.location_uuid)
+        location = location.name if location else ''
         # instead of creating materialized contest asynchronously we will create it when the contest is created
         self.contest_materialized.create(
             uuid=contest.uuid, name=contest.name, status=contest.status.name, start_time=contest.start_time,
-            owner=contest.owner_uuid, location=contest.location_uuid, participants={str(contest.owner_uuid): {
+            owner=contest.owner_uuid, location=location, participants={str(contest.owner_uuid): {
                 'uuid': str(contest.owner_uuid),
                 'first_name': account['first_name'],
                 'last_name': account['last_name'],
