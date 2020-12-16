@@ -8,7 +8,7 @@ class Config(object):
     PROPAGATE_EXCEPTIONS = os.getenv("PROPAGATE_EXCEPTIONS")
     TESTING = os.getenv("TESTING", False)
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite://")
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = True  # Update to true for search
     SECRET_KEY = os.getenv("SECRET_KEY")
     KONG_URL = os.getenv("KONG_URL")
     MAILER_URL = os.getenv("MAILER_URL")
