@@ -156,27 +156,3 @@ class ContestsMaterializedListAPI(Base):
                 )
             }
         )
-
-
-class ContestsMaterializedListSearchAPI(Base):
-    def __init__(self):
-        Base.__init__(self)
-        self.contest_materialized = ContestMaterializedService()
-
-    @marshal_with(DataResponse.marshallable())
-    def get(self):
-        data = self.clean(schema=search_materialized_schema, instance=request.args)
-        contests = self.contest_materialized.search(**data)
-        return DataResponse(
-            data={
-                '_metadata': self.prepare_metadata(
-                    total_count=contests.total,
-                    page_count=len(contests.items),
-                    page=data['page'],
-                    per_page=data['per_page']),
-                'contests': self.dump(
-                    schema=dump_many_materialized_schema,
-                    instance=contests.items,
-                )
-            }
-        )

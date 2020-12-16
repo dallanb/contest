@@ -90,6 +90,7 @@ class _FetchAllContestMaterializedHasKeySchema(Schema):
 class FetchAllContestMaterializedSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
+    search = fields.String(required=False)
     sort_by = fields.String(required=False)
     participants = fields.String(required=False, attribute="has_key.participants", data_key='participants')
 
