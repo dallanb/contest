@@ -236,13 +236,6 @@ class DB:
         return cls._clean_query(query, page=page, per_page=per_page)
 
     @classmethod
-    def search(cls, model, key, sort=False, page=None, per_page=None):
-        query = db.session.query(model)
-        query = full_text_search(query, key, sort=sort)
-
-        return cls._clean_query(query, page=page, per_page=per_page)
-
-    @classmethod
     def destroy(cls, instance):
         db.session.delete(instance)
         db.session.commit()
