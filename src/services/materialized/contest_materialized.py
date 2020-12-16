@@ -33,3 +33,6 @@ class ContestMaterialized(Base):
     def apply(self, instance, **kwargs):
         materialized_contest = self.assign_attr(instance=instance, attr=kwargs)
         return self.save(instance=materialized_contest)
+
+    def search(self, **kwargs):
+        return Base.search(self, model=self.materialized_model, **kwargs)

@@ -3,6 +3,7 @@ import re
 
 import inflect
 from sqlalchemy import inspect, or_, and_
+from sqlalchemy_searchable import search
 
 from .. import db
 from ..common.cleaner import Cleaner
@@ -204,6 +205,22 @@ class DB:
         return filters
 
     @classmethod
+    def _clean_query(cls, query, **kwargs):
+        page = kwargs.get('page', None)
+        per_page = kwargs.get('per_page', None)
+
+        if page is not None and per_page is not None:
+            paginate = query.paginate(page, per_page, False)
+            items = paginate.items
+            total = paginate.total
+        else:
+            items = query.all()
+            total = len(items)
+
+        Find = collections.namedtuple('Find', ['items', 'total'])
+        return Find(items=items, total=total)
+
+    @classmethod
     # Methods
     def init(cls, model, **kwargs):
         return model(**kwargs)
@@ -234,16 +251,14 @@ class DB:
                                         **kwargs)
         query = cls._query_builder(model=model, filters=filters, include=include, expand=expand, sort_by=sort_by)
 
-        if page is not None and per_page is not None:
-            paginate = query.paginate(page, per_page, False)
-            items = paginate.items
-            total = paginate.total
-        else:
-            items = query.all()
-            total = len(items)
+        return cls._clean_query(query, page=page, per_page=per_page)
 
-        Find = collections.namedtuple('Find', ['items', 'total'])
-        return Find(items=items, total=total)
+    @classmethod
+    def search(cls, model, key, sort=False, page=None, per_page=None):
+        query = db.session.query(model)
+        query = search(query, key, sort=sort)
+
+        return cls._clean_query(query, page=page, per_page=per_page)
 
     @classmethod
     def destroy(cls, instance):
