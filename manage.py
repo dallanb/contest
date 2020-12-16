@@ -16,6 +16,7 @@ def full_init():
 
 def create_db():
     db.drop_all()
+    db.configure_mappers()
     db.create_all()
     db.session.commit()
 
