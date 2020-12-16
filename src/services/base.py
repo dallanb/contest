@@ -1,4 +1,5 @@
 import logging
+
 from ..common import Cache, DB, Event
 from ..common.error import ManualException
 
@@ -16,6 +17,9 @@ class Base:
 
     def find(self, model, **kwargs):
         return self.db.find(model=model, **kwargs)
+
+    def search(self, model, **kwargs):
+        return self.db.search(model=model, **kwargs)
 
     def init(self, model, **kwargs):
         return self.db.init(model=model, **kwargs)

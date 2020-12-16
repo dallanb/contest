@@ -94,6 +94,12 @@ class FetchAllContestMaterializedSchema(Schema):
     participants = fields.String(required=False, attribute="has_key.participants", data_key='participants')
 
 
+class SearchContestMaterializedSchema(Schema):
+    page = fields.Int(required=False, missing=1)
+    per_page = fields.Int(required=False, missing=10)
+    key = fields.String(required=False, missing='')
+
+
 create_schema = CreateContestSchema()
 dump_schema = DumpContestSchema()
 dump_many_schema = DumpContestSchema(many=True)
@@ -103,3 +109,4 @@ update_schema = UpdateContestSchema()
 fetch_schema = FetchContestSchema()
 fetch_all_schema = FetchAllContestSchema()
 fetch_all_materialized_schema = FetchAllContestMaterializedSchema()
+search_materialized_schema = SearchContestMaterializedSchema()
