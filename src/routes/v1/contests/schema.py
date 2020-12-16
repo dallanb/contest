@@ -97,6 +97,7 @@ class FetchAllContestMaterializedSchema(Schema):
 class SearchContestMaterializedSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
+    sort = fields.Boolean(required=False, missing=True)
     key = fields.String(required=False, missing='')
 
 

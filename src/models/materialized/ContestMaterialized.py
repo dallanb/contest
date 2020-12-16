@@ -23,7 +23,7 @@ class ContestMaterialized(db.Model):
     owner = db.Column(UUIDType(binary=False), nullable=False)
     location = db.Column(db.String, nullable=False)
     participants = db.Column(mutable_json_type(dbtype=JSONB, nested=True))
-    search_vector = db.Column(TSVectorType('name', 'location'))
+    search_vector = db.Column(TSVectorType('name', 'location', weights={'name': 'A', 'location': 'B'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
