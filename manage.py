@@ -16,7 +16,6 @@ def full_init():
 
 def create_db():
     db.drop_all()
-    db.configure_mappers()
     db.create_all()
     db.session.commit()
 
@@ -46,6 +45,11 @@ def check_actives():
 @cli.command("init")
 def init():
     full_init()
+
+
+@cli.command("configure")
+def configure():
+    db.configure_mappers()
 
 
 @cli.command("reset_db")
