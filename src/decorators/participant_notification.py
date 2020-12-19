@@ -67,16 +67,16 @@ class participant_notification:
         if key == 'participant_invited':
             contest = kwargs.get('contest')
             account = self.service.fetch_account(uuid=str(contest.owner_uuid))
-            return f"{account['first_name']} {account['last_name']} invited you to {contest.name}"
+            return f"{account['display_name']} invited you to {contest.name}"
         elif key == 'participant_active':
             contest = kwargs.get('contest')
             participant = kwargs.get('participant')
             account = self.service.fetch_account(uuid=str(participant.user_uuid))
-            return f"{account['first_name']} {account['last_name']} accepted invite to {contest.name}"
+            return f"{account['display_name']} accepted invite to {contest.name}"
         elif key == 'participant_inactive':
             contest = kwargs.get('contest')
             participant = kwargs.get('participant')
             account = self.service.fetch_account(uuid=str(participant.user_uuid))
-            return f"{account['first_name']} {account['last_name']} declined invite to {contest.name}"
+            return f"{account['display_name']} declined invite to {contest.name}"
         else:
             return ''

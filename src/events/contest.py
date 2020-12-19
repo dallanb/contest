@@ -48,8 +48,7 @@ class Contest:
                     account = self.participant_service.fetch_account(uuid=str(participant.user_uuid))
                     contest.participants[data['user_uuid']] = {
                         'uuid': data['user_uuid'],
-                        'first_name': account['first_name'],
-                        'last_name': account['last_name'],
+                        'display_name': account['display_name'],
                         'score': None,
                         'strokes': None
                     }  # maybe fix this to conform to the rest of the code
