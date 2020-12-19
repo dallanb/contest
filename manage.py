@@ -63,9 +63,11 @@ def check_actives():
     delta = datetime.timedelta(days=1)
     check_contest_active(delta=delta)
 
+
 @cli.command("init")
 def init():
     init_db()
+
 
 @cli.command("load")
 def load():

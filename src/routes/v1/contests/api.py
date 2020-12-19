@@ -98,8 +98,7 @@ class ContestsListAPI(Base):
             uuid=contest.uuid, name=contest.name, status=contest.status.name, start_time=contest.start_time,
             owner=contest.owner_uuid, location=location.get('name', ''), participants={str(contest.owner_uuid): {
                 'uuid': str(contest.owner_uuid),
-                'first_name': account.get('first_name', ''),
-                'last_name': account.get('last_name', ''),
+                'display_name': account.get('display_name', ''),
                 'score': None,
                 'strokes': None,
             }}
