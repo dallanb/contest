@@ -1,5 +1,4 @@
 import collections
-import logging
 import re
 
 import inflect
@@ -22,8 +21,8 @@ class DB:
             for key, value in filter_arr:
                 if key == 'like':
                     for like_k, like_v in value:
-                        search = "%{}%".format(like_v)
-                        criterion.append(like_k.like(search))
+                        like_format = "%{}%".format(like_v)
+                        criterion.append(like_k.like(like_format))
                 if key == 'equal':
                     for equal_k, equal_v in value:
                         criterion.append(equal_k == equal_v)
@@ -54,7 +53,7 @@ class DB:
             options = db.lazyload(getattr(model, tables[0]))
             for j, table in enumerate(tables):
                 if j > 0:
-                    nested_class = cls.get_class_by_tablename(tables[j - 1])
+                    nested_class = cls._get_class_by_tablename(tables[j - 1])
                     options = options.lazyload(getattr(nested_class, table))
             query = query.options(options)
         for i, k in enumerate(include):
@@ -62,7 +61,7 @@ class DB:
             options = db.joinedload(getattr(model, tables[0]))
             for j, table in enumerate(tables):
                 if j > 0:
-                    nested_class = cls.get_class_by_tablename(cls._singularize(tables[j - 1]))
+                    nested_class = cls._get_class_by_tablename(cls._singularize(tables[j - 1]))
                     options = options.joinedload(getattr(nested_class, table))
             query = query.options(options)
         if search is not None:
