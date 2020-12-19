@@ -9,9 +9,16 @@ from src import app, db, common
 cli = FlaskGroup(app)
 
 
-def full_init():
+def full_load():
     initialize_statuses()
     os.system('flask seed run')
+
+
+def init_db():
+    db.drop_all()
+    db.configure_mappers()
+    db.create_all()
+    db.session.commit()
 
 
 def drop_db():
@@ -56,10 +63,13 @@ def check_actives():
     delta = datetime.timedelta(days=1)
     check_contest_active(delta=delta)
 
-
 @cli.command("init")
 def init():
-    full_init()
+    init_db()
+
+@cli.command("load")
+def load():
+    full_load()
 
 
 @cli.command("create")
@@ -92,8 +102,8 @@ def flush_cache():
     clear_cache()
 
 
-@cli.command("init_status")
-def init_status():
+@cli.command("load_status")
+def load_status():
     initialize_statuses()
 
 
