@@ -14,7 +14,22 @@ def full_init():
     os.system('flask seed run')
 
 
+def drop_db():
+    db.drop_all()
+    db.session.commit()
+
+
+def configure_db():
+    db.configure_mappers()
+    db.session.commit()
+
+
 def create_db():
+    db.create_all()
+    db.session.commit()
+
+
+def reset_db():
     db.drop_all()
     db.create_all()
     db.session.commit()
@@ -47,14 +62,24 @@ def init():
     full_init()
 
 
+@cli.command("create")
+def create():
+    create_db()
+
+
+@cli.command("drop")
+def drop():
+    drop_db()
+
+
+@cli.command("reset")
+def reset():
+    reset_db()
+
+
 @cli.command("configure")
 def configure():
-    db.configure_mappers()
-
-
-@cli.command("reset_db")
-def reset_db():
-    create_db()
+    configure_db()
 
 
 @cli.command("delete_db")
