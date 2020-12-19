@@ -1,5 +1,4 @@
 import collections
-import logging
 import re
 
 import inflect
@@ -22,8 +21,8 @@ class DB:
             for key, value in filter_arr:
                 if key == 'like':
                     for like_k, like_v in value:
-                        search = "%{}%".format(like_v)
-                        criterion.append(like_k.like(search))
+                        like_format = "%{}%".format(like_v)
+                        criterion.append(like_k.like(like_format))
                 if key == 'equal':
                     for equal_k, equal_v in value:
                         criterion.append(equal_k == equal_v)
