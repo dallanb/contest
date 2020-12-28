@@ -15,7 +15,6 @@ class Contest(Base):
         Base.__init__(self)
         self.logger = logging.getLogger(__name__)
         self.contest_model = ContestModel
-        self.participantModel = ParticipantModel
 
     def find(self, **kwargs):
         return Base.find(self, model=self.contest_model, **kwargs)
