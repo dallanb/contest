@@ -66,17 +66,17 @@ class participant_notification:
     def generate_message(self, key, **kwargs):
         if key == 'participant_invited':
             contest = kwargs.get('contest')
-            account = self.service.fetch_account(uuid=str(contest.owner_uuid))
-            return f"{account['display_name']} invited you to {contest.name}"
+            member = self.service.fetch_member(user_uuid=str(contest.owner_uuid))
+            return f"{member['display_name']} invited you to {contest.name}"
         elif key == 'participant_active':
             contest = kwargs.get('contest')
             participant = kwargs.get('participant')
-            account = self.service.fetch_account(uuid=str(participant.user_uuid))
-            return f"{account['display_name']} accepted invite to {contest.name}"
+            member = self.service.fetch_member_user(user_uuid=str(participant.user_uuid))
+            return f"{member['display_name']} accepted invite to {contest.name}"
         elif key == 'participant_inactive':
             contest = kwargs.get('contest')
             participant = kwargs.get('participant')
-            account = self.service.fetch_account(uuid=str(participant.user_uuid))
-            return f"{account['display_name']} declined invite to {contest.name}"
+            member = self.service.fetch_member_user(user_uuid=str(participant.user_uuid))
+            return f"{member['display_name']} declined invite to {contest.name}"
         else:
             return ''

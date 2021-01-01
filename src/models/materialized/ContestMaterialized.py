@@ -22,6 +22,7 @@ class ContestMaterialized(db.Model):
     avatar = db.Column(db.String, nullable=True)
     owner = db.Column(UUIDType(binary=False), nullable=False)
     location = db.Column(db.String, nullable=False)
+    league = db.Column(UUIDType(binary=False), nullable=True)
     participants = db.Column(mutable_json_type(dbtype=JSONB, nested=True))
     search_vector = db.Column(TSVectorType('name', 'location', weights={'name': 'A', 'location': 'B'}))
 

@@ -5,7 +5,7 @@ from http import HTTPStatus
 from .base import Base
 from ..common import ParticipantStatusEnum
 from ..decorators import participant_notification
-from ..external import Account as AccountExternal
+from ..external import Account as AccountExternal, Member as MemberExternal
 from ..models import Participant as ParticipantModel
 
 
@@ -43,6 +43,10 @@ class Participant(Base):
             new_status] == ParticipantStatusEnum['pending']:
             self.error(code=HTTPStatus.BAD_REQUEST)
         return True
+
+    def fetch_members(self, **kwargs):
+        # add caching to this api call
+        res = MemberExternal().fetch_members(**kwargs)
 
     # possibly turn this into a decorator (the caching part)
     def fetch_account(self, uuid):

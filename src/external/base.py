@@ -11,7 +11,8 @@ class Base:
     def get(**kwargs):
         url = kwargs.get('url', None)
         headers = kwargs.get('headers', None)
-        return requests.get(url, headers=headers)
+        params = kwargs.get('params', None)
+        return requests.get(url, headers=headers, params=params)
 
     @staticmethod
     def post(**kwargs):
