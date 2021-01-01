@@ -84,10 +84,7 @@ class ContestsListAPI(Base):
                                       start_time=data['start_time'], location_uuid=data['location_uuid'],
                                       league_uuid=data['league_uuid'])
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
-        members = self.participant.fetch_members(user_uuid=str(g.user), league_uuid=contest.league_uuid)
-        if not len(members):
-            self.throw_error(http_code=self.code.BAD_REQUEST)
-        owner = members[0]
+        owner = self.participant.fetch_owner(user_uuid=str(g.user), league_uuid=contest.league_uuid)
 
         participants = data.pop('participants')
         if participants:
