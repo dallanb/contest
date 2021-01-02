@@ -4,7 +4,6 @@ from http import HTTPStatus
 from ..base import Base
 from ..contest import Contest as ContestService
 from ..participant import Participant as ParticipantService
-from ...external import Account as AccountExternal
 from ...models import ContestMaterialized as MaterializedModel
 
 
@@ -15,7 +14,6 @@ class ContestMaterialized(Base):
         self.contest_service = ContestService()
         self.participant_service = ParticipantService()
         self.materialized_model = MaterializedModel
-        self.account_external = AccountExternal()
 
     def find(self, **kwargs):
         return Base.find(self, model=self.materialized_model, **kwargs)

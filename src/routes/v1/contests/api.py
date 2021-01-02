@@ -81,24 +81,26 @@ class ContestsListAPI(Base):
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
         contest = self.contest.create(status='pending', owner_uuid=g.user, name=data['name'],
-                                      start_time=data['start_time'], location_uuid=data['location_uuid'])
+                                      start_time=data['start_time'], location_uuid=data['location_uuid'],
+                                      league_uuid=data['league_uuid'])
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
+        owner = self.participant.fetch_owner(user_uuid=str(g.user), league_uuid=contest.league_uuid)
+
         participants = data.pop('participants')
         if participants:
             str_participants = [str(participant) for participant in participants]
-            self.participant.fetch_accounts(uuids=str_participants)
-            for user_uuid in participants:
-                status = 'active' if g.user == user_uuid else 'pending'
-                self.participant.create(user_uuid=user_uuid, status=status, contest=contest)
+            self.participant.fetch_member_batch(uuids=str_participants)
+            for member_uuid in participants:
+                status = 'active' if owner.get('uuid', '') == member_uuid else 'pending'
+                self.participant.create(member_uuid=member_uuid, status=status, contest=contest)
 
-        account = self.participant.fetch_account(uuid=str(g.user))
         location = self.contest.fetch_location(uuid=str(contest.location_uuid))
         # instead of creating materialized contest asynchronously we will create it when the contest is created
         self.contest_materialized.create(
             uuid=contest.uuid, name=contest.name, status=contest.status.name, start_time=contest.start_time,
-            owner=contest.owner_uuid, location=location.get('name', ''), participants={str(contest.owner_uuid): {
+            owner=contest.owner_uuid, location=location.get('name', ''), participants={str(owner.get('uuid', '')): {
                 'uuid': str(contest.owner_uuid),
-                'display_name': account.get('display_name', ''),
+                'display_name': owner.get('display_name', ''),
                 'score': None,
                 'strokes': None,
             }}

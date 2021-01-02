@@ -3,7 +3,7 @@ from flask_restful import marshal_with
 
 from .schema import *
 from ..base import Base
-from ....common.auth import check_user, assign_user
+from ....common.auth import check_user
 from ....common.response import DataResponse
 from ....services import ParticipantService, ContestService
 
@@ -41,14 +41,14 @@ class ParticipantsAPI(Base):
         )
 
 
-class ParticipantsUserAPI(Base):
+class ParticipantsMemberAPI(Base):
     def __init__(self):
         Base.__init__(self)
         self.participant = ParticipantService()
 
     @marshal_with(DataResponse.marshallable())
-    def get(self, contest_uuid, user_uuid):
-        participants = self.participant.find(user_uuid=user_uuid, contest_uuid=contest_uuid)
+    def get(self, contest_uuid, member_uuid):
+        participants = self.participant.find(member_uuid=member_uuid, contest_uuid=contest_uuid)
         if not participants.total:
             self.throw_error(http_code=self.code.NOT_FOUND)
         return DataResponse(
@@ -56,29 +56,6 @@ class ParticipantsUserAPI(Base):
                 'participants': self.dump(
                     schema=dump_schema,
                     instance=participants.items[0]
-                )
-            }
-        )
-
-
-class ParticipantsMyUserAPI(Base):
-    def __init__(self):
-        Base.__init__(self)
-        self.participant = ParticipantService()
-
-    @assign_user
-    @marshal_with(DataResponse.marshallable())
-    def get(self, contest_uuid, me):
-        participants = self.participant.find(user_uuid=me, contest_uuid=contest_uuid)
-        if not participants.total:
-            participant = None
-        else:
-            participant = participants.items[0]
-        return DataResponse(
-            data={
-                'participants': self.dump(
-                    schema=dump_schema,
-                    instance=participant
                 )
             }
         )
@@ -120,8 +97,8 @@ class ParticipantsListAPI(Base):
         contests = self.contest.find(uuid=uuid)
         if not contests.total:
             self.throw_error(http_code=self.code.NOT_FOUND)
-        self.participant.fetch_account(uuid=str(data['user_uuid']))
-        participant = self.participant.create(user_uuid=data['user_uuid'], contest=contests.items[0],
+        self.participant.fetch_member(uuid=str(data['member_uuid']))
+        participant = self.participant.create(member_uuid=data['member_uuid'], contest=contests.items[0],
                                               status="pending")
         return DataResponse(
             data={

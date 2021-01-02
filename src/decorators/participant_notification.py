@@ -40,10 +40,12 @@ class participant_notification:
             key = 'participant_invited'
             contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
             contest = contests.items[0]
+            member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
             value = {
                 'contest_uuid': str(new_instance.contest_uuid),
                 'participant_uuid': str(new_instance.uuid),
-                'user_uuid': str(new_instance.user_uuid),
+                'member_uuid': str(new_instance.member_uuid),
+                'user_uuid': str(member['user_uuid']),
                 'owner_uuid': str(contest.owner_uuid),
                 'message': self.generate_message(key=key, contest=contest)
             }
@@ -54,29 +56,31 @@ class participant_notification:
             key = f'participant_{new_instance.status.name}'
             contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
             contest = contests.items[0]
+            member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
             value = {
                 'contest_uuid': str(new_instance.contest_uuid),
                 'participant_uuid': str(new_instance.uuid),
-                'user_uuid': str(new_instance.user_uuid),
+                'member_uuid': str(new_instance.member_uuid),
+                'user_uuid': str(member['user_uuid']),
                 'owner_uuid': str(contest.owner_uuid),
-                'message': self.generate_message(key=key, contest=contest, participant=new_instance)
+                'message': self.generate_message(key=key, contest=contest, member=new_instance)
             }
             self.service.notify(topic=self.topic, value=value, key=key)
 
     def generate_message(self, key, **kwargs):
         if key == 'participant_invited':
             contest = kwargs.get('contest')
-            account = self.service.fetch_account(uuid=str(contest.owner_uuid))
-            return f"{account['display_name']} invited you to {contest.name}"
+            user_uuid = str(contest.owner_uuid)
+            league_uuid = str(contest.league_uuid) if contest.league_uuid else None
+            owner = self.service.fetch_owner(user_uuid=user_uuid, league_uuid=league_uuid)
+            return f"{owner['display_name']} invited you to {contest.name}"
         elif key == 'participant_active':
             contest = kwargs.get('contest')
-            participant = kwargs.get('participant')
-            account = self.service.fetch_account(uuid=str(participant.user_uuid))
-            return f"{account['display_name']} accepted invite to {contest.name}"
+            member = kwargs.get('member')
+            return f"{member['display_name']} accepted invite to {contest.name}"
         elif key == 'participant_inactive':
             contest = kwargs.get('contest')
-            participant = kwargs.get('participant')
-            account = self.service.fetch_account(uuid=str(participant.user_uuid))
-            return f"{account['display_name']} declined invite to {contest.name}"
+            member = kwargs.get('member')
+            return f"{member['display_name']} declined invite to {contest.name}"
         else:
             return ''

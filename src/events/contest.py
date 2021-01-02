@@ -45,10 +45,10 @@ class Contest:
                 contests = self.contest_materialized_service.find(uuid=data['contest_uuid'])
                 if contests.total:
                     contest = contests.items[0]
-                    account = self.participant_service.fetch_account(uuid=str(participant.user_uuid))
-                    contest.participants[data['user_uuid']] = {
-                        'uuid': data['user_uuid'],
-                        'display_name': account['display_name'],
+                    member = self.participant_service.fetch_member(uuid=str(participant.member_uuid))
+                    contest.participants[data['member_uuid']] = {
+                        'uuid': data['member_uuid'],
+                        'display_name': member.get('display_name', ''),
                         'score': None,
                         'strokes': None
                     }  # maybe fix this to conform to the rest of the code

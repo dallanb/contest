@@ -5,7 +5,7 @@ from .mixins import BaseMixin
 
 
 class Participant(db.Model, BaseMixin):
-    user_uuid = db.Column(UUIDType(binary=False), nullable=False)
+    member_uuid = db.Column(UUIDType(binary=False), nullable=False)
 
     # FK
     contest_uuid = db.Column(UUIDType(binary=False), db.ForeignKey('contest.uuid'), nullable=False)
