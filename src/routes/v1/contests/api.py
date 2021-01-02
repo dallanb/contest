@@ -91,7 +91,7 @@ class ContestsListAPI(Base):
             str_participants = [str(participant) for participant in participants]
             self.participant.fetch_member_batch(uuids=str_participants)
             for member_uuid in participants:
-                status = 'active' if owner.get('uuid', '') == member_uuid else 'pending'
+                status = 'active' if owner.get('uuid', '') == str(member_uuid) else 'pending'
                 self.participant.create(member_uuid=member_uuid, status=status, contest=contest)
 
         location = self.contest.fetch_location(uuid=str(contest.location_uuid))
