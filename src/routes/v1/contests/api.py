@@ -84,7 +84,10 @@ class ContestsListAPI(Base):
                                       start_time=data['start_time'], location_uuid=data['location_uuid'],
                                       league_uuid=data['league_uuid'])
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
-        owner = self.participant.fetch_owner(user_uuid=str(g.user), league_uuid=contest.league_uuid)
+
+        owner = self.participant.fetch_member_user(user_uuid=str(g.user),
+                                                   league_uuid=str(
+                                                       contest.league_uuid) if contest.league_uuid else None)
 
         participants = data.pop('participants')
         if participants:

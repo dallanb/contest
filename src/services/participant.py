@@ -44,17 +44,14 @@ class Participant(Base):
             self.error(code=HTTPStatus.BAD_REQUEST)
         return True
 
-    def fetch_owner(self, user_uuid, league_uuid):
-        members = self.fetch_members(user_uuid=user_uuid, league_uuid=league_uuid)
-        if not len(members):
-            self.error(code=HTTPStatus.BAD_REQUEST)
-        return members[0]
-
-    def fetch_members(self, **kwargs):
-        # add caching to this api call
-        res = MemberExternal().fetch_members(params={**kwargs})
-        members = res['data']['members']
-        return members
+    def fetch_member_user(self, user_uuid, league_uuid):
+        hit = self.cache.get(f'{user_uuid}_{league_uuid}')
+        if hit:
+            return hit
+        res = MemberExternal().fetch_member_user(uuid=user_uuid, params={'league_uuid': league_uuid})
+        member = res['data']['members']
+        self.cache.set(f'{user_uuid}_{league_uuid}', member, 3600)
+        return member
 
     # possibly turn this into a decorator (the caching part)
     def fetch_member(self, uuid):
