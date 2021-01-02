@@ -98,7 +98,8 @@ class ContestsListAPI(Base):
         # instead of creating materialized contest asynchronously we will create it when the contest is created
         self.contest_materialized.create(
             uuid=contest.uuid, name=contest.name, status=contest.status.name, start_time=contest.start_time,
-            owner=contest.owner_uuid, location=location.get('name', ''), participants={str(owner.get('uuid', '')): {
+            owner=contest.owner_uuid, location=location.get('name', ''), league=contest.league_uuid,
+            participants={str(owner.get('uuid', '')): {
                 'uuid': str(contest.owner_uuid),
                 'display_name': owner.get('display_name', ''),
                 'score': None,
