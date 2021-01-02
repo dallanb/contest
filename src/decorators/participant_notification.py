@@ -70,7 +70,9 @@ class participant_notification:
     def generate_message(self, key, **kwargs):
         if key == 'participant_invited':
             contest = kwargs.get('contest')
-            owner = self.service.fetch_owner(user_uuid=str(contest.owner_uuid), league_uuid=str(contest.league_uuid))
+            user_uuid = str(contest.owner_uuid)
+            league_uuid = str(contest.league_uuid) if contest.league_uuid else None
+            owner = self.service.fetch_owner(user_uuid=user_uuid, league_uuid=league_uuid)
             return f"{owner['display_name']} invited you to {contest.name}"
         elif key == 'participant_active':
             contest = kwargs.get('contest')
