@@ -8,11 +8,11 @@ class Config(object):
     PROPAGATE_EXCEPTIONS = os.getenv("PROPAGATE_EXCEPTIONS")
     TESTING = os.getenv("TESTING", False)
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite://")
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = True  # Update to true for search
     SECRET_KEY = os.getenv("SECRET_KEY")
     KONG_URL = os.getenv("KONG_URL")
     MAILER_URL = os.getenv("MAILER_URL")
-    ACCOUNT_URL = os.getenv("ACCOUNT_URL")
+    MEMBER_URL = os.getenv("MEMBER_URL")
     COURSE_URL = os.getenv("COURSE_URL")
     KAFKA_URL = os.getenv("KAFKA_URL")
     KAFKA_TOPICS = os.getenv("KAFKA_TOPICS").split(",")

@@ -1,8 +1,8 @@
-from .. import api
-from .v1 import PingAPI
-from .v1 import ContestsAPI, ContestsListAPI, ContestsMaterializedAPI, ContestsMaterializedListAPI
-from .v1 import ParticipantsAPI, ParticipantsUserAPI, ParticipantsMyUserAPI, ParticipantsListAPI
 from .v1 import AvatarsAPI
+from .v1 import ContestsAPI, ContestsListAPI, ContestsMaterializedAPI, ContestsMaterializedListAPI
+from .v1 import ParticipantsAPI, ParticipantsMemberAPI, ParticipantsListAPI
+from .v1 import PingAPI
+from .. import api
 
 # Ping
 api.add_resource(PingAPI, '/ping', methods=['GET'])
@@ -18,8 +18,7 @@ api.add_resource(AvatarsAPI, '/contests/<uuid>/avatars', endpoint="avatar")
 
 # Participants
 api.add_resource(ParticipantsAPI, '/participants/<uuid:uuid>', endpoint="participant")
-api.add_resource(ParticipantsUserAPI, '/contests/<uuid:contest_uuid>/participants/user/<uuid:user_uuid>',
-                 endpoint="participant_user")
-api.add_resource(ParticipantsMyUserAPI, '/contests/<uuid:contest_uuid>/participants/user/me',
-                 endpoint="participant_my_user")
-api.add_resource(ParticipantsListAPI, '/contests/<uuid:contest_uuid>/participants', '/participants', endpoint="participants")
+api.add_resource(ParticipantsMemberAPI, '/contests/<uuid:contest_uuid>/participants/member/<uuid:member_uuid>',
+                 endpoint="participant_member")
+api.add_resource(ParticipantsListAPI, '/contests/<uuid:contest_uuid>/participants', '/participants',
+                 endpoint="participants")

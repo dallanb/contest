@@ -3,6 +3,7 @@ import re
 
 import inflect
 from sqlalchemy import inspect, or_, and_
+from sqlalchemy_searchable import search as full_text_search
 
 from .. import db
 from ..common.cleaner import Cleaner
@@ -12,15 +13,16 @@ from ..common.error import *
 class DB:
     # Helpers
     @classmethod
-    def _query_builder(cls, model, filters=[], expand=[], include=[], sort_by=None, limit=None, offset=None):
+    def _query_builder(cls, model, filters=[], expand=[], include=[], search=None, sort_by=None, limit=None,
+                       offset=None):
         query = db.session.query(model)
         for logic_operator, filter_arr in filters:
             criterion = []
             for key, value in filter_arr:
                 if key == 'like':
                     for like_k, like_v in value:
-                        search = "%{}%".format(like_v)
-                        criterion.append(like_k.like(search))
+                        like_format = "%{}%".format(like_v)
+                        criterion.append(like_k.like(like_format))
                 if key == 'equal':
                     for equal_k, equal_v in value:
                         criterion.append(equal_k == equal_v)
@@ -51,7 +53,7 @@ class DB:
             options = db.lazyload(getattr(model, tables[0]))
             for j, table in enumerate(tables):
                 if j > 0:
-                    nested_class = cls.get_class_by_tablename(tables[j - 1])
+                    nested_class = cls._get_class_by_tablename(tables[j - 1])
                     options = options.lazyload(getattr(nested_class, table))
             query = query.options(options)
         for i, k in enumerate(include):
@@ -59,9 +61,11 @@ class DB:
             options = db.joinedload(getattr(model, tables[0]))
             for j, table in enumerate(tables):
                 if j > 0:
-                    nested_class = cls.get_class_by_tablename(cls._singularize(tables[j - 1]))
+                    nested_class = cls._get_class_by_tablename(cls._singularize(tables[j - 1]))
                     options = options.joinedload(getattr(nested_class, table))
             query = query.options(options)
+        if search is not None:
+            query = full_text_search(query, search, sort=True)
         if sort_by is not None:
             direction = re.search('[.](a|de)sc', sort_by)
             if direction is not None:
@@ -135,25 +139,6 @@ class DB:
         return nested_filter
 
     @classmethod
-    def _generate_search_filter(cls, model, search):
-        search_filter = []
-        if 'key' in search:
-            search_filter.append(
-                (
-                    'or',
-                    [
-                        (
-                            'like',
-                            [
-                                (getattr(model, field), search['key'])
-                            ]
-                        ) for field in search['fields']
-                    ]
-                )
-            )
-        return search_filter
-
-    @classmethod
     def _generate_in_filter(cls, model, within):
         in_filter = []
         for k, v in within.items():
@@ -183,7 +168,7 @@ class DB:
         return has_key_filter
 
     @classmethod
-    def _generate_filters(cls, model, nested=None, search=None, within=None, has_key=None, **kwargs):
+    def _generate_filters(cls, model, nested=None, within=None, has_key=None, **kwargs):
         filters = []
 
         if len(kwargs):
@@ -192,9 +177,6 @@ class DB:
         if nested:
             filters.extend(cls._generate_nested_filter(nested=nested))
 
-        if search:
-            filters.extend(cls._generate_search_filter(model=model, search=search))
-
         if within:
             filters.extend(cls._generate_in_filter(model=model, within=within))
 
@@ -202,6 +184,22 @@ class DB:
             filters.extend(cls._generate_has_key_filter(model=model, has_key=has_key))
 
         return filters
+
+    @classmethod
+    def _clean_query(cls, query, **kwargs):
+        page = kwargs.get('page', None)
+        per_page = kwargs.get('per_page', None)
+
+        if page is not None and per_page is not None:
+            paginate = query.paginate(page, per_page, False)
+            items = paginate.items
+            total = paginate.total
+        else:
+            items = query.all()
+            total = len(items)
+
+        Find = collections.namedtuple('Find', ['items', 'total'])
+        return Find(items=items, total=total)
 
     @classmethod
     # Methods
@@ -228,22 +226,13 @@ class DB:
     @classmethod
     # TODO: Consider using dataclass instead of a named tuple
     def find(cls, model, page=None, per_page=None, expand=[], include=[], sort_by=None, nested=None, search=None,
-             within=None,
-             has_key=None, **kwargs):
-        filters = cls._generate_filters(model=model, nested=nested, search=search, within=within, has_key=has_key,
+             within=None, has_key=None, **kwargs):
+        filters = cls._generate_filters(model=model, nested=nested, within=within, has_key=has_key,
                                         **kwargs)
-        query = cls._query_builder(model=model, filters=filters, include=include, expand=expand, sort_by=sort_by)
+        query = cls._query_builder(model=model, filters=filters, search=search, include=include, expand=expand,
+                                   sort_by=sort_by)
 
-        if page is not None and per_page is not None:
-            paginate = query.paginate(page, per_page, False)
-            items = paginate.items
-            total = paginate.total
-        else:
-            items = query.all()
-            total = len(items)
-
-        Find = collections.namedtuple('Find', ['items', 'total'])
-        return Find(items=items, total=total)
+        return cls._clean_query(query, page=page, per_page=per_page)
 
     @classmethod
     def destroy(cls, instance):

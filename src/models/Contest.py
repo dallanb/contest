@@ -6,7 +6,10 @@ from ..common import ContestStatusEnum
 
 
 class Contest(db.Model, BaseMixin):
+    # this is a user_uuid not a member_uuid for notification purposes
     owner_uuid = db.Column(UUIDType(binary=False), nullable=False)
+
+    league_uuid = db.Column(UUIDType(binary=False), nullable=True)
     name = db.Column(db.String, nullable=False)
     start_time = db.Column(db.BigInteger, nullable=False)
     location_uuid = db.Column(UUIDType(binary=False), nullable=False)

@@ -10,6 +10,7 @@ from ....common import ContestStatusEnum
 class CreateContestSchema(Schema):
     sport_uuid = fields.UUID()
     location_uuid = fields.UUID()
+    league_uuid = fields.UUID(allow_none=True)
     name = fields.String()
     start_time = fields.Integer()
     participants = fields.List(fields.UUID(), missing=None)
@@ -23,6 +24,7 @@ class DumpContestSchema(Schema):
     name = fields.String()
     start_time = fields.Integer()
     status = EnumField(ContestStatusEnum)
+    league_uuid = fields.UUID(allow_none=True)
     location_uuid = fields.UUID()
     participants = fields.List(fields.Nested('DumpParticipantSchema'))
     avatar = fields.Nested(DumpAvatarSchema)
@@ -59,6 +61,7 @@ class DumpContestMaterializedSchema(Schema):
     name = fields.String()
     status = fields.String()
     avatar = fields.String()
+    league = fields.UUID(allow_none=True)
     location = fields.String()
     owner = fields.UUID()
     participants = fields.Dict()
@@ -80,7 +83,6 @@ class FetchAllContestSchema(Schema):
     per_page = fields.Int(required=False, missing=10)
     include = fields.DelimitedList(fields.String(), required=False, missing=[])
     expand = fields.DelimitedList(fields.String(), required=False, missing=[])
-    owner_uuid = fields.UUID(required=False)
 
 
 class _FetchAllContestMaterializedHasKeySchema(Schema):
@@ -90,8 +92,16 @@ class _FetchAllContestMaterializedHasKeySchema(Schema):
 class FetchAllContestMaterializedSchema(Schema):
     page = fields.Int(required=False, missing=1)
     per_page = fields.Int(required=False, missing=10)
+    search = fields.String(required=False)
     sort_by = fields.String(required=False)
     participants = fields.String(required=False, attribute="has_key.participants", data_key='participants')
+
+
+class SearchContestMaterializedSchema(Schema):
+    page = fields.Int(required=False, missing=1)
+    per_page = fields.Int(required=False, missing=10)
+    sort = fields.Boolean(required=False, missing=True)
+    key = fields.String(required=False, missing='')
 
 
 create_schema = CreateContestSchema()
@@ -103,3 +113,4 @@ update_schema = UpdateContestSchema()
 fetch_schema = FetchContestSchema()
 fetch_all_schema = FetchAllContestSchema()
 fetch_all_materialized_schema = FetchAllContestMaterializedSchema()
+search_materialized_schema = SearchContestMaterializedSchema()

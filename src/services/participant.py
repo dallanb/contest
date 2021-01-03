@@ -5,7 +5,7 @@ from http import HTTPStatus
 from .base import Base
 from ..common import ParticipantStatusEnum
 from ..decorators import participant_notification
-from ..external import Account as AccountExternal
+from ..external import Member as MemberExternal
 from ..models import Participant as ParticipantModel
 
 
@@ -44,17 +44,26 @@ class Participant(Base):
             self.error(code=HTTPStatus.BAD_REQUEST)
         return True
 
+    def fetch_member_user(self, user_uuid, league_uuid):
+        hit = self.cache.get(f'{user_uuid}_{league_uuid}')
+        if hit:
+            return hit
+        res = MemberExternal().fetch_member_user(uuid=user_uuid, params={'league_uuid': league_uuid})
+        member = res['data']['members']
+        self.cache.set(f'{user_uuid}_{league_uuid}', member, 3600)
+        return member
+
     # possibly turn this into a decorator (the caching part)
-    def fetch_account(self, uuid):
+    def fetch_member(self, uuid):
         hit = self.cache.get(uuid)
         if hit:
             return hit
-        res = AccountExternal().fetch_account(uuid=uuid)
-        membership = res['data']['membership']
-        self.cache.set(uuid, membership, 3600)
-        return membership
+        res = MemberExternal().fetch_member(uuid=uuid)
+        member = res['data']['members']
+        self.cache.set(uuid, member, 3600)
+        return member
 
-    def fetch_accounts(self, uuids):
+    def fetch_member_batch(self, uuids):
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            executor.map(self.fetch_account, uuids)
+            executor.map(self.fetch_member, uuids)
         return
