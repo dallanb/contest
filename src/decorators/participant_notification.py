@@ -72,7 +72,7 @@ class participant_notification:
             contest = kwargs.get('contest')
             owner = self.service.fetch_member_user(
                 user_uuid=str(contest.owner_uuid),
-                params={'league_uuid': str(contest.league_uuid) if contest.league_uuid else None}
+                league_uuid=str(contest.league_uuid) if contest.league_uuid else None
             )
             return f"{owner['display_name']} invited you to {contest.name}"
         elif key == 'participant_active':
