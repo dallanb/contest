@@ -47,7 +47,7 @@ class Contest:
                     contest = contests.items[0]
                     member = self.participant_service.fetch_member(uuid=str(participant.member_uuid))
                     contest.participants[data['member_uuid']] = {
-                        'uuid': data['member_uuid'],
+                        'member_uuid': data['member_uuid'],
                         'display_name': member.get('display_name', ''),
                         'score': None,
                         'strokes': None
