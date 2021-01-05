@@ -35,27 +35,46 @@ class contest_notification:
 
     def create(self, new_instance):
         key = 'contest_created'
-        value = {'uuid': str(new_instance.uuid), 'owner_uuid': str(new_instance.owner_uuid)}
+        value = {
+            'uuid': str(new_instance.uuid),
+            'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
+            'owner_uuid': str(new_instance.owner_uuid)}
         self.service.notify(topic=self.topic, value=value, key=key, )
 
     def update(self, prev_instance, new_instance, args):
         if prev_instance and prev_instance.get('status') and prev_instance['status'].name != new_instance.status.name:
             key = f'contest_{new_instance.status.name}'
-            value = {'uuid': str(new_instance.uuid), 'owner_uuid': str(new_instance.owner_uuid),
-                     'message': self.generate_message(key=key, contest=new_instance)}
+            value = {
+                'uuid': str(new_instance.uuid),
+                'owner_uuid': str(new_instance.owner_uuid),
+                'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
+                'message': self.generate_message(key=key, contest=new_instance)
+            }
             self.service.notify(topic=self.topic, value=value, key=key)
         if args.get('avatar'):
             key = 'avatar_created'
-            value = {'uuid': str(args['avatar'].uuid), 'contest_uuid': str(new_instance.uuid),
-                     's3_filename': str(args['avatar'].s3_filename)}
+            value = {
+                'uuid': str(args['avatar'].uuid),
+                'contest_uuid': str(new_instance.uuid),
+                'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
+                's3_filename': str(args['avatar'].s3_filename)
+            }
             self.service.notify(topic=self.topic, value=value, key=key)
         if prev_instance and prev_instance.get('name') and prev_instance['name'] != new_instance.name:
             key = 'name_updated'
-            value = {'uuid': str(new_instance.uuid), 'name': new_instance.name}
+            value = {
+                'uuid': str(new_instance.uuid),
+                'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
+                'name': new_instance.name
+            }
             self.service.notify(topic=self.topic, value=value, key=key)
         if prev_instance and prev_instance.get('start_time') and prev_instance['start_time'] != new_instance.start_time:
             key = 'start_time_updated'
-            value = {'uuid': str(new_instance.uuid), 'start_time': new_instance.start_time}
+            value = {
+                'uuid': str(new_instance.uuid),
+                'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
+                'start_time': new_instance.start_time
+            }
             self.service.notify(topic=self.topic, value=value, key=key)
 
     @staticmethod

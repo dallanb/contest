@@ -47,6 +47,7 @@ class participant_notification:
                 'member_uuid': str(new_instance.member_uuid),
                 'user_uuid': str(member['user_uuid']),
                 'owner_uuid': str(contest.owner_uuid),
+                'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
                 'message': self.generate_message(key=key, contest=contest)
             }
             self.service.notify(topic=self.topic, value=value, key=key)
@@ -63,6 +64,7 @@ class participant_notification:
                 'member_uuid': str(new_instance.member_uuid),
                 'user_uuid': str(member['user_uuid']),
                 'owner_uuid': str(contest.owner_uuid),
+                'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
                 'message': self.generate_message(key=key, contest=contest, member=member)
             }
             self.service.notify(topic=self.topic, value=value, key=key)
