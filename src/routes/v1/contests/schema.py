@@ -83,6 +83,7 @@ class FetchAllContestSchema(Schema):
     per_page = fields.Int(required=False, missing=10)
     include = fields.DelimitedList(fields.String(), required=False, missing=[])
     expand = fields.DelimitedList(fields.String(), required=False, missing=[])
+    league_uuid = fields.UUID(required=False)
 
 
 class _FetchAllContestMaterializedHasKeySchema(Schema):
@@ -95,6 +96,7 @@ class FetchAllContestMaterializedSchema(Schema):
     search = fields.String(required=False)
     sort_by = fields.String(required=False)
     participants = fields.String(required=False, attribute="has_key.participants", data_key='participants')
+    league = fields.UUID(required=False, data_key="league_uuid")
 
 
 class SearchContestMaterializedSchema(Schema):
@@ -102,6 +104,7 @@ class SearchContestMaterializedSchema(Schema):
     per_page = fields.Int(required=False, missing=10)
     sort = fields.Boolean(required=False, missing=True)
     key = fields.String(required=False, missing='')
+    league = fields.UUID(required=False, data_key="league")
 
 
 create_schema = CreateContestSchema()
