@@ -59,8 +59,6 @@ class Participant(Base):
         if hit:
             return hit
         res = MemberExternal().fetch_member(uuid=uuid)
-        self.logger.info(res)
-        self.logger.info(uuid)
         member = res['data']['members']
         self.cache.set(uuid, member, 3600)
         return member
