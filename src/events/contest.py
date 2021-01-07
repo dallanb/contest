@@ -14,7 +14,7 @@ class Contest:
     def handle_event(self, key, data):
         if key == 'contest_created':
             self.logger.info('contest created')
-        elif key == 'contest_ready' or key == 'contest_active' or key == 'contest_inactive':
+        elif key == 'contest_ready' or key == 'contest_active' or key == 'contest_inactive' or key == 'contest_completed':
             self.logger.info('contest updated')
             contests = self.contest_service.find(uuid=data['uuid'])
             if contests.total:
