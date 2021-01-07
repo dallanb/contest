@@ -1,5 +1,6 @@
 import logging
 
+from ..common import ParticipantStatusEnum
 from ..services import ContestService, ContestMaterializedService, ParticipantService
 
 
@@ -49,6 +50,7 @@ class Contest:
                     contest.participants[data['member_uuid']] = {
                         'member_uuid': data['member_uuid'],
                         'display_name': member.get('display_name', ''),
+                        'status': ParticipantStatusEnum['active'].name,
                         'score': None,
                         'strokes': None
                     }  # maybe fix this to conform to the rest of the code
@@ -57,6 +59,13 @@ class Contest:
         elif key == 'participant_inactive':
             self.contest_service.check_contest_status(uuid=data['contest_uuid'])
         elif key == 'participant_completed':
+            participants = self.participant_service.find(uuid=data['participant_uuid'])
+            if participants.total:
+                contests = self.contest_materialized_service.find(uuid=data['contest_uuid'])
+                if contests.total:
+                    contest = contests.items[0]
+                    contest.participants[data['member_uuid']]['status'] = ParticipantStatusEnum['completed'].name
+                    self.contest_materialized_service.save(instance=contest)
             self.contest_service.check_contest_status(uuid=data['contest_uuid'])
         elif key == 'avatar_created':
             contests = self.contest_service.find(uuid=data['contest_uuid'])

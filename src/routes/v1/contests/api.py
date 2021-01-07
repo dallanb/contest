@@ -3,6 +3,7 @@ from flask_restful import marshal_with
 
 from .schema import *
 from ..base import Base
+from ....common import ParticipantStatusEnum
 from ....common.auth import check_user
 from ....common.response import DataResponse
 from ....services import ContestService, SportService, ParticipantService, ContestMaterializedService
@@ -105,6 +106,7 @@ class ContestsListAPI(Base):
             participants={str(owner.get('uuid', '')): {
                 'member_uuid': str(owner.get('uuid', '')),
                 'display_name': owner.get('display_name', ''),
+                'status': ParticipantStatusEnum['active'].name,
                 'score': None,
                 'strokes': None,
             }}
