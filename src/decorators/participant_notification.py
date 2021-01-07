@@ -85,5 +85,9 @@ class participant_notification:
             contest = kwargs.get('contest')
             member = kwargs.get('member')
             return f"{member['display_name']} declined invite to {contest.name}"
+        elif key == 'participant_completed':
+            contest = kwargs.get('contest')
+            member = kwargs.get('member')
+            return f"{member['display_name']} completed {contest.name}"
         else:
             return ''
