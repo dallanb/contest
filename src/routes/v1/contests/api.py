@@ -121,6 +121,28 @@ class ContestsListAPI(Base):
         )
 
 
+class ContestsListCalendarAPI(Base):
+    def __init__(self):
+        Base.__init__(self)
+        self.contest = ContestService()
+
+    @marshal_with(DataResponse.marshallable())
+    def get(self):
+        data = self.clean(schema=fetch_all_calendar_schema, instance=request.args)
+        contests = self.contest.find_by_start_time_range(**data)
+        return DataResponse(
+            data={
+                '_metadata': self.prepare_metadata(
+                    total_count=contests.total,
+                ),
+                'contests': self.dump(
+                    schema=dump_many_schema,
+                    instance=contests.items,
+                )
+            }
+        )
+
+
 class ContestsMaterializedAPI(Base):
     def __init__(self):
         Base.__init__(self)

@@ -1,4 +1,4 @@
-from marshmallow import Schema, post_dump
+from marshmallow import Schema, post_dump, pre_load
 from marshmallow_enum import EnumField
 from webargs import fields
 
@@ -86,6 +86,14 @@ class FetchAllContestSchema(Schema):
     league_uuid = fields.UUID(required=False)
 
 
+class FetchAllContestCalendarSchema(Schema):
+    include = fields.DelimitedList(fields.String(), required=False, missing=[])
+    expand = fields.DelimitedList(fields.String(), required=False, missing=[])
+    league_uuid = fields.UUID(required=False)
+    month = fields.Int(required=True)
+    year = fields.Int(required=True)
+
+
 class _FetchAllContestMaterializedHasKeySchema(Schema):
     participant = fields.UUID(required=False)
 
@@ -115,5 +123,6 @@ dump_many_materialized_schema = DumpContestMaterializedSchema(many=True)
 update_schema = UpdateContestSchema()
 fetch_schema = FetchContestSchema()
 fetch_all_schema = FetchAllContestSchema()
+fetch_all_calendar_schema = FetchAllContestCalendarSchema()
 fetch_all_materialized_schema = FetchAllContestMaterializedSchema()
 search_materialized_schema = SearchContestMaterializedSchema()

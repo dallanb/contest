@@ -126,7 +126,7 @@ class DB:
     def _generate_nested_filter(cls, nested):
         nested_filter = []
         for k, v in nested.items():
-            nested_class = cls.get_class_by_tablename(k)
+            nested_class = cls._get_class_by_tablename(k)
             for nested_k, nested_v in v.items():
                 nested_filter.append(
                     (
@@ -186,7 +186,16 @@ class DB:
         return filters
 
     @classmethod
-    def _clean_query(cls, query, **kwargs):
+    def clean_query(cls, model, expand=[], include=[], sort_by=None, nested=None, search=None,
+                    within=None, has_key=None, **kwargs):
+        filters = cls._generate_filters(model=model, nested=nested, within=within, has_key=has_key,
+                                        **kwargs)
+        query = cls._query_builder(model=model, filters=filters, search=search, include=include, expand=expand,
+                                   sort_by=sort_by)
+        return query
+
+    @classmethod
+    def run_query(cls, query, **kwargs):
         page = kwargs.get('page', None)
         per_page = kwargs.get('per_page', None)
 
@@ -225,14 +234,9 @@ class DB:
 
     @classmethod
     # TODO: Consider using dataclass instead of a named tuple
-    def find(cls, model, page=None, per_page=None, expand=[], include=[], sort_by=None, nested=None, search=None,
-             within=None, has_key=None, **kwargs):
-        filters = cls._generate_filters(model=model, nested=nested, within=within, has_key=has_key,
-                                        **kwargs)
-        query = cls._query_builder(model=model, filters=filters, search=search, include=include, expand=expand,
-                                   sort_by=sort_by)
-
-        return cls._clean_query(query, page=page, per_page=per_page)
+    def find(cls, model, page=None, per_page=None, **kwargs):
+        query = cls.clean_query(model=model, **kwargs)
+        return cls.run_query(query=query, page=page, per_page=per_page)
 
     @classmethod
     def destroy(cls, instance):
