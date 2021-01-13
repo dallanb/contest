@@ -51,6 +51,21 @@ class participant_notification:
                 'message': self.generate_message(key=key, contest=contest)
             }
             self.service.notify(topic=self.topic, value=value, key=key)
+        else:
+            key = 'owner_active'
+            contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
+            contest = contests.items[0]
+            member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
+            value = {
+                'contest_uuid': str(new_instance.contest_uuid),
+                'participant_uuid': str(new_instance.uuid),
+                'member_uuid': str(new_instance.member_uuid),
+                'user_uuid': str(member['user_uuid']),
+                'owner_uuid': str(contest.owner_uuid),
+                'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
+                'message': self.generate_message(key=key, owner=member)
+            }
+            self.service.notify(topic=self.topic, value=value, key=key)
 
     def update(self, prev_instance, new_instance):
         if prev_instance and prev_instance['status'].name != new_instance.status.name:
@@ -77,6 +92,9 @@ class participant_notification:
                 league_uuid=str(contest.league_uuid) if contest.league_uuid else None
             )
             return f"{owner['display_name']} invited you to {contest.name}"
+        if key == 'owner_active':
+            owner = kwargs.get('owner')
+            return f"{owner['display_name']} is active"
         elif key == 'participant_active':
             contest = kwargs.get('contest')
             member = kwargs.get('member')
