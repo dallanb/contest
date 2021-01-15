@@ -1,4 +1,4 @@
-from marshmallow import Schema, post_dump, pre_load
+from marshmallow import Schema, post_dump
 from marshmallow_enum import EnumField
 from webargs import fields
 
@@ -14,6 +14,8 @@ class CreateContestSchema(Schema):
     name = fields.String()
     start_time = fields.Integer()
     participants = fields.List(fields.UUID(), missing=None)
+    buy_in: fields.Float()
+    payout: fields.List(fields.Float())
 
 
 class DumpContestSchema(Schema):

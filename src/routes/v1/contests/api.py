@@ -85,6 +85,10 @@ class ContestsListAPI(Base):
                                       start_time=data['start_time'], location_uuid=data['location_uuid'],
                                       league_uuid=data['league_uuid'])
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
+        # Notify any interested services that a contest has been created and provide associated wager info
+        _ = self.notify(topic='contests',
+                        value={'uuid': str(contest.uuid), 'buy_in': data['buy_in'], 'payout': data['payout']},
+                        key='wager_created')
 
         owner = self.participant.fetch_member_user(user_uuid=str(g.user),
                                                    league_uuid=str(
