@@ -14,8 +14,8 @@ class CreateContestSchema(Schema):
     name = fields.String()
     start_time = fields.Integer()
     participants = fields.List(fields.UUID(), missing=None)
-    buy_in: fields.Float()
-    payout: fields.List(fields.Float())
+    buy_in = fields.Float()
+    payout = fields.List(fields.Float())
 
 
 class DumpContestSchema(Schema):
