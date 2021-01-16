@@ -1,3 +1,4 @@
+import datetime
 import logging
 from http import HTTPStatus
 
@@ -60,3 +61,11 @@ class Contest(Base):
         location = res['data']['courses']
         self.cache.set(uuid, location, 3600)
         return location
+
+    def find_by_start_time_range(self, month, year, **kwargs):
+        query = self.db.clean_query(model=self.contest_model, **kwargs)
+        min_start_time = datetime.datetime(year=year, month=month, day=1).timestamp() * 1000
+        max_start_time = datetime.datetime(year=year, month=month + 1, day=1).timestamp() * 1000
+        query = query.filter(self.contest_model.start_time > min_start_time,
+                             self.contest_model.start_time < max_start_time)
+        return self.db.run_query(query=query)

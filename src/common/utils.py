@@ -1,6 +1,6 @@
 import base64
 import uuid as UUID
-from datetime import datetime
+import datetime
 from io import BytesIO
 from time import time
 
@@ -46,7 +46,6 @@ def get_image_data(file):
     return BytesIO(base64.b64decode(image_data))
 
 
-
 def s3_object_name(filename):
     return f"{app.config['S3_FILEPATH']}{filename}"
 
@@ -54,7 +53,7 @@ def s3_object_name(filename):
 def request_formatter(request, response, start):
     now = time()
     duration = round(now - start, 2)
-    dt = datetime.fromtimestamp(now)
+    dt = datetime.datetime.fromtimestamp(now)
     timestamp = rfc3339(dt, utc=True)
 
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)

@@ -1,5 +1,5 @@
 from .v1 import AvatarsAPI
-from .v1 import ContestsAPI, ContestsListAPI, ContestsMaterializedAPI, ContestsMaterializedListAPI
+from .v1 import ContestsAPI, ContestsListAPI, ContestsListCalendarAPI, ContestsMaterializedAPI, ContestsMaterializedListAPI
 from .v1 import ParticipantsAPI, ParticipantsMemberAPI, ParticipantsListAPI
 from .v1 import PingAPI
 from .. import api
@@ -12,7 +12,7 @@ api.add_resource(ContestsMaterializedAPI, '/contests/materialized/<uuid:uuid>', 
 api.add_resource(ContestsMaterializedListAPI, '/contests/materialized', endpoint="contests_materialized")
 api.add_resource(ContestsAPI, '/contests/<uuid:uuid>', endpoint="contest")
 api.add_resource(ContestsListAPI, '/contests', endpoint="contests")
-
+api.add_resource(ContestsListCalendarAPI, '/contests/calendar', endpoint="contests_calendar")
 # Avatars
 api.add_resource(AvatarsAPI, '/contests/<uuid>/avatars', endpoint="avatar")
 

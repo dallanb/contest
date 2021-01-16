@@ -3,6 +3,7 @@ from flask_restful import marshal_with
 
 from .schema import *
 from ..base import Base
+from ....common import ParticipantStatusEnum
 from ....common.auth import check_user
 from ....common.response import DataResponse
 from ....services import ContestService, SportService, ParticipantService, ContestMaterializedService
@@ -84,6 +85,10 @@ class ContestsListAPI(Base):
                                       start_time=data['start_time'], location_uuid=data['location_uuid'],
                                       league_uuid=data['league_uuid'])
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
+        # Notify any interested services that a contest has been created and provide associated wager info
+        _ = self.notify(topic='contests',
+                        value={'uuid': str(contest.uuid), 'buy_in': data['buy_in'], 'payout': data['payout']},
+                        key='wager_created')
 
         owner = self.participant.fetch_member_user(user_uuid=str(g.user),
                                                    league_uuid=str(
@@ -105,6 +110,7 @@ class ContestsListAPI(Base):
             participants={str(owner.get('uuid', '')): {
                 'member_uuid': str(owner.get('uuid', '')),
                 'display_name': owner.get('display_name', ''),
+                'status': ParticipantStatusEnum['active'].name,
                 'score': None,
                 'strokes': None,
             }}
@@ -114,6 +120,28 @@ class ContestsListAPI(Base):
                 'contests': self.dump(
                     schema=dump_schema,
                     instance=contest
+                )
+            }
+        )
+
+
+class ContestsListCalendarAPI(Base):
+    def __init__(self):
+        Base.__init__(self)
+        self.contest = ContestService()
+
+    @marshal_with(DataResponse.marshallable())
+    def get(self):
+        data = self.clean(schema=fetch_all_calendar_schema, instance=request.args)
+        contests = self.contest.find_by_start_time_range(**data)
+        return DataResponse(
+            data={
+                '_metadata': self.prepare_metadata(
+                    total_count=contests.total,
+                ),
+                'contests': self.dump(
+                    schema=dump_many_schema,
+                    instance=contests.items,
                 )
             }
         )
