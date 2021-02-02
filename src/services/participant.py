@@ -39,7 +39,7 @@ class Participant(Base):
 
     @participant_notification(operation='create_owner')
     def create_owner(self, buy_in, payout, **kwargs):
-        owner = self.init(**kwargs, status='active')
+        owner = self.init(model=self.participant_model, **kwargs, status='active')
         return self.save(instance=owner)
 
     def _status_machine(self, prev_status, new_status):
