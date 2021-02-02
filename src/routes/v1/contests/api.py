@@ -96,7 +96,8 @@ class ContestsListAPI(Base):
             self.participant.fetch_member_batch(uuids=str_participants)
             for member_uuid in participants:
                 if owner.get('uuid', '') == str(member_uuid):
-                    self.participant.create_owner(member_uuid=member_uuid, contest=contest)
+                    self.participant.create_owner(member_uuid=member_uuid, contest=contest, buy_in=data['buy_in'],
+                                                  payout=data['payout'])
                 else:
                     self.participant.create(member_uuid=member_uuid, status='pending', contest=contest)
 
