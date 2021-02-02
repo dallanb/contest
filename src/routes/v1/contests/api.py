@@ -85,10 +85,6 @@ class ContestsListAPI(Base):
                                       start_time=data['start_time'], location_uuid=data['location_uuid'],
                                       league_uuid=data['league_uuid'])
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
-        # Notify any interested services that a contest has been created and provide associated wager info
-        _ = self.notify(topic='contests',
-                        value={'uuid': str(contest.uuid), 'buy_in': data['buy_in'], 'payout': data['payout']},
-                        key='wager_created')
 
         owner = self.participant.fetch_member_user(user_uuid=str(g.user),
                                                    league_uuid=str(
@@ -99,8 +95,10 @@ class ContestsListAPI(Base):
             str_participants = [str(participant) for participant in participants]
             self.participant.fetch_member_batch(uuids=str_participants)
             for member_uuid in participants:
-                status = 'active' if owner.get('uuid', '') == str(member_uuid) else 'pending'
-                self.participant.create(member_uuid=member_uuid, status=status, contest=contest)
+                if owner.get('uuid', '') == str(member_uuid):
+                    self.participant.create_owner(member_uuid=member_uuid, contest=contest)
+                else:
+                    self.participant.create(member_uuid=member_uuid, status='pending', contest=contest)
 
         location = self.contest.fetch_location(uuid=str(contest.location_uuid))
         # instead of creating materialized contest asynchronously we will create it when the contest is created
