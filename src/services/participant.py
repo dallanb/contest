@@ -37,6 +37,11 @@ class Participant(Base):
         participant = self.assign_attr(instance=instance, attr=kwargs)
         return self.save(instance=participant)
 
+    @participant_notification(operation='create_owner')
+    def create_owner(self, buy_in, payout, **kwargs):
+        owner = self.init(model=self.participant_model, **kwargs, status='active')
+        return self.save(instance=owner)
+
     def _status_machine(self, prev_status, new_status):
         # cannot go from active to pending
         if ParticipantStatusEnum[prev_status] == ParticipantStatusEnum['active'] and ParticipantStatusEnum[

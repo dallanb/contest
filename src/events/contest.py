@@ -23,7 +23,7 @@ class Contest:
                     uuid=contest.uuid,
                     status=contest.status.name
                 )
-        elif key == 'name_updated':
+        elif key == 'name_updated':  # TODO: look into making this a direct find and apply towards the materialized service
             contests = self.contest_service.find(uuid=data['uuid'])
             if contests.total:
                 contest = contests.items[0]

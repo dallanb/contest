@@ -1,7 +1,6 @@
 from functools import wraps
 
 from ..common import DB
-from ..common import ParticipantStatusEnum
 from ..models import Contest
 
 
@@ -19,6 +18,10 @@ class participant_notification:
             new_instance = f(*args, **kwargs)
             if self.operation == 'create':
                 self.create(new_instance=new_instance)
+            elif self.operation == 'create_owner':
+                buy_in = kwargs.pop('buy_in', None)
+                payout = kwargs.pop('payout', None)
+                self.create_owner(new_instance=new_instance, buy_in=buy_in, payout=payout)
             elif self.operation == 'update':
                 self.update(prev_instance=prev_instance, new_instance=new_instance)
             return new_instance
@@ -36,36 +39,38 @@ class participant_notification:
         self._service = service
 
     def create(self, new_instance):
-        if new_instance.status == ParticipantStatusEnum['pending']:
-            key = 'participant_invited'
-            contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
-            contest = contests.items[0]
-            member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
-            value = {
-                'contest_uuid': str(new_instance.contest_uuid),
-                'participant_uuid': str(new_instance.uuid),
-                'member_uuid': str(new_instance.member_uuid),
-                'user_uuid': str(member['user_uuid']),
-                'owner_uuid': str(contest.owner_uuid),
-                'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
-                'message': self.generate_message(key=key, contest=contest)
-            }
-            self.service.notify(topic=self.topic, value=value, key=key)
-        else:
-            key = 'owner_active'
-            contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
-            contest = contests.items[0]
-            member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
-            value = {
-                'contest_uuid': str(new_instance.contest_uuid),
-                'participant_uuid': str(new_instance.uuid),
-                'member_uuid': str(new_instance.member_uuid),
-                'user_uuid': str(member['user_uuid']),
-                'owner_uuid': str(contest.owner_uuid),
-                'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
-                'message': self.generate_message(key=key, owner=member)
-            }
-            self.service.notify(topic=self.topic, value=value, key=key)
+        key = 'participant_invited'
+        contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
+        contest = contests.items[0]
+        member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
+        value = {
+            'contest_uuid': str(new_instance.contest_uuid),
+            'participant_uuid': str(new_instance.uuid),
+            'member_uuid': str(new_instance.member_uuid),
+            'user_uuid': str(member['user_uuid']),
+            'owner_uuid': str(contest.owner_uuid),
+            'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
+            'message': self.generate_message(key=key, contest=contest)
+        }
+        self.service.notify(topic=self.topic, value=value, key=key)
+
+    def create_owner(self, new_instance, buy_in, payout):
+        key = 'owner_active'
+        contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
+        contest = contests.items[0]
+        member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
+        value = {
+            'contest_uuid': str(new_instance.contest_uuid),
+            'participant_uuid': str(new_instance.uuid),
+            'member_uuid': str(new_instance.member_uuid),
+            'user_uuid': str(member['user_uuid']),
+            'owner_uuid': str(contest.owner_uuid),
+            'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
+            'buy_in': buy_in,
+            'payout': payout,
+            'message': self.generate_message(key=key, owner=member)
+        }
+        self.service.notify(topic=self.topic, value=value, key=key)
 
     def update(self, prev_instance, new_instance):
         if prev_instance and prev_instance['status'].name != new_instance.status.name:
