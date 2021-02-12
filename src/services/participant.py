@@ -17,12 +17,12 @@ class Participant(Base):
         self.participant_model = ParticipantModel
 
     def find(self, **kwargs):
-        return Base.find(self, model=self.participant_model, **kwargs)
+        return self._find(model=self.participant_model, **kwargs)
 
     @participant_notification(operation='create')
     def create(self, **kwargs):
-        participant = self.init(model=self.participant_model, **kwargs)
-        return self.save(instance=participant)
+        participant = self._init(model=self.participant_model, **kwargs)
+        return self._save(instance=participant)
 
     def update(self, uuid, **kwargs):
         participants = self.find(uuid=uuid)
@@ -34,13 +34,13 @@ class Participant(Base):
     def apply(self, instance, **kwargs):
         # if contest status is being updated we will trigger a notification
         _ = self._status_machine(instance.status.name, kwargs['status'])
-        participant = self.assign_attr(instance=instance, attr=kwargs)
-        return self.save(instance=participant)
+        participant = self._assign_attr(instance=instance, attr=kwargs)
+        return self._save(instance=participant)
 
     @participant_notification(operation='create_owner')
     def create_owner(self, buy_in, payout, **kwargs):
-        owner = self.init(model=self.participant_model, **kwargs, status='active')
-        return self.save(instance=owner)
+        owner = self._init(model=self.participant_model, **kwargs, status='active')
+        return self._save(instance=owner)
 
     def _status_machine(self, prev_status, new_status):
         # cannot go from active to pending

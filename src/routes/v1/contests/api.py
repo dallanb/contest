@@ -3,7 +3,6 @@ from flask_restful import marshal_with
 
 from .schema import *
 from ..base import Base
-from ....common import ParticipantStatusEnum
 from ....common.auth import check_user
 from ....common.response import DataResponse
 from ....services import ContestService, SportService, ParticipantService, ContestMaterializedService
@@ -81,39 +80,15 @@ class ContestsListAPI(Base):
     @check_user
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        contest = self.contest.create(status='pending', owner_uuid=g.user, name=data['name'],
-                                      start_time=data['start_time'], location_uuid=data['location_uuid'],
-                                      league_uuid=data['league_uuid'])
-        _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
-
+        contest = self.contest.init(status='pending', owner_uuid=g.user, name=data['name'],
+                                    start_time=data['start_time'], location_uuid=data['location_uuid'],
+                                    league_uuid=data['league_uuid'])
+        _ = self.sport.init(sport_uuid=data['sport_uuid'], contest=contest)
         owner = self.participant.fetch_member_user(user_uuid=str(g.user),
                                                    league_uuid=str(
-                                                       contest.league_uuid) if contest.league_uuid else None)
-
-        participants = data.pop('participants')
-        if participants:
-            str_participants = [str(participant) for participant in participants]
-            self.participant.fetch_member_batch(uuids=str_participants)
-            for member_uuid in participants:
-                if owner.get('uuid', '') == str(member_uuid):
-                    self.participant.create_owner(member_uuid=member_uuid, contest=contest, buy_in=data['buy_in'],
-                                                  payout=data['payout'])
-                else:
-                    self.participant.create(member_uuid=member_uuid, status='pending', contest=contest)
-
-        location = self.contest.fetch_location(uuid=str(contest.location_uuid))
-        # instead of creating materialized contest asynchronously we will create it when the contest is created
-        self.contest_materialized.create(
-            uuid=contest.uuid, name=contest.name, status=contest.status.name, start_time=contest.start_time,
-            owner=contest.owner_uuid, location=location.get('name', ''), league=contest.league_uuid,
-            participants={str(owner.get('uuid', '')): {
-                'member_uuid': str(owner.get('uuid', '')),
-                'display_name': owner.get('display_name', ''),
-                'status': ParticipantStatusEnum['active'].name,
-                'score': None,
-                'strokes': None,
-            }}
-        )
+                                                       data['league_uuid']) if data['league_uuid'] else None)
+        self.participant.create_owner(member_uuid=owner['uuid'], contest=contest, buy_in=data['buy_in'],
+                                      payout=data['payout'])
         return DataResponse(
             data={
                 'contests': self.dump(

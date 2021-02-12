@@ -1,12 +1,8 @@
 import pytest
 
-from tests.helpers import generate_uuid
+from tests.helpers import fetch_member
 
 
 @pytest.fixture
-def mock_fetch_member():
-    def _method(self, **kwargs):
-        member = kwargs.get('uuid')
-        return {'user_uuid': generate_uuid()}
-
-    return _method
+def mock_fetch_member(mocker):
+    yield mocker.patch('src.services.ParticipantService.fetch_member', fetch_member)

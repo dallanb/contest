@@ -1,4 +1,5 @@
 import logging
+from http import HTTPStatus
 
 from ..common import Cache, DB, Event
 from ..common.error import ManualException
@@ -12,20 +13,75 @@ class Base:
         self.logger = logging.getLogger(__name__)
 
     # @cache.memoize(timeout=1000)
-    def count(self, model):
+    def _count(self, model):
         return self.db.count(model=model)
 
-    def find(self, model, **kwargs):
-        return self.db.find(model=model, **kwargs)
+    def _find(self, model, **kwargs):
+        try:
+            return self.db.find(model=model, **kwargs)
+        except AttributeError:
+            self.logger.error(f'find error - AttributeError')
+            self.error(code=HTTPStatus.BAD_REQUEST)
 
-    def init(self, model, **kwargs):
-        return self.db.init(model=model, **kwargs)
+    def _init(self, model, **kwargs):
+        try:
+            return self.db.init(model=model, **kwargs)
+        except TypeError:
+            self.logger.error(f'init error - TypeError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+        except KeyError:
+            self.logger.error(f'init error - KeyError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+        except AttributeError:
+            self.logger.error('init error - AttributeError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
 
-    def save(self, instance):
+    def _add(self, instance):
+        try:
+            return self.db.add(instance=instance)
+        except TypeError:
+            self.logger.error(f'add error - TypeError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+        except KeyError:
+            self.logger.error(f'add error - KeyError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+    def _save(self, instance):
         return self.db.save(instance=instance)
 
-    def destroy(self, instance):
+    def _destroy(self, instance):
         return self.db.destroy(instance=instance)
+
+    def _rollback(self):
+        return self.db.rollback()
+
+    def _assign_attr(self, instance, attr):
+        try:
+            for k, v in attr.items():
+                if not (hasattr(instance, k)):
+                    raise KeyError(f'invalid key {k}')
+                instance.__setattr__(k, v)
+            return instance
+        except ValueError as ex:
+            self.logger.error(f'assign_attr error - ValueError')
+            self.logger.error(ex)
+            self.db.rollback()
+            self.error(code=HTTPStatus.BAD_REQUEST)
+        except KeyError as ex:
+            self.logger.error(f'assign_attr error - KeyError')
+            self.logger.error(ex)
+            self.db.rollback()
+            self.error(code=HTTPStatus.BAD_REQUEST)
+        except AttributeError as ex:
+            self.logger.error(f'assign_attr error - AttributeError')
+            self.logger.error(ex)
+            self.db.rollback()
+            self.error(code=HTTPStatus.BAD_REQUEST)
 
     @classmethod
     def dump(cls, schema, instance, params=None):
@@ -38,12 +94,6 @@ class Base:
     def clean(cls, schema, instance, **kwargs):
         return schema.load(instance, **kwargs)
 
-    @staticmethod
-    def assign_attr(instance, attr):
-        for k, v in attr.items():
-            instance.__setattr__(k, v)
-        return instance
-
     def notify(self, topic, value, key):
         self.event.send(topic=topic, value=value, key=key)
 
@@ -51,7 +101,7 @@ class Base:
     def error(code, **kwargs):
         if code is None:
             raise ManualException()
-        code = code.value
+        error_code = code.value
         msg = kwargs.get('msg', code.phrase)
         err = kwargs.get('err', None)
-        raise ManualException(code=code, msg=msg, err=err)
+        raise ManualException(code=error_code, msg=msg, err=err)

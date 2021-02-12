@@ -1,4 +1,5 @@
 import logging
+
 from .base import Base
 from ..models import Sport as SportModel
 
@@ -10,8 +11,14 @@ class Sport(Base):
         self.sport_model = SportModel
 
     def find(self, **kwargs):
-        return Base.find(self, model=self.sport_model, **kwargs)
+        return self._find(model=self.sport_model, **kwargs)
+
+    def init(self, **kwargs):
+        return self._init(model=self.sport_model, **kwargs)
+
+    def save(self, instance):
+        return self._save(instance=instance)
 
     def create(self, **kwargs):
-        sport = self.init(model=self.sport_model, **kwargs)
-        return self.save(instance=sport)
+        sport = self._init(model=self.sport_model, **kwargs)
+        return self._save(instance=sport)

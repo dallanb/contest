@@ -109,14 +109,6 @@ class FetchAllContestMaterializedSchema(Schema):
     league = fields.UUID(required=False, data_key="league_uuid")
 
 
-class SearchContestMaterializedSchema(Schema):
-    page = fields.Int(required=False, missing=1)
-    per_page = fields.Int(required=False, missing=10)
-    sort = fields.Boolean(required=False, missing=True)
-    key = fields.String(required=False, missing='')
-    league = fields.UUID(required=False, data_key="league")
-
-
 create_schema = CreateContestSchema()
 dump_schema = DumpContestSchema()
 dump_many_schema = DumpContestSchema(many=True)
@@ -127,4 +119,3 @@ fetch_schema = FetchContestSchema()
 fetch_all_schema = FetchAllContestSchema()
 fetch_all_calendar_schema = FetchAllContestCalendarSchema()
 fetch_all_materialized_schema = FetchAllContestMaterializedSchema()
-search_materialized_schema = SearchContestMaterializedSchema()

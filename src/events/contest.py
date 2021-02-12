@@ -14,6 +14,32 @@ class Contest:
     def handle_event(self, key, data):
         if key == 'contest_created':
             self.logger.info('contest created')
+            contests = self.contest_service.find(uuid=data['uuid'], include=['participants'])
+            if contests.total:
+                contest = contests.items[0]
+                location = self.contest_service.fetch_location(uuid=str(contest['location_uuid']))
+                owner = self.participant_service.fetch_member_user(user_uuid=str(contest.owner_uuid),
+                                                                   league_uuid=str(
+                                                                       data['league_uuid']) if data[
+                                                                       'league_uuid'] else None)
+                self.contest_materialized_service.create(
+                    uuid=contest.uuid,
+                    name=contest.name,
+                    status=contest.status.name,
+                    start_time=contest.start_time,
+                    owner=contest.owner_uuid,
+                    location=location.get('name', ''),
+                    league=contest.league_uuid,
+                    participants={
+                        str(owner.get('uuid', '')): {
+                            'member_uuid': str(owner.get('uuid', '')),
+                            'display_name': owner.get('display_name', ''),
+                            'status': ParticipantStatusEnum['active'].name,
+                            'score': None,
+                            'strokes': None,
+                        }
+                    }
+                )
         elif key == 'contest_ready' or key == 'contest_active' or key == 'contest_inactive' or key == 'contest_completed':
             self.logger.info('contest updated')
             contests = self.contest_service.find(uuid=data['uuid'])

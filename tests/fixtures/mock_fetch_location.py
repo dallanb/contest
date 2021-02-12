@@ -1,12 +1,8 @@
 import pytest
 
-from tests.helpers import generate_uuid
+from tests.helpers import fetch_location
 
 
 @pytest.fixture
-def mock_fetch_location():
-    def _method(self, **kwargs):
-        course = kwargs.get('uuid')
-        return {'name': 'Test Course'}
-
-    return _method
+def mock_fetch_location(mocker):
+    yield mocker.patch('src.services.ContestService.fetch_location', fetch_location)
