@@ -10,7 +10,8 @@ from src import app
 ###########
 # Create
 ###########
-def test_create_contest(get_user_uuid, get_sport_uuid, get_location_uuid, get_league_uuid, get_name, get_start_time,
+def test_create_contest(reset_db, get_user_uuid, get_sport_uuid, get_location_uuid, get_league_uuid, get_name,
+                        get_start_time,
                         get_participants, get_buy_in,
                         get_payout):
     """
@@ -19,12 +20,32 @@ def test_create_contest(get_user_uuid, get_sport_uuid, get_location_uuid, get_le
     THEN check that the response is valid
     """
     sport_uuid = get_sport_uuid()
+    location_uuid = get_location_uuid()
+    league_uuid = get_league_uuid()
+    name = get_name()
+    start_time = get_start_time()
+    participants = get_participants()
+    buy_in = get_buy_in()
+    payout = get_payout()
+
+    user_uuid = get_user_uuid()
+    # Header
+    headers = {'X-Consumer-Custom-ID': user_uuid}
 
     # Payload
-    payload = {'sport_uuid': sport_uuid}
+    payload = {
+        'sport_uuid': sport_uuid,
+        'location_uuid': location_uuid,
+        'league_uuid': league_uuid,
+        'name': name,
+        'start_time': start_time,
+        'participants': participants,
+        'buy_in': buy_in,
+        'payout': payout
+    }
 
     # Request
-    response = app.test_client().post('/contests', json=payload)
+    response = app.test_client().post('/contests', headers=headers, json=payload)
 
     # Response
     assert response.status_code == 200
