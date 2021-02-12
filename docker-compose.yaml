@@ -27,7 +27,7 @@ services:
     ports:
       - 20001:5000
     env_file:
-      - ${HUNCHO_DIR}/env/dev/.env.contest
+      - env/.env.contest
       - ${HUNCHO_DIR}/secrets/s3/credentials.txt
     healthcheck:
       test: curl --fail -s contest:5000/ping || exit 1
@@ -44,10 +44,10 @@ services:
     image: redis:6
     restart: unless-stopped
     volumes:
-      - ${HUNCHO_DIR}/data/dev/contest_cache/redis_data:/var/libs/redis
-      - ${HUNCHO_DIR}/data/dev/contest_cache/redis.conf:/usr/local/etc/redis/redis.conf
+      - contest_cache/redis_data:/var/libs/redis
+      - contest_cache/redis.conf:/usr/local/etc/redis/redis.conf
     env_file:
-      - ${HUNCHO_DIR}/env/dev/.env.contest_cache
+      - env/.env.contest_cache
     healthcheck:
       test: [ "CMD", "redis-cli","ping" ]
       interval: 30s
@@ -59,9 +59,9 @@ services:
     container_name: contest_db
     image: postgres:9.6
     volumes:
-      - ${HUNCHO_DIR}/data/dev/contest_db/data:/var/libs/postgresql/data/
+      - contest_data:/var/libs/postgresql/data/
     env_file:
-      - ${HUNCHO_DIR}/env/dev/.env.contest_db
+      - env/.env.contest_db
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U contest" ]
       interval: 10s
@@ -76,11 +76,14 @@ services:
     ports:
       - 8082:8081
     env_file:
-      - ${HUNCHO_DIR}/env/dev/.env.contest-redis-commander
+      - env/.env.contest-redis-commander
     depends_on:
       - contest_cache
     networks:
       - app-net
+volumes:
+  contest_data:
+  contest_cache:
 networks:
   app-net:
     driver: bridge
