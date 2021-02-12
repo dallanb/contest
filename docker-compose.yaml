@@ -44,8 +44,7 @@ services:
     image: redis:6
     restart: unless-stopped
     volumes:
-      - contest_cache/redis_data:/var/libs/redis
-      - contest_cache/redis.conf:/usr/local/etc/redis/redis.conf
+      - contest_cache:/var/libs/redis
     env_file:
       - env/.env.contest_cache
     healthcheck:
@@ -67,6 +66,26 @@ services:
       interval: 10s
       timeout: 5s
       retries: 20
+    networks:
+      - app-net
+  contest_kafka:
+    container_name: contest_kafka
+    image: wurstmeister/kafka:latest
+    restart: on-failure
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - env/.env.contest_kafka
+    depends_on:
+      - contest_zookeeper
+    networks:
+      - app-net
+  contest_zookeeper:
+    container_name: contest_zookeeper
+    image: wurstmeister/zookeeper:latest
+    restart: on-failure
+    env_file:
+      - env/.env.contest_zookeeper
     networks:
       - app-net
   redis-commander:

@@ -24,8 +24,7 @@ services:
     image: redis:6
     restart: unless-stopped
     volumes:
-      - cache_data/redis_data:/var/libs/redis
-      - cache_data/redis.conf:/usr/local/etc/redis/redis.conf
+      - cache_data:/var/libs/redis
     env_file:
       - env/test/.env.cache
     healthcheck:

@@ -1,22 +1,30 @@
 import json
+
 from src import app
 
+
+#############
+# SUCCESS
+#############
 
 ###########
 # Create
 ###########
-def test_create_contest(get_user_uuid, get_sport_uuid):
-    user_uuid = get_user_uuid()
+def test_create_contest(get_user_uuid, get_sport_uuid, get_location_uuid, get_league_uuid, get_name, get_start_time,
+                        get_participants, get_buy_in,
+                        get_payout):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the POST endpoint 'contests' is requested
+    THEN check that the response is valid
+    """
     sport_uuid = get_sport_uuid()
-    # Headers
-    headers = {'X-Consumer-Custom-ID': user_uuid}
 
     # Payload
     payload = {'sport_uuid': sport_uuid}
 
     # Request
-    response = app.test_client().post('/contests', json=payload,
-                                      headers=headers)
+    response = app.test_client().post('/contests', json=payload)
 
     # Response
     assert response.status_code == 200

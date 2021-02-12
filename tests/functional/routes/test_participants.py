@@ -1,7 +1,7 @@
-import pytest
 import json
-from tests.functional.helpers import generate_name, generate_uuid
+
 from src import app
+from tests.helpers import generate_uuid
 
 
 ###########
