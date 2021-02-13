@@ -1,7 +1,7 @@
 from functools import wraps
 
 from src.notifications import contest_created, contest_ready, contest_inactive, contest_active, avatar_created, \
-    name_updated, start_time_updated
+    name_updated, start_time_updated, contest_completed
 
 
 class contest_notification:
@@ -53,6 +53,11 @@ class contest_notification:
                 topic = contest_active.topic
                 key = contest_active.key
                 value = contest_active.schema.dump(new_instance)
+                self.service.notify(topic=topic, value=value, key=key)
+            elif new_instance.status.name == 'completed':
+                topic = contest_completed.topic
+                key = contest_completed.key
+                value = contest_completed.schema.dump(new_instance)
                 self.service.notify(topic=topic, value=value, key=key)
             elif new_instance.status.name == 'inactive':
                 topic = contest_inactive.topic

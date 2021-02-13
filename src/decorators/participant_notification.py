@@ -1,7 +1,7 @@
 from functools import wraps
 
-from ..common import DB
-from ..models import Contest
+from ..notifications import owner_active, participant_active, participant_completed, participant_inactive, \
+    participant_invited
 
 
 class participant_notification:
@@ -39,78 +39,31 @@ class participant_notification:
         self._service = service
 
     def create(self, new_instance):
-        key = 'participant_invited'
-        contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
-        contest = contests.items[0]
-        member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
-        value = {
-            'contest_uuid': str(new_instance.contest_uuid),
-            'participant_uuid': str(new_instance.uuid),
-            'member_uuid': str(new_instance.member_uuid),
-            'user_uuid': str(member['user_uuid']),
-            'owner_uuid': str(contest.owner_uuid),
-            'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
-            'message': self.generate_message(key=key, contest=contest)
-        }
-        self.service.notify(topic=self.topic, value=value, key=key)
+        topic = participant_invited.topic
+        key = participant_invited.key
+        value = participant_invited.schema.dump({'participant': new_instance})
+        self.service.notify(topic=topic, value=value, key=key)
 
     def create_owner(self, new_instance, buy_in, payout):
-        key = 'owner_active'
-        contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
-        contest = contests.items[0]
-        member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
-        value = {
-            'contest_uuid': str(new_instance.contest_uuid),
-            'participant_uuid': str(new_instance.uuid),
-            'member_uuid': str(new_instance.member_uuid),
-            'user_uuid': str(member['user_uuid']),
-            'owner_uuid': str(contest.owner_uuid),
-            'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
-            'buy_in': buy_in,
-            'payout': payout,
-            'message': self.generate_message(key=key, owner=member)
-        }
-        self.service.notify(topic=self.topic, value=value, key=key)
+        topic = owner_active.topic
+        key = owner_active.key
+        value = owner_active.schema.dump({'participant': new_instance, 'buy_in': buy_in, "payout": payout})
+        self.service.notify(topic=topic, value=value, key=key)
 
     def update(self, prev_instance, new_instance):
         if prev_instance and prev_instance['status'].name != new_instance.status.name:
-            key = f'participant_{new_instance.status.name}'
-            contests = DB().find(model=Contest, uuid=str(new_instance.contest_uuid))
-            contest = contests.items[0]
-            member = self.service.fetch_member(uuid=str(new_instance.member_uuid))
-            value = {
-                'contest_uuid': str(new_instance.contest_uuid),
-                'participant_uuid': str(new_instance.uuid),
-                'member_uuid': str(new_instance.member_uuid),
-                'user_uuid': str(member['user_uuid']),
-                'owner_uuid': str(contest.owner_uuid),
-                'league_uuid': str(contest.league_uuid) if contest.league_uuid else None,
-                'message': self.generate_message(key=key, contest=contest, member=member)
-            }
-            self.service.notify(topic=self.topic, value=value, key=key)
-
-    def generate_message(self, key, **kwargs):
-        if key == 'participant_invited':
-            contest = kwargs.get('contest')
-            owner = self.service.fetch_member_user(
-                user_uuid=str(contest.owner_uuid),
-                league_uuid=str(contest.league_uuid) if contest.league_uuid else None
-            )
-            return f"{owner['display_name']} invited you to {contest.name}"
-        if key == 'owner_active':
-            owner = kwargs.get('owner')
-            return f"{owner['display_name']} is active"
-        elif key == 'participant_active':
-            contest = kwargs.get('contest')
-            member = kwargs.get('member')
-            return f"{member['display_name']} accepted invite to {contest.name}"
-        elif key == 'participant_inactive':
-            contest = kwargs.get('contest')
-            member = kwargs.get('member')
-            return f"{member['display_name']} declined invite to {contest.name}"
-        elif key == 'participant_completed':
-            contest = kwargs.get('contest')
-            member = kwargs.get('member')
-            return f"{member['display_name']} completed {contest.name}"
-        else:
-            return ''
+            if new_instance.status.name == 'active':
+                topic = participant_active.topic
+                key = participant_active.key
+                value = participant_active.schema.dump({'participant'})
+                self.service.notify(topic=topic, value=value, key=key)
+            elif new_instance.status.name == 'inactive':
+                topic = participant_inactive.topic
+                key = participant_inactive.key
+                value = participant_inactive.schema.dump({'participant'})
+                self.service.notify(topic=topic, value=value, key=key)
+            elif new_instance.status.name == 'completed':
+                topic = participant_completed.topic
+                key = participant_completed.key
+                value = participant_completed.schema.dump({'participant'})
+                self.service.notify(topic=topic, value=value, key=key)
