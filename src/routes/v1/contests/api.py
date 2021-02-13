@@ -80,6 +80,9 @@ class ContestsListAPI(Base):
     @check_user
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
+
+        # ensure passed in parameters are correct by requesting external api's
+        _ = self.contest.fetch_location(uuid=str(data['location_uuid']))
         owner = self.participant.fetch_member_user(user_uuid=str(g.user),
                                                    league_uuid=str(
                                                        data['league_uuid']) if data['league_uuid'] else None)

@@ -57,20 +57,24 @@ class Participant(Base):
 
     def fetch_member_user(self, user_uuid, league_uuid):
         hit = self.cache.get(f'{user_uuid}_{league_uuid}')
+        logging.info(f'fetch_member_user: {hit}')
         if hit:
             return hit
         res = MemberExternal().fetch_member_user(uuid=user_uuid, params={'league_uuid': league_uuid})
         member = res['data']['members']
         self.cache.set(f'{user_uuid}_{league_uuid}', member, 3600)
+        self.cache.set(str(member['uuid']), member, 3600)
         return member
 
     # possibly turn this into a decorator (the caching part)
     def fetch_member(self, uuid):
         hit = self.cache.get(uuid)
+        logging.info(f'fetch_member: {hit}')
         if hit:
             return hit
         res = MemberExternal().fetch_member(uuid=uuid)
         member = res['data']['members']
+        self.cache.set(f'{str(member["user_uuid"])}_{str(member["league_uuid"])}', member, 3600)
         self.cache.set(uuid, member, 3600)
         return member
 
