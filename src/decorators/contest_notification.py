@@ -39,7 +39,7 @@ class contest_notification:
     def create(self, new_instance):
         topic = contest_created.topic
         key = contest_created.key
-        value = contest_created.schema.dump(new_instance)
+        value = contest_created.schema.dump({'contest': new_instance})
         self.service.notify(topic=topic, value=value, key=key, )
 
     def update(self, prev_instance, new_instance, args):
@@ -47,22 +47,22 @@ class contest_notification:
             if new_instance.status.name == 'ready':
                 topic = contest_ready.topic
                 key = contest_ready.key
-                value = contest_ready.schema.dump(new_instance)
+                value = contest_ready.schema.dump({'contest': new_instance})
                 self.service.notify(topic=topic, value=value, key=key)
             elif new_instance.status.name == 'active':
                 topic = contest_active.topic
                 key = contest_active.key
-                value = contest_active.schema.dump(new_instance)
+                value = contest_active.schema.dump({'contest': new_instance})
                 self.service.notify(topic=topic, value=value, key=key)
             elif new_instance.status.name == 'completed':
                 topic = contest_completed.topic
                 key = contest_completed.key
-                value = contest_completed.schema.dump(new_instance)
+                value = contest_completed.schema.dump({'contest': new_instance})
                 self.service.notify(topic=topic, value=value, key=key)
             elif new_instance.status.name == 'inactive':
                 topic = contest_inactive.topic
                 key = contest_inactive.key
-                value = contest_inactive.schema.dump(new_instance)
+                value = contest_inactive.schema.dump({'contest': new_instance})
                 self.service.notify(topic=topic, value=value, key=key)
         if args.get('avatar'):
             topic = avatar_created.topic
@@ -72,10 +72,10 @@ class contest_notification:
         if prev_instance and prev_instance.get('name') and prev_instance['name'] != new_instance.name:
             topic = name_updated.topic
             key = name_updated.key
-            value = name_updated.schema.dump(new_instance)
+            value = name_updated.schema.dump({'contest': new_instance})
             self.service.notify(topic=topic, value=value, key=key)
         if prev_instance and prev_instance.get('start_time') and prev_instance['start_time'] != new_instance.start_time:
             topic = start_time_updated.topic
             key = start_time_updated.key
-            value = start_time_updated.schema.dump(new_instance)
+            value = start_time_updated.schema.dump({'contest': new_instance})
             self.service.notify(topic=topic, value=value, key=key)

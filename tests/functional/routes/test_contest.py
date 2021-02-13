@@ -14,7 +14,7 @@ from src import app, services
 ###########
 # Create
 ###########
-def test_create_contest(kafka_conn, reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
+def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
                         mock_fetch_location):
     """
     GIVEN a Flask application configured for testing
@@ -67,6 +67,9 @@ def test_create_contest(kafka_conn, reset_db, mock_fetch_member_user, mock_fetch
     owner = participants.items[0]
     assert str(owner.contest_uuid) == contests['uuid']
     assert owner.status.name == 'active'
+
+    time.sleep(2)
+
 
 ###########
 # Fetch

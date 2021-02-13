@@ -17,7 +17,7 @@ class Contest:
             contests = self.contest_service.find(uuid=data['uuid'], include=['participants'])
             if contests.total:
                 contest = contests.items[0]
-                location = self.contest_service.fetch_location(uuid=str(contest['location_uuid']))
+                location = self.contest_service.fetch_location(uuid=str(contest.location_uuid))
                 owner = self.participant_service.fetch_member_user(user_uuid=str(contest.owner_uuid),
                                                                    league_uuid=str(
                                                                        data['league_uuid']) if data[

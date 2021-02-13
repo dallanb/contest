@@ -47,7 +47,7 @@ class participant_notification:
     def create_owner(self, new_instance, buy_in, payout):
         topic = owner_active.topic
         key = owner_active.key
-        value = owner_active.schema.dump({'participant': new_instance, 'buy_in': buy_in, "payout": payout})
+        value = owner_active.schema.dump({'participant': new_instance, 'buy_in': buy_in, 'payout': payout})
         self.service.notify(topic=topic, value=value, key=key)
 
     def update(self, prev_instance, new_instance):

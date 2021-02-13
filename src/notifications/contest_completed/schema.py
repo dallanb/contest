@@ -3,13 +3,13 @@ from webargs import fields
 
 
 class ContestCompletedSchema(Schema):
-    uuid = fields.UUID()
-    league_uuid = fields.UUID(missing=None)
-    owner_uuid = fields.UUID()
+    uuid = fields.UUID(attribute='uuid')
+    league_uuid = fields.UUID(attribute='league_uuid', missing=None)
+    owner_uuid = fields.UUID(attribute='owner_uuid')
     message = fields.String()
 
     @pre_dump
-    def generate_message(self, data, **kwargs):
+    def prepare(self, data, **kwargs):
         name = data.get('name', '')
-        setattr(data, 'message', f"{name} is completed")
-        return
+        data['message'] = f"{name} is completed"
+        return data

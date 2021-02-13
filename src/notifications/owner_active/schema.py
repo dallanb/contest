@@ -18,10 +18,10 @@ class OwnerActiveSchema(Schema):
 
     @pre_dump
     def prepare(self, data, **kwargs):
-        contests = DB().find(model=Contest, uuid=str(data.participant.contest_uuid))
+        contests = DB().find(model=Contest, uuid=str(data['participant'].contest_uuid))
         contest = contests.items[0]
-        member = services.ParticipantService().fetch_member(uuid=str(data.participant.member_uuid))
-        setattr(data, 'contest', contest)
-        setattr(data, 'member', member)
-        setattr(data, 'message', f"{member['display_name']} is active")
-        return
+        member = services.ParticipantService().fetch_member(uuid=str(data['participant'].member_uuid))
+        data['contest'] = contest
+        data['member'] = member
+        data['message'] = f"{member['display_name']} is active"
+        return data

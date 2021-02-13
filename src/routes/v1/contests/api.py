@@ -83,15 +83,16 @@ class ContestsListAPI(Base):
         owner = self.participant.fetch_member_user(user_uuid=str(g.user),
                                                    league_uuid=str(
                                                        data['league_uuid']) if data['league_uuid'] else None)
-        # initialized contest
+        # create contest
         contest = self.contest.create(status='pending', owner_uuid=owner['user_uuid'], name=data['name'],
                                       start_time=data['start_time'], location_uuid=data['location_uuid'],
                                       league_uuid=data['league_uuid'])
-        # initialize sport
+        # create sport
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
 
-        # initialize owner
-        participant = self.participant.create(member_uuid=owner['uuid'], contest=contest, status='active')
+        # create owner
+        _ = self.participant.create_owner(member_uuid=owner['uuid'], contest=contest, buy_in=data['buy_in'],
+                                          payout=data['payout'])
 
         return DataResponse(
             data={
