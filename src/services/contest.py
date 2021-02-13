@@ -27,16 +27,9 @@ class Contest(Base):
         return self._save(instance=instance)
 
     @contest_notification(operation='create')
-    def create_save(self, instance):
-        return self._save(instance=instance)
-
-    @contest_notification(operation='update')
-    def update_save(self, instance):
-        return self._save(instance=instance)
-
     def create(self, **kwargs):
-        contest = self.init(model=self.contest_model, **kwargs)
-        return self.create_save(instance=contest)
+        contest = self._init(model=self.contest_model, **kwargs)
+        return self._save(instance=contest)
 
     def update(self, uuid, **kwargs):
         contests = self.find(uuid=uuid)
@@ -44,10 +37,11 @@ class Contest(Base):
             self.error(code=HTTPStatus.NOT_FOUND)
         return self.apply(instance=contests.items[0], **kwargs)
 
+    @contest_notification(operation='update')
     def apply(self, instance, **kwargs):
         # if contest status is being updated we will trigger a notification
         contest = self._assign_attr(instance=instance, attr=kwargs)
-        return self.update_save(instance=contest)
+        return self._save(instance=contest)
 
     # Check and update contest status if all participants associated with the contest have responded
     def check_contest_status(self, uuid):

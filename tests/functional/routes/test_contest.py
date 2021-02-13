@@ -1,4 +1,5 @@
 import json
+import time
 from datetime import datetime
 
 import pytest
@@ -13,7 +14,7 @@ from src import app, services
 ###########
 # Create
 ###########
-def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
+def test_create_contest(kafka_conn, reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
                         mock_fetch_location):
     """
     GIVEN a Flask application configured for testing
@@ -31,7 +32,6 @@ def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, moc
         'league_uuid': pytest.league_uuid,
         'name': pytest.name,
         'start_time': pytest.start_time,
-        'participants': pytest.participants,
         'buy_in': pytest.buy_in,
         'payout': pytest.payout
     }
@@ -67,26 +67,6 @@ def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, moc
     owner = participants.items[0]
     assert str(owner.contest_uuid) == contests['uuid']
     assert owner.status.name == 'active'
-
-    # confirm participant creation
-    participants = services.ParticipantService().find(member_uuid=pytest.participant_member_uuid)
-    assert participants.total == 1
-
-    participant = participants.items[0]
-    assert str(participant.contest_uuid) == contests['uuid']
-    assert participant.status.name == 'pending'
-
-    # confirm contest_materialized creation
-    contests_materialized = services.ContestMaterializedService().find()
-    assert contests_materialized.total == 1
-
-    contest_materialized = contests_materialized.items[0]
-    assert str(contest_materialized.uuid) == contests['uuid']
-    assert str(contest_materialized.location) == pytest.course_name
-
-    materialized_participants = contest_materialized.participants
-    assert materialized_participants[str(owner.member_uuid)] is not None
-
 
 ###########
 # Fetch

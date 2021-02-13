@@ -80,15 +80,19 @@ class ContestsListAPI(Base):
     @check_user
     def post(self):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        contest = self.contest.init(status='pending', owner_uuid=g.user, name=data['name'],
-                                    start_time=data['start_time'], location_uuid=data['location_uuid'],
-                                    league_uuid=data['league_uuid'])
-        _ = self.sport.init(sport_uuid=data['sport_uuid'], contest=contest)
         owner = self.participant.fetch_member_user(user_uuid=str(g.user),
                                                    league_uuid=str(
                                                        data['league_uuid']) if data['league_uuid'] else None)
-        self.participant.create_owner(member_uuid=owner['uuid'], contest=contest, buy_in=data['buy_in'],
-                                      payout=data['payout'])
+        # initialized contest
+        contest = self.contest.create(status='pending', owner_uuid=owner['user_uuid'], name=data['name'],
+                                      start_time=data['start_time'], location_uuid=data['location_uuid'],
+                                      league_uuid=data['league_uuid'])
+        # initialize sport
+        _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
+
+        # initialize owner
+        participant = self.participant.create(member_uuid=owner['uuid'], contest=contest, status='active')
+
         return DataResponse(
             data={
                 'contests': self.dump(

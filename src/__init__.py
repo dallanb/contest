@@ -37,6 +37,8 @@ from .models import *
 from .routes import *
 # import services
 from .services import *
+# import notifications
+from .notifications import *
 
 # import common
 from .common import (
