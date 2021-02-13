@@ -9,4 +9,5 @@ from .mock_fetch_member_user import mock_fetch_member_user
 from .reset_db import reset_db
 from .seed_contest import seed_contest
 from .seed_contest_materialized import seed_contest_materialized
+from .seed_participant import seed_participant
 from .seed_sport import seed_sport
