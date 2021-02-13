@@ -1,5 +1,6 @@
 import concurrent.futures
 import logging
+import threading
 from http import HTTPStatus
 
 from .base import Base
@@ -48,6 +49,17 @@ class Participant(Base):
         owner = self._init(model=self.participant_model, **kwargs, status='active')
         return self._save(instance=owner)
 
+    def create_batch(self, uuids, contest):
+        participants = [str(uuid) for uuid in uuids]
+        self.fetch_member_batch(uuids=participants)
+        for participant in participants:
+            self.create(member_uuid=participant, status='pending', contest=contest)
+
+    def create_batch_async(self, uuids, contest):
+        thread = threading.Thread(target=self.create_batch, args=(uuids, contest),
+                                  daemon=True)
+        thread.start()
+
     def _status_machine(self, prev_status, new_status):
         # cannot go from active to pending
         if ParticipantStatusEnum[prev_status] == ParticipantStatusEnum['active'] and ParticipantStatusEnum[
@@ -57,7 +69,6 @@ class Participant(Base):
 
     def fetch_member_user(self, user_uuid, league_uuid):
         hit = self.cache.get(f'{user_uuid}_{league_uuid}')
-        logging.info(f'fetch_member_user: {hit}')
         if hit:
             return hit
         res = MemberExternal().fetch_member_user(uuid=user_uuid, params={'league_uuid': league_uuid})
@@ -69,7 +80,6 @@ class Participant(Base):
     # possibly turn this into a decorator (the caching part)
     def fetch_member(self, uuid):
         hit = self.cache.get(uuid)
-        logging.info(f'fetch_member: {hit}')
         if hit:
             return hit
         res = MemberExternal().fetch_member(uuid=uuid)

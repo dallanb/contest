@@ -1,5 +1,4 @@
 import json
-import time
 from datetime import datetime
 
 import pytest
@@ -15,7 +14,7 @@ from src import app, services
 # Create
 ###########
 def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
-                        mock_fetch_location):
+                        mock_fetch_location, mock_create_batch_async):
     """
     GIVEN a Flask application configured for testing
     WHEN the POST endpoint 'contests' is requested
@@ -31,6 +30,7 @@ def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, moc
         'location_uuid': pytest.location_uuid,
         'league_uuid': pytest.league_uuid,
         'name': pytest.name,
+        'participants': pytest.participants,
         'start_time': pytest.start_time,
         'buy_in': pytest.buy_in,
         'payout': pytest.payout
@@ -67,8 +67,6 @@ def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, moc
     owner = participants.items[0]
     assert str(owner.contest_uuid) == contests['uuid']
     assert owner.status.name == 'active'
-
-    time.sleep(2)
 
 
 ###########

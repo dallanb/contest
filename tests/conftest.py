@@ -20,7 +20,7 @@ def pytest_configure(config):
     pytest.participant_user_uuid = uuid4()
     pytest.participant_member_uuid = uuid4()
     pytest.participant_display_name = 'LeBron James'
-    pytest.participants = [pytest.owner_member_uuid, pytest.participant_member_uuid]
+    pytest.participants = [pytest.participant_member_uuid]
     pytest.payout = [0.75, 0.25]
     pytest.sport_uuid = uuid4()
     pytest.start_time = time_now()

@@ -13,6 +13,7 @@ class CreateContestSchema(Schema):
     league_uuid = fields.UUID(allow_none=True)
     name = fields.String()
     start_time = fields.Integer()
+    participants = fields.List(fields.String())
     buy_in = fields.Float()
     payout = fields.List(fields.Float())
 
