@@ -23,5 +23,5 @@ def pytest_configure(config):
     pytest.participants = [pytest.participant_member_uuid]
     pytest.payout = [0.75, 0.25]
     pytest.sport_uuid = uuid4()
-    pytest.start_time = time_now()
+    pytest.start_time = time_now() + 1000
     pytest.course_name = 'Super Course'

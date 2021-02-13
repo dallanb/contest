@@ -63,10 +63,14 @@ class Contest(Base):
         hit = self.cache.get(uuid)
         if hit:
             return hit
-        res = CourseExternal().fetch_course(uuid=uuid)
-        location = res['data']['courses']
-        self.cache.set(uuid, location, 3600)
-        return location
+        try:
+            res = CourseExternal().fetch_course(uuid=uuid)
+            location = res['data']['courses']
+            self.cache.set(uuid, location, 3600)
+            return location
+        except TypeError:
+            self.logger.error(f'fetch location failed for uuid: {uuid}')
+            return None
 
     def find_by_start_time_range(self, month, year, **kwargs):
         query = self.db.clean_query(model=self.contest_model, **kwargs)

@@ -82,10 +82,16 @@ class ContestsListAPI(Base):
         data = self.clean(schema=create_schema, instance=request.get_json())
 
         # ensure passed in parameters are correct by requesting external api's
-        _ = self.contest.fetch_location(uuid=str(data['location_uuid']))
+        location = self.contest.fetch_location(uuid=str(data['location_uuid']))
+        if location is None:
+            self.throw_error(http_code=self.code.BAD_REQUEST, msg='Location does not exist')
+
         owner = self.participant.fetch_member_user(user_uuid=str(g.user),
                                                    league_uuid=str(
                                                        data['league_uuid']) if data['league_uuid'] else None)
+        if owner is None:
+            self.throw_error(http_code=self.code.BAD_REQUEST, msg='User not found')
+
         # create contest
         contest = self.contest.create(status='pending', owner_uuid=owner['user_uuid'], name=data['name'],
                                       start_time=data['start_time'], location_uuid=data['location_uuid'],

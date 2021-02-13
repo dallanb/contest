@@ -10,4 +10,4 @@ def fetch_member_user(self, user_uuid, league_uuid):
             'uuid': str(pytest.owner_member_uuid)
         }
     else:
-        return 500
+        return None

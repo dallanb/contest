@@ -4,15 +4,18 @@ from datetime import datetime
 import pytest
 
 from src import app, services
+###########
+# Create
+###########
+from src.common import time_now
+from tests.helpers import generate_uuid
 
 
 #############
 # SUCCESS
 #############
 
-###########
-# Create
-###########
+
 def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
                         mock_fetch_location, mock_create_batch_async):
     """
@@ -72,7 +75,7 @@ def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, moc
 ###########
 # Fetch
 ###########
-def test_fetch_contest(reset_db, seed_contest):
+def test_fetch_contest(reset_db, seed_contest, seed_contest_materialized, seed_sport):
     """
     GIVEN a Flask application configured for testing
     WHEN the GET endpoint 'contest' is requested
@@ -101,13 +104,13 @@ def test_fetch_contest(reset_db, seed_contest):
     assert contests['location_uuid'] == str(pytest.location_uuid)
 
 
-def test_fetch_contest_materialized(reset_db, seed_contest, seed_contest_materialized):
+def test_fetch_contest_materialized():
     """
     GIVEN a Flask application configured for testing
     WHEN the GET endpoint 'contest_materialized' is requested
     THEN check that the response is valid
     """
-    contest_uuid = pytest.contest_materialized.uuid
+    contest_uuid = pytest.contest.uuid
 
     # Headers
     headers = {'X-Consumer-Custom-ID': pytest.owner_user_uuid}
@@ -134,7 +137,7 @@ def test_fetch_contest_materialized(reset_db, seed_contest, seed_contest_materia
 ###########
 # Fetch All
 ###########
-def test_fetch_all_contest(reset_db, seed_contest):
+def test_fetch_all_contest():
     """
     GIVEN a Flask application configured for testing
     WHEN the GET endpoint 'contests' is requested
@@ -162,13 +165,13 @@ def test_fetch_all_contest(reset_db, seed_contest):
     assert contests['location_uuid'] == str(pytest.location_uuid)
 
 
-def test_fetch_all_contest_materialized(reset_db, seed_contest, seed_contest_materialized):
+def test_fetch_all_contest_materialized():
     """
     GIVEN a Flask application configured for testing
     WHEN the GET endpoint 'contests_materialized' is requested
     THEN check that the response is valid
     """
-    contest_uuid = pytest.contest_materialized.uuid
+    contest_uuid = pytest.contest.uuid
 
     # Headers
     headers = {'X-Consumer-Custom-ID': pytest.owner_user_uuid}
@@ -193,7 +196,7 @@ def test_fetch_all_contest_materialized(reset_db, seed_contest, seed_contest_mat
     assert len(contests['participants']) == 1
 
 
-def test_fetch_all_contest_calendar(reset_db, seed_contest):
+def test_fetch_all_contest_calendar():
     """
     GIVEN a Flask application configured for testing
     WHEN the GET endpoint 'contests_calender' is requested
@@ -249,15 +252,24 @@ def test_create_contest_fail(reset_db, mock_fetch_member_user, mock_fetch_member
         'sport_uuid': pytest.sport_uuid,
         'location_uuid': pytest.location_uuid,
         'league_uuid': pytest.league_uuid,
-        'name': None,
+        'name': pytest.name,
         'start_time': pytest.start_time,
         'participants': pytest.participants,
         'buy_in': pytest.buy_in,
         'payout': pytest.payout
     }
 
-    # Request
-    response = app.test_client().post('/contests', headers=headers, json=payload)
+    response = app.test_client().post('/contests', headers=headers, json={**payload, 'name': None})
+    assert response.status_code == 400
 
-    # Response
+    response = app.test_client().post('/contests', headers=headers, json={**payload, 'location_uuid': generate_uuid()})
+    assert response.status_code == 400
+
+    response = app.test_client().post('/contests', headers=headers, json={**payload, 'league_uuid': generate_uuid()})
+    assert response.status_code == 400
+
+    response = app.test_client().post('/contests', headers=headers, json={**payload, 'participants': [generate_uuid()]})
+    assert response.status_code == 200
+
+    response = app.test_client().post('/contests', headers=headers, json={**payload, 'start_time': time_now() - 10000})
     assert response.status_code == 400

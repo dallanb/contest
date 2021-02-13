@@ -71,22 +71,28 @@ class Participant(Base):
         hit = self.cache.get(f'{user_uuid}_{league_uuid}')
         if hit:
             return hit
-        res = MemberExternal().fetch_member_user(uuid=user_uuid, params={'league_uuid': league_uuid})
-        member = res['data']['members']
-        self.cache.set(f'{user_uuid}_{league_uuid}', member, 3600)
-        self.cache.set(str(member['uuid']), member, 3600)
-        return member
+        try:
+            res = MemberExternal().fetch_member_user(uuid=user_uuid, params={'league_uuid': league_uuid})
+            member = res['data']['members']
+            self.cache.set(f'{user_uuid}_{league_uuid}', member, 3600)
+            self.cache.set(str(member['uuid']), member, 3600)
+            return member
+        except TypeError:
+            return None
 
     # possibly turn this into a decorator (the caching part)
     def fetch_member(self, uuid):
         hit = self.cache.get(uuid)
         if hit:
             return hit
-        res = MemberExternal().fetch_member(uuid=uuid)
-        member = res['data']['members']
-        self.cache.set(f'{str(member["user_uuid"])}_{str(member["league_uuid"])}', member, 3600)
-        self.cache.set(uuid, member, 3600)
-        return member
+        try:
+            res = MemberExternal().fetch_member(uuid=uuid)
+            member = res['data']['members']
+            self.cache.set(f'{str(member["user_uuid"])}_{str(member["league_uuid"])}', member, 3600)
+            self.cache.set(uuid, member, 3600)
+            return member
+        except TypeError:
+            return None
 
     def fetch_member_batch(self, uuids):
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:

@@ -15,4 +15,4 @@ def fetch_member(self, uuid):
             'display_name': pytest.owner_display_name
         }
     else:
-        return 500
+        return None
