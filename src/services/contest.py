@@ -18,12 +18,18 @@ class Contest(Base):
         self.contest_model = ContestModel
 
     def find(self, **kwargs):
-        return Base.find(self, model=self.contest_model, **kwargs)
+        return self._find(model=self.contest_model, **kwargs)
+
+    def init(self, **kwargs):
+        return self._init(model=self.contest_model, **kwargs)
+
+    def save(self, instance):
+        return self._save(instance=instance)
 
     @contest_notification(operation='create')
     def create(self, **kwargs):
-        contest = self.init(model=self.contest_model, **kwargs)
-        return self.save(instance=contest)
+        contest = self._init(model=self.contest_model, **kwargs)
+        return self._save(instance=contest)
 
     def update(self, uuid, **kwargs):
         contests = self.find(uuid=uuid)
@@ -34,8 +40,8 @@ class Contest(Base):
     @contest_notification(operation='update')
     def apply(self, instance, **kwargs):
         # if contest status is being updated we will trigger a notification
-        contest = self.assign_attr(instance=instance, attr=kwargs)
-        return self.save(instance=contest)
+        contest = self._assign_attr(instance=instance, attr=kwargs)
+        return self._save(instance=contest)
 
     # Check and update contest status if all participants associated with the contest have responded
     def check_contest_status(self, uuid):
@@ -57,10 +63,14 @@ class Contest(Base):
         hit = self.cache.get(uuid)
         if hit:
             return hit
-        res = CourseExternal().fetch_course(uuid=uuid)
-        location = res['data']['courses']
-        self.cache.set(uuid, location, 3600)
-        return location
+        try:
+            res = CourseExternal().fetch_course(uuid=uuid)
+            location = res['data']['courses']
+            self.cache.set(uuid, location, 3600)
+            return location
+        except TypeError:
+            self.logger.error(f'fetch location failed for uuid: {uuid}')
+            return None
 
     def find_by_start_time_range(self, month, year, **kwargs):
         query = self.db.clean_query(model=self.contest_model, **kwargs)

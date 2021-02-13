@@ -210,8 +210,9 @@ class DB:
         Find = collections.namedtuple('Find', ['items', 'total'])
         return Find(items=items, total=total)
 
+        # Methods
+
     @classmethod
-    # Methods
     def init(cls, model, **kwargs):
         return model(**kwargs)
 
@@ -219,8 +220,9 @@ class DB:
     def count(cls, model):
         return db.session.query(model).count()
 
+    # add an instance without saving it to the db
     @classmethod
-    def save(cls, instance):
+    def add(cls, instance):
         if not instance:
             raise MissingParamError(instance.__tablename__)
         if not Cleaner().is_mapped(instance):
@@ -228,8 +230,16 @@ class DB:
 
         if not cls._is_pending(instance):
             db.session.add(instance)
+        return instance
 
+    @classmethod
+    def commit(cls):
         db.session.commit()
+
+    @classmethod
+    def save(cls, instance):
+        cls.add(instance=instance)
+        cls.commit()
         return instance
 
     @classmethod
@@ -243,3 +253,7 @@ class DB:
         db.session.delete(instance)
         db.session.commit()
         return True
+
+    @classmethod
+    def rollback(cls):
+        db.session.rollback()

@@ -1,10 +1,11 @@
 from marshmallow import Schema, post_dump
+from marshmallow.validate import Range
 from marshmallow_enum import EnumField
 from webargs import fields
 
 from ..avatars.schema import DumpAvatarSchema
 from ..sports.schema import DumpSportsSchema
-from ....common import ContestStatusEnum
+from ....common import ContestStatusEnum, time_now
 
 
 class CreateContestSchema(Schema):
@@ -12,9 +13,9 @@ class CreateContestSchema(Schema):
     location_uuid = fields.UUID()
     league_uuid = fields.UUID(allow_none=True)
     name = fields.String()
-    start_time = fields.Integer()
-    participants = fields.List(fields.UUID(), missing=None)
-    buy_in = fields.Float()
+    start_time = fields.Integer(validate=Range(min=time_now()))
+    participants = fields.List(fields.String())
+    buy_in = fields.Float(validate=Range(min=0))
     payout = fields.List(fields.Float())
 
 
@@ -109,14 +110,6 @@ class FetchAllContestMaterializedSchema(Schema):
     league = fields.UUID(required=False, data_key="league_uuid")
 
 
-class SearchContestMaterializedSchema(Schema):
-    page = fields.Int(required=False, missing=1)
-    per_page = fields.Int(required=False, missing=10)
-    sort = fields.Boolean(required=False, missing=True)
-    key = fields.String(required=False, missing='')
-    league = fields.UUID(required=False, data_key="league")
-
-
 create_schema = CreateContestSchema()
 dump_schema = DumpContestSchema()
 dump_many_schema = DumpContestSchema(many=True)
@@ -127,4 +120,3 @@ fetch_schema = FetchContestSchema()
 fetch_all_schema = FetchAllContestSchema()
 fetch_all_calendar_schema = FetchAllContestCalendarSchema()
 fetch_all_materialized_schema = FetchAllContestMaterializedSchema()
-search_materialized_schema = SearchContestMaterializedSchema()

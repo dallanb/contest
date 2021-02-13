@@ -16,11 +16,11 @@ class Avatar(Base):
         self.avatar_model = AvatarModel
 
     def find(self, **kwargs):
-        return Base.find(self, model=self.avatar_model, **kwargs)
+        return self._find(model=self.avatar_model, **kwargs)
 
     def create(self, **kwargs):
-        avatar = self.init(model=self.avatar_model, **kwargs)
-        return self.save(instance=avatar)
+        avatar = self._init(model=self.avatar_model, **kwargs)
+        return self._save(instance=avatar)
 
     def update(self, uuid, **kwargs):
         avatars = self.find(uuid=uuid)
@@ -29,8 +29,8 @@ class Avatar(Base):
         return self.apply(instance=avatars.items[0], **kwargs)
 
     def apply(self, instance, **kwargs):
-        avatar = self.assign_attr(instance=instance, attr=kwargs)
-        return self.save(instance=avatar)
+        avatar = self._assign_attr(instance=instance, attr=kwargs)
+        return self._save(instance=avatar)
 
     def destroy(self, uuid, ):
         avatars = self.find(uuid=uuid)

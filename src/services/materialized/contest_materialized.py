@@ -16,11 +16,11 @@ class ContestMaterialized(Base):
         self.materialized_model = MaterializedModel
 
     def find(self, **kwargs):
-        return Base.find(self, model=self.materialized_model, **kwargs)
+        return self._find(model=self.materialized_model, **kwargs)
 
     def create(self, **kwargs):
-        materialized_contest = self.init(model=self.materialized_model, **kwargs)
-        return self.save(instance=materialized_contest)
+        materialized_contest = self._init(model=self.materialized_model, **kwargs)
+        return self._save(instance=materialized_contest)
 
     def update(self, uuid, **kwargs):
         materialized_contests = self.find(uuid=uuid)
@@ -29,5 +29,5 @@ class ContestMaterialized(Base):
         return self.apply(instance=materialized_contests.items[0], **kwargs)
 
     def apply(self, instance, **kwargs):
-        materialized_contest = self.assign_attr(instance=instance, attr=kwargs)
-        return self.save(instance=materialized_contest)
+        materialized_contest = self._assign_attr(instance=instance, attr=kwargs)
+        return self._save(instance=materialized_contest)
