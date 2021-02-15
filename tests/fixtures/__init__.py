@@ -11,6 +11,7 @@ from .mock_participant_notification import mock_participant_notification_create,
     mock_participant_notification_create_owner, mock_participant_notification_update
 from .mock_upload_fileobj import mock_upload_fileobj
 from .reset_db import reset_db
+from .seed_avatar import seed_avatar
 from .seed_contest import seed_contest
 from .seed_contest_materialized import seed_contest_materialized
 from .seed_participant import seed_participant
