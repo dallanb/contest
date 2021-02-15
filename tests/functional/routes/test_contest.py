@@ -4,9 +4,6 @@ from datetime import datetime
 import pytest
 
 from src import app, services
-###########
-# Create
-###########
 from src.common import time_now
 from tests.helpers import generate_uuid
 
@@ -15,9 +12,12 @@ from tests.helpers import generate_uuid
 # SUCCESS
 #############
 
-
+###########
+# Create
+###########
 def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
-                        mock_fetch_location, mock_create_batch_async):
+                        mock_fetch_location, mock_create_batch_async, mock_contest_notification_create,
+                        mock_participant_notification_create_owner, mock_participant_notification_create):
     """
     GIVEN a Flask application configured for testing
     WHEN the POST endpoint 'contests' is requested
@@ -238,7 +238,9 @@ def test_fetch_all_contest_calendar():
 # Create
 ###########
 def test_create_contest_fail(reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
-                             mock_fetch_location):
+                             mock_fetch_location, mock_contest_notification_create,
+                             mock_participant_notification_create_owner,
+                             mock_participant_notification_create):
     """
     GIVEN a Flask application configured for testing
     WHEN the POST endpoint 'contests' is requested with incorrect data

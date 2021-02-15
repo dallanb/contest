@@ -55,15 +55,15 @@ class participant_notification:
             if new_instance.status.name == 'active':
                 topic = participant_active.topic
                 key = participant_active.key
-                value = participant_active.schema.dump({'participant'})
+                value = participant_active.schema.dump({'participant': new_instance})
                 self.service.notify(topic=topic, value=value, key=key)
             elif new_instance.status.name == 'inactive':
                 topic = participant_inactive.topic
                 key = participant_inactive.key
-                value = participant_inactive.schema.dump({'participant'})
+                value = participant_inactive.schema.dump({'participant': new_instance})
                 self.service.notify(topic=topic, value=value, key=key)
             elif new_instance.status.name == 'completed':
                 topic = participant_completed.topic
                 key = participant_completed.key
-                value = participant_completed.schema.dump({'participant'})
+                value = participant_completed.schema.dump({'participant': new_instance})
                 self.service.notify(topic=topic, value=value, key=key)

@@ -1,7 +1,8 @@
 from sqlalchemy_utils import UUIDType
+
+from .mixins import BaseMixin
 from .. import db
 from ..common import ParticipantStatusEnum
-from .mixins import BaseMixin
 
 
 class Participant(db.Model, BaseMixin):
@@ -12,7 +13,7 @@ class Participant(db.Model, BaseMixin):
     status = db.Column(db.Enum(ParticipantStatusEnum), db.ForeignKey('participant_status.name'), nullable=False)
 
     # Relationship
-    contest = db.relationship("Contest", back_populates="participants", lazy="noload")
+    contest = db.relationship("Contest", back_populates="participants")
     participant_status = db.relationship("ParticipantStatus")
 
     def __init__(self, *args, **kwargs):
