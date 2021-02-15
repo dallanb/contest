@@ -23,9 +23,6 @@ class Contest(Base):
     def init(self, **kwargs):
         return self._init(model=self.contest_model, **kwargs)
 
-    def save(self, instance):
-        return self._save(instance=instance)
-
     @contest_notification(operation='create')
     def create(self, **kwargs):
         contest = self._init(model=self.contest_model, **kwargs)

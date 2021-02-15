@@ -36,7 +36,7 @@ class Avatar(Base):
         avatars = self.find(uuid=uuid)
         if not avatars.total:
             self.error(code=HTTPStatus.NOT_FOUND)
-        return Base.destroy(self, instance=avatars.items[0])
+        return self._destroy(instance=avatars.items[0])
 
     def upload_file(self, filename):
         result = self.s3.upload(filename=filename, bucket=app.config['S3_BUCKET'],

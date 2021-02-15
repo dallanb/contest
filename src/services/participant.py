@@ -23,9 +23,6 @@ class Participant(Base):
     def init(self, **kwargs):
         return self._init(model=self.participant_model, **kwargs)
 
-    def save(self, instance):
-        return self._save(instance=instance)
-
     @participant_notification(operation='create')
     def create(self, **kwargs):
         participant = self._init(model=self.participant_model, **kwargs)

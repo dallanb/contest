@@ -16,9 +16,6 @@ class Sport(Base):
     def init(self, **kwargs):
         return self._init(model=self.sport_model, **kwargs)
 
-    def save(self, instance):
-        return self._save(instance=instance)
-
     def create(self, **kwargs):
         sport = self._init(model=self.sport_model, **kwargs)
         return self._save(instance=sport)
