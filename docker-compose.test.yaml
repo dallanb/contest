@@ -62,7 +62,7 @@ services:
       - test-net
   web:
     container_name: web
-    image: dallanbhatti/wager_proxy:test
+    image: dallanbhatti/contest_proxy:test
     restart: on-failure
     volumes:
       - statics/.:/usr/share/nginx/
