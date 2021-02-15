@@ -27,30 +27,22 @@ class contest_notification:
 
     @staticmethod
     def create(new_instance):
-        notification = contest_created.from_data(contest=new_instance)
-        notification.notify()
+        contest_created.from_data(contest=new_instance).notify()
 
     @staticmethod
     def update(prev_instance, new_instance, args):
         if prev_instance and prev_instance.get('status') and prev_instance['status'].name != new_instance.status.name:
             if new_instance.status.name == 'ready':
-                notification = contest_ready.from_data(contest=new_instance)
-                notification.notify()
+                contest_ready.from_data(contest=new_instance).notify()
             elif new_instance.status.name == 'active':
-                notification = contest_active.from_data(contest=new_instance)
-                notification.notify()
+                contest_active.from_data(contest=new_instance).notify()
             elif new_instance.status.name == 'completed':
-                notification = contest_completed.from_data(contest=new_instance)
-                notification.notify()
+                contest_completed.from_data(contest=new_instance).notify()
             elif new_instance.status.name == 'inactive':
-                notification = contest_inactive.from_data(contest=new_instance)
-                notification.notify()
+                contest_inactive.from_data(contest=new_instance).notify()
         if args.get('avatar'):
-            notification = avatar_created.from_data(contest=new_instance, avatar=args['avatar'])
-            notification.notify()
+            avatar_created.from_data(contest=new_instance, avatar=args['avatar']).notify()
         if prev_instance and prev_instance.get('name') and prev_instance['name'] != new_instance.name:
-            notification = name_updated.from_data(contest=new_instance)
-            notification.notify()
+            name_updated.from_data(contest=new_instance).notify()
         if prev_instance and prev_instance.get('start_time') and prev_instance['start_time'] != new_instance.start_time:
-            notification = start_time_updated.from_data(contest=new_instance)
-            notification.notify()
+            start_time_updated.from_data(contest=new_instance).notify()

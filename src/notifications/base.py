@@ -5,8 +5,8 @@ class Base:
     def __init__(self, key, data):
         self.topic = 'contests'
         self.event = Event()
-        self.key = None
-        self.data = None
+        self.key = key
+        self.data = data
 
     def dump(self):
         return self.topic, self.key, self.data
