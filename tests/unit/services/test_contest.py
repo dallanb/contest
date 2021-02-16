@@ -1,6 +1,7 @@
 import pytest
 
 from src import services, ManualException
+from src.common import time_now
 from tests.helpers import generate_uuid
 
 global_contest = None
@@ -285,3 +286,188 @@ def test_contest_init_dup(seed_contest):
                                    start_time=pytest.start_time, location_uuid=pytest.location_uuid,
                                    league_uuid=pytest.league_uuid)
     assert contest.uuid is not None
+
+
+def test_contest_init_w_bad_league_uuid(reset_db):
+    """
+    GIVEN 0 contest instance in the database
+    WHEN the init method is called with a bad league_uuid
+    THEN it should return 1 contest and add 0 contest instance into the database
+    """
+    contest = contest_service.init(status='pending', owner_uuid=pytest.owner_user_uuid, name=pytest.name,
+                                   start_time=pytest.start_time, location_uuid=pytest.location_uuid,
+                                   league_uuid=1)
+    assert contest.uuid is not None
+
+    contests = contest_service.find(uuid=contest.uuid)
+    assert contests.total == 0
+    assert len(contests.items) == 0
+
+
+def test_contest_init_w_bad_field(reset_db):
+    """
+    GIVEN 0 contest instance in the database
+    WHEN the init method is called with a bad league_uuid
+    THEN it should return 1 contest and add 0 contest instance into the database and ManualException with code 500
+    """
+    try:
+        _ = contest_service.init(status='pending', owner_uuid=pytest.owner_user_uuid, name=pytest.name,
+                                 start_time=pytest.start_time, location_uuid=pytest.location_uuid,
+                                 league_uuid=pytest.league_uuid, junk='junk')
+    except ManualException as ex:
+        assert ex.code == 500
+
+
+###########
+# Update
+###########
+def test_contest_update(reset_db, seed_contest):
+    """
+    GIVEN 1 contest instance in the database
+    WHEN the update method is called
+    THEN it should return 1 contest and update 1 contest instance into the database
+    """
+    contest = contest_service.update(uuid=pytest.contest.uuid, start_time=time_now() + 10000)
+    assert contest.uuid is not None
+
+    contests = contest_service.find(uuid=contest.uuid)
+    assert contests.total == 1
+    assert len(contests.items) == 1
+
+
+def test_contest_update_w_bad_uuid(reset_db, seed_contest):
+    """
+    GIVEN 1 contest instance in the database
+    WHEN the update method is called with random uuid
+    THEN it should return 0 contest and update 0 contest instance into the database and ManualException with code 404
+    """
+    try:
+        _ = contest_service.update(uuid=generate_uuid(), start_time=time_now() + 10000)
+    except ManualException as ex:
+        assert ex.code == 404
+
+
+def test_contest_update_w_bad_field():
+    """
+    GIVEN 1 contest instance in the database
+    WHEN the update method is called with bad field
+    THEN it should return 0 contest and update 0 contest instance in the database and ManualException with code 400
+    """
+    try:
+        _ = contest_service.update(uuid=pytest.contest.uuid, junk='junk')
+    except ManualException as ex:
+        assert ex.code == 400
+
+
+###########
+# Apply
+###########
+def test_contest_apply(reset_db, seed_contest):
+    """
+    GIVEN 1 contest instance in the database
+    WHEN the apply method is called
+    THEN it should return 1 contest and update 1 contest instance in the database
+    """
+    contest = contest_service.apply(instance=pytest.contest, start_time=time_now() + 10000)
+    assert contest.uuid is not None
+
+    contests = contest_service.find(uuid=contest.uuid)
+    assert contests.total == 1
+    assert len(contests.items) == 1
+
+
+def test_contest_apply_w_bad_contest(reset_db, seed_contest):
+    """
+    GIVEN 1 contest instance in the database
+    WHEN the apply method is called with random uuid
+    THEN it should return 0 contest and update 0 contest instance in the database and ManualException with code 404
+    """
+    try:
+        _ = contest_service.apply(instance=generate_uuid(), start_time=time_now() + 10000)
+    except ManualException as ex:
+        assert ex.code == 400
+
+
+def test_contest_apply_w_bad_field():
+    """
+    GIVEN 1 contest instance in the database
+    WHEN the apply method is called with bad field
+    THEN it should return 0 contest and update 0 contest instance in the database and ManualException with code 400
+    """
+    try:
+        _ = contest_service.apply(instance=pytest.contest, junk='junk')
+    except ManualException as ex:
+        assert ex.code == 400
+
+
+###########
+# Misc
+###########
+def test_check_contest_status(reset_db, mock_participant_notification_update, seed_contest, seed_owner,
+                              seed_participant):
+    """
+    GIVEN 1 pending contest instance, 1 active owner participant instance and 1 active participant instance in the database
+    WHEN the check_contest_status method is called
+    THEN it should update the contest status from 'pending' to 'ready'
+    """
+    assert pytest.contest.status.name == 'pending'
+    assert len(pytest.contest.participants) == 2
+
+    services.ParticipantService().apply(instance=pytest.participant, status='active')
+    assert pytest.contest.status.name == 'pending'
+    for participant in pytest.contest.participants:
+        assert participant.status.name == 'active'
+
+    contest_service.check_contest_status(uuid=pytest.contest.uuid)
+    assert pytest.contest.status.name == 'ready'
+
+
+def test_check_contest_status_no_change(reset_db, mock_participant_notification_update, seed_contest, seed_owner,
+                                        seed_participant):
+    """
+    GIVEN 1 pending contest instance, 1 active owner participant instance and 1 pending participant instance in the database
+    WHEN the check_contest_status method is called
+    THEN it should not change the contest status
+    """
+    assert pytest.contest.status.name == 'pending'
+    assert len(pytest.contest.participants) == 2
+
+    contest_service.check_contest_status(uuid=pytest.contest.uuid)
+    assert pytest.contest.status.name == 'pending'
+
+
+def test_check_contest_status_active(reset_db, mock_contest_notification_update, mock_participant_notification_update,
+                                     seed_contest, seed_owner,
+                                     seed_participant):
+    """
+    GIVEN 1 active contest instance, 1 completed owner participant instance and 1 completed participant instance in the database
+    WHEN the check_contest_status method is called
+    THEN it should update the contest status from 'active' to 'completed'
+    """
+    services.ParticipantService().apply(instance=pytest.participant, status='active')
+    contest_service.check_contest_status(uuid=pytest.contest.uuid)
+    assert pytest.contest.status.name == 'ready'
+
+    services.ContestService().apply(instance=pytest.contest, status='active')
+    assert pytest.contest.status.name == 'active'
+
+    services.ParticipantService().apply(instance=pytest.participant, status='completed')
+    services.ParticipantService().apply(instance=pytest.owner, status='completed')
+    assert pytest.contest.status.name == 'active'
+
+    contest_service.check_contest_status(uuid=pytest.contest.uuid)
+    assert pytest.contest.status.name == 'completed'
+
+
+def test_check_contest_status_participant_inactive_owner_active(reset_db, mock_contest_notification_update,
+                                                                mock_participant_notification_update,
+                                                                seed_contest, seed_owner,
+                                                                seed_participant):
+    """
+    GIVEN 1 active contest instance, 1 completed owner participant instance and 1 completed participant instance in the database
+    WHEN the check_contest_status method is called
+    THEN it should update the contest status from 'active' to 'completed'
+    """
+    services.ParticipantService().apply(instance=pytest.participant, status='inactive')
+    contest_service.check_contest_status(uuid=pytest.contest.uuid)
+    assert pytest.contest.status.name == 'ready'

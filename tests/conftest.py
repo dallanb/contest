@@ -10,6 +10,7 @@ def pytest_configure(config):
     pytest.contest = None
     pytest.contest_materialized = None
     pytest.sport = None
+    pytest.owner = None
     pytest.participant = None
     pytest.avatar = None
     pytest.buy_in = 5.0
