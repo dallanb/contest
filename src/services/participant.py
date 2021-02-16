@@ -8,6 +8,7 @@ from ..common import ParticipantStatusEnum
 from ..decorators import participant_notification
 from ..external import Member as MemberExternal
 from ..models import Participant as ParticipantModel
+from ..services import ContestService
 
 
 class Participant(Base):
@@ -48,9 +49,14 @@ class Participant(Base):
 
     def create_batch(self, uuids, contest):
         participants = [str(uuid) for uuid in uuids]
-        self.fetch_member_batch(uuids=participants)
-        for participant in participants:
-            self.create(member_uuid=participant, status='pending', contest=contest)
+        member_batch = self.fetch_member_batch(uuids=participants)
+        for member in member_batch:
+            if member is None:
+                # send a notifications here
+                self.create(member_uuid=None, status='inactive', contest=contest)
+            else:
+                self.create(member_uuid=member['uuid'], status='pending', contest=contest)
+        ContestService().check_contest_status(uuid=contest.uuid)
 
     def create_batch_async(self, uuids, contest):
         thread = threading.Thread(target=self.create_batch, args=(uuids, contest),
@@ -93,5 +99,5 @@ class Participant(Base):
 
     def fetch_member_batch(self, uuids):
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            executor.map(self.fetch_member, uuids)
-        return
+            batch = executor.map(self.fetch_member, uuids)
+        return batch

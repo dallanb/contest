@@ -9,7 +9,7 @@ from src import app, services
 # Create
 ###########
 def test_create_participant(reset_db, mock_fetch_member, mock_fetch_member_user, mock_participant_notification_create,
-                            seed_contest):
+                            mock_contest_notification_update, seed_contest):
     """
     GIVEN a Flask application configured for testing
     WHEN the POST endpoint 'participants' is requested
@@ -114,7 +114,7 @@ def test_fetch_all_participant(reset_db, seed_contest, seed_participant):
 ###########
 # Update
 ###########
-def test_update_participant(mock_fetch_member, mock_participant_notification_update):
+def test_update_participant(mock_fetch_member, mock_participant_notification_update, mock_contest_notification_update):
     """
     GIVEN a Flask application configured for testing
     WHEN the PUT endpoint 'participant' is requested

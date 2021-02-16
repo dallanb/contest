@@ -29,7 +29,7 @@ class participant_notification:
 
     @staticmethod
     def create(new_instance):
-        notification = participant_invited.from_data(participant=new_instance).notify()
+        participant_invited.from_data(participant=new_instance).notify()
 
     @staticmethod
     def create_owner(new_instance, buy_in, payout):

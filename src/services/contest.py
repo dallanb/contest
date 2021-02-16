@@ -5,7 +5,7 @@ from http import HTTPStatus
 from sqlalchemy import func
 
 from .base import Base
-from ..common import ParticipantStatusEnum, ContestStatusEnum
+from ..common import ParticipantStatusEnum
 from ..decorators import contest_notification
 from ..external import Course as CourseExternal
 from ..models import Contest as ContestModel, Participant as ParticipantModel
@@ -49,12 +49,14 @@ class Contest(Base):
         contests = self.find(uuid=uuid)
         contest = contests.items[0]
 
-        if ContestStatusEnum[contest.status.name] == ContestStatusEnum['pending'] and not counts.get(
-                ParticipantStatusEnum[contest.status.name]):
-            self.apply(instance=contest, status=ContestStatusEnum.ready.name)
-        elif ContestStatusEnum[contest.status.name] == ContestStatusEnum[
-            'active'] and not counts.get(ParticipantStatusEnum[contest.status.name]):
-            self.apply(instance=contest, status=ContestStatusEnum.completed.name)
+        if contest.status.name == 'pending' and not counts.get(ParticipantStatusEnum['pending']):
+            # the contest does not have enough active participants to proceed
+            if counts.get(ParticipantStatusEnum['active']) < 2:
+                self.apply(instance=contest, status='inactive')
+            else:
+                self.apply(instance=contest, status='ready')
+        elif contest.status.name == 'active' and not counts.get(ParticipantStatusEnum['active']):
+            self.apply(instance=contest, status='completed')
 
     def fetch_location(self, uuid):
         hit = self.cache.get(uuid)

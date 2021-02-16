@@ -210,7 +210,7 @@ def test_contest_find_by_non_existent_expand():
 ###########
 # Create
 ###########
-def test_contest_create(reset_db):
+def test_contest_create(reset_db, mock_contest_notification_create):
     """
     GIVEN 0 contest instance in the database
     WHEN the create method is called
@@ -224,7 +224,7 @@ def test_contest_create(reset_db):
     assert contest.owner_uuid == pytest.owner_user_uuid
 
 
-def test_contest_create_dup(reset_db):
+def test_contest_create_dup(reset_db, mock_contest_notification_create):
     """
     GIVEN 1 contest instance in the database
     WHEN the create method is called with the exact same parameters of an existing contest
@@ -238,7 +238,7 @@ def test_contest_create_dup(reset_db):
     assert contest.owner_uuid == pytest.owner_user_uuid
 
 
-def test_contest_create_w_bad_field():
+def test_contest_create_w_bad_field(mock_contest_notification_create):
     """
     GIVEN 2 contest instance in the database
     WHEN the create method is called with a non existent field
@@ -321,7 +321,7 @@ def test_contest_init_w_bad_field(reset_db):
 ###########
 # Update
 ###########
-def test_contest_update(reset_db, seed_contest):
+def test_contest_update(reset_db, mock_contest_notification_update, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the update method is called
@@ -335,7 +335,7 @@ def test_contest_update(reset_db, seed_contest):
     assert len(contests.items) == 1
 
 
-def test_contest_update_w_bad_uuid(reset_db, seed_contest):
+def test_contest_update_w_bad_uuid(reset_db, mock_contest_notification_update, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the update method is called with random uuid
@@ -347,7 +347,7 @@ def test_contest_update_w_bad_uuid(reset_db, seed_contest):
         assert ex.code == 404
 
 
-def test_contest_update_w_bad_field():
+def test_contest_update_w_bad_field(mock_contest_notification_update, ):
     """
     GIVEN 1 contest instance in the database
     WHEN the update method is called with bad field
@@ -362,7 +362,7 @@ def test_contest_update_w_bad_field():
 ###########
 # Apply
 ###########
-def test_contest_apply(reset_db, seed_contest):
+def test_contest_apply(reset_db, mock_contest_notification_update, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the apply method is called
@@ -376,7 +376,7 @@ def test_contest_apply(reset_db, seed_contest):
     assert len(contests.items) == 1
 
 
-def test_contest_apply_w_bad_contest(reset_db, seed_contest):
+def test_contest_apply_w_bad_contest(reset_db, mock_contest_notification_update, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the apply method is called with random uuid
@@ -388,7 +388,7 @@ def test_contest_apply_w_bad_contest(reset_db, seed_contest):
         assert ex.code == 400
 
 
-def test_contest_apply_w_bad_field():
+def test_contest_apply_w_bad_field(mock_contest_notification_update):
     """
     GIVEN 1 contest instance in the database
     WHEN the apply method is called with bad field
@@ -436,7 +436,7 @@ def test_check_contest_status_no_change(reset_db, mock_participant_notification_
     assert pytest.contest.status.name == 'pending'
 
 
-def test_check_contest_status_active(reset_db, mock_contest_notification_update, mock_participant_notification_update,
+def test_check_contest_status_active(reset_db, mock_contest_notification, mock_participant_notification_update,
                                      seed_contest, seed_owner,
                                      seed_participant):
     """
@@ -470,4 +470,4 @@ def test_check_contest_status_participant_inactive_owner_active(reset_db, mock_c
     """
     services.ParticipantService().apply(instance=pytest.participant, status='inactive')
     contest_service.check_contest_status(uuid=pytest.contest.uuid)
-    assert pytest.contest.status.name == 'ready'
+    assert pytest.contest.status.name == 'inactive'
