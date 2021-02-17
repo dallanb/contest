@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from src import services, ManualException
@@ -535,3 +537,31 @@ def test_fetch_location_bad_uuid(reset_db, pause_notification, mock_fetch_locati
     location_uuid = str(generate_uuid())
     location = contest_service.fetch_location(uuid=location_uuid)
     assert location is None
+
+
+def test_find_by_start_time_range(reset_db, pause_notification, seed_contest):
+    """
+    GIVEN 1 contest instance in the database
+    WHEN the find_by_start_time_range method is called
+    THEN it should return 1 contest
+    """
+    start_time = pytest.start_time
+    struct = time.gmtime(start_time / 1000)
+    year = struct[0]
+    month = struct[1]
+    contests = contest_service.find_by_start_time_range(month=month, year=year)
+    assert contests.total == 1
+
+
+def test_find_by_start_time_range_bad_uuid():
+    """
+    GIVEN 0 contest instance in the database
+    WHEN the find_by_start_time_range method is called with an future month and year
+    THEN it should return 0 contest
+    """
+    start_time = pytest.start_time
+    struct = time.gmtime(start_time / 1000)
+    year = struct[0] + 1
+    month = struct[1]
+    contests = contest_service.find_by_start_time_range(month=month, year=year)
+    assert contests.total == 0
