@@ -16,7 +16,7 @@ from tests.helpers import generate_uuid
 # Create
 ###########
 def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
-                        mock_fetch_location, mock_create_batch_async, pause_notification):
+                        mock_fetch_location, mock_create_batch_threaded, pause_notification):
     """
     GIVEN a Flask application configured for testing
     WHEN the POST endpoint 'contests' is requested
@@ -237,7 +237,7 @@ def test_fetch_all_contest_calendar():
 # Create
 ###########
 def test_create_contest_fail(reset_db, mock_fetch_member_user, mock_fetch_member, mock_fetch_member_batch,
-                             mock_create_batch_async, mock_fetch_location, pause_notification):
+                             mock_create_batch_threaded, mock_fetch_location, pause_notification):
     """
     GIVEN a Flask application configured for testing
     WHEN the POST endpoint 'contests' is requested with incorrect data

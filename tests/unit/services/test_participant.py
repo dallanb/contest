@@ -395,7 +395,7 @@ def test_create_batch_bad_members(reset_db, pause_notification, mock_fetch_membe
     """
     GIVEN 1 participants in the database
     WHEN the create_batch method is called with a bad list of member_uuid's
-    THEN it should return nothing
+    THEN it should return nothing but insert the members provided with inactive status
     """
 
     participant_service.create_batch(uuids=[generate_uuid()], contest=pytest.contest)
@@ -406,129 +406,135 @@ def test_create_batch_bad_members(reset_db, pause_notification, mock_fetch_membe
     participants = participant_service.find(status='inactive')
     assert participants.total == 1
 
-# def test_check_contest_status_active(reset_db, pause_notification,
-#                                      seed_contest, seed_owner,
-#                                      seed_participant):
-#     """
-#     GIVEN 1 active contest instance, 1 completed owner participant instance and 1 completed participant instance in the database
-#     WHEN the check_contest_status method is called
-#     THEN it should update the contest status from 'active' to 'completed'
-#     """
-#     services.ParticipantService().apply(instance=pytest.participant, status='active')
-#     contest_service.check_contest_status(uuid=pytest.contest.uuid)
-#     assert pytest.contest.status.name == 'ready'
-#
-#     services.ContestService().apply(instance=pytest.contest, status='active')
-#     assert pytest.contest.status.name == 'active'
-#
-#     services.ParticipantService().apply(instance=pytest.participant, status='completed')
-#     services.ParticipantService().apply(instance=pytest.owner, status='completed')
-#     assert pytest.contest.status.name == 'active'
-#
-#     contest_service.check_contest_status(uuid=pytest.contest.uuid)
-#     assert pytest.contest.status.name == 'completed'
-#
-#
-# def test_check_contest_status_participant_inactive_owner_active(reset_db, pause_notification,
-#                                                                 seed_contest, seed_owner,
-#                                                                 seed_participant):
-#     """
-#     GIVEN 1 pending contest instance, 1 active owner participant instance and 1 inactive participant instance in the database
-#     WHEN the check_contest_status method is called
-#     THEN it should update the contest status from 'pending' to 'inactive'
-#     """
-#     services.ParticipantService().apply(instance=pytest.participant, status='inactive')
-#     contest_service.check_contest_status(uuid=pytest.contest.uuid)
-#     assert pytest.contest.status.name == 'inactive'
-#
-#
-# def test_check_contest_status_participant_inactive_participant_active_owner_active(reset_db, pause_notification,
-#                                                                                    seed_contest, seed_owner,
-#                                                                                    seed_participant):
-#     """
-#     GIVEN 1 pending contest instance, 1 active owner participant instance, 1 active participant instance and 1 inactive participant instance in the database
-#     WHEN the check_contest_status method is called
-#     THEN it should update the contest status from 'pending' to 'ready'
-#     """
-#     new_participant = services.ParticipantService().create(status='pending',
-#                                                            member_uuid=generate_uuid(),
-#                                                            contest=pytest.contest)
-#     services.ParticipantService().apply(instance=pytest.participant, status='inactive')
-#     contest_service.check_contest_status(uuid=pytest.contest.uuid)
-#     # we still have one participant that is unaccounted for
-#     assert pytest.contest.status.name == 'pending'
-#
-#     services.ParticipantService().apply(instance=new_participant, status='active')
-#     contest_service.check_contest_status(uuid=pytest.contest.uuid)
-#     assert pytest.contest.status.name == 'ready'
-#
-#
-# def test_check_contest_status_participants_inactive_owner_active(reset_db, pause_notification,
-#                                                                  seed_contest, seed_owner,
-#                                                                  seed_participant):
-#     """
-#     GIVEN 1 pending contest instance, 1 active owner participant instance, 2 inactive participant instance in the database
-#     WHEN the check_contest_status method is called
-#     THEN it should update the contest status from 'pending' to 'inactive'
-#     """
-#     new_participant = services.ParticipantService().create(status='pending',
-#                                                            member_uuid=generate_uuid(),
-#                                                            contest=pytest.contest)
-#     services.ParticipantService().apply(instance=pytest.participant, status='inactive')
-#     contest_service.check_contest_status(uuid=pytest.contest.uuid)
-#     # we still have one participant that is unaccounted for
-#     assert pytest.contest.status.name == 'pending'
-#
-#     services.ParticipantService().apply(instance=new_participant, status='inactive')
-#     contest_service.check_contest_status(uuid=pytest.contest.uuid)
-#     assert pytest.contest.status.name == 'inactive'
-#
-#
-# def test_fetch_location(reset_db, pause_notification, mock_fetch_location):
-#     """
-#     GIVEN 0 contest instance in the database
-#     WHEN the fetch_location method is called
-#     THEN it should return a location
-#     """
-#     location_uuid = str(pytest.location_uuid)
-#     location = contest_service.fetch_location(uuid=location_uuid)
-#     assert location['uuid'] == location_uuid
-#
-#
-# def test_fetch_location_bad_uuid(reset_db, pause_notification, mock_fetch_location):
-#     """
-#     GIVEN 0 contest instance in the database
-#     WHEN the fetch_location method is called with an invalid uuid
-#     THEN it should return None
-#     """
-#     location_uuid = str(generate_uuid())
-#     location = contest_service.fetch_location(uuid=location_uuid)
-#     assert location is None
-#
-#
-# def test_find_by_start_time_range(reset_db, pause_notification, seed_contest):
-#     """
-#     GIVEN 1 contest instance in the database
-#     WHEN the find_by_start_time_range method is called
-#     THEN it should return 1 contest
-#     """
-#     start_time = pytest.start_time
-#     struct = time.gmtime(start_time / 1000)
-#     year = struct[0]
-#     month = struct[1]
-#     contests = contest_service.find_by_start_time_range(month=month, year=year)
-#     assert contests.total == 1
-#
-#
-# def test_find_by_start_time_range_bad_uuid():
-#     """
-#     GIVEN 1 contest instance in the database
-#     WHEN the find_by_start_time_range method is called with an future month and year
-#     THEN it should return 0 contest
-#     """
-#     start_time = pytest.start_time
-#     struct = time.gmtime(start_time / 1000)
-#     year = struct[0] + 1
-#     month = struct[1]
-#     contests = contest_service.find_by_start_time_range(month=month, year=year)
-#     assert contests.total == 0
+
+def test_create_batch_threaded(reset_db, pause_notification, mock_fetch_member, seed_contest, seed_owner):
+    """
+    GIVEN 1 participants in the database
+    WHEN the create_batch_threaded method is called with a list of member_uuid's
+    THEN it should return nothing but insert the members provided using threads
+    """
+
+    participant_service.create_batch_threaded(uuids=pytest.participants, contest=pytest.contest)
+    participants = participant_service.find()
+    assert participants.total == 1
+    time.sleep(0.2)
+    participants = participant_service.find()
+    assert participants.total == 2
+
+
+def test_create_batch_threaded_bad_members(reset_db, pause_notification, mock_fetch_member, seed_contest, seed_owner):
+    """
+    GIVEN 1 participants in the database
+    WHEN the create_batch_threaded method is called with a bad list of member_uuid's
+    THEN it should return nothing but insert the members provided with inactive status using threads
+    """
+
+    participant_service.create_batch_threaded(uuids=[generate_uuid()], contest=pytest.contest)
+    participants = participant_service.find()
+    assert participants.total == 1
+
+    time.sleep(0.1)
+    participants = participant_service.find()
+    assert participants.total == 2
+
+    participants = participant_service.find(status='inactive')
+    assert participants.total == 1
+
+
+def test__status_machine(reset_db):
+    """
+    GIVEN 0 pending participant instance
+    WHEN the _status_machine method is called
+    THEN it should return True when updating status from pending to active and ManualException with code 400 for the inverse
+    """
+    assert participant_service._status_machine(prev_status='pending', new_status='active')
+
+    try:
+        _ = participant_service._status_machine(prev_status='active', new_status='pending')
+    except ManualException as ex:
+        assert ex.code == 400
+
+
+def test_fetch_member_user(reset_db, pause_notification, mock_fetch_member_user):
+    """
+    GIVEN 0 participants in the database
+    WHEN the fetch_member_user method is called
+    THEN it should return a member from the Member service
+    """
+
+    member = participant_service.fetch_member_user(user_uuid=str(pytest.owner_user_uuid),
+                                                   league_uuid=str(pytest.league_uuid))
+    assert member is not None
+    assert member['uuid'] == str(pytest.owner_member_uuid)
+
+
+def test_fetch_member_user_bad_user_uuid(reset_db, pause_notification, mock_fetch_member_user):
+    """
+    GIVEN 0 participants in the database
+    WHEN the fetch_member_user method is called with a bad user_uuid
+    THEN it should return None
+    """
+
+    member = participant_service.fetch_member_user(user_uuid=str(generate_uuid()),
+                                                   league_uuid=str(pytest.league_uuid))
+    assert member is None
+
+
+def test_fetch_member_user_bad_league_uuid(reset_db, pause_notification, mock_fetch_member_user):
+    """
+    GIVEN 0 participants in the database
+    WHEN the fetch_member_user method is called with a bad league_uuid
+    THEN it should return None
+    """
+
+    member = participant_service.fetch_member_user(user_uuid=str(pytest.owner_user_uuid),
+                                                   league_uuid=str(generate_uuid()))
+    assert member is None
+
+
+def test_fetch_member(reset_db, pause_notification, mock_fetch_member):
+    """
+    GIVEN 0 participants in the database
+    WHEN the fetch_member method is called
+    THEN it should return a member from the Member service
+    """
+
+    member = participant_service.fetch_member(uuid=str(pytest.owner_member_uuid))
+    assert member is not None
+    assert member['user_uuid'] == str(pytest.owner_user_uuid)
+
+
+def test_fetch_member_bad_member_uuid(reset_db, pause_notification, mock_fetch_member):
+    """
+    GIVEN 0 participants in the database
+    WHEN the fetch_member method is called with a bad member_uuid
+    THEN it should return None
+    """
+
+    member = participant_service.fetch_member(uuid=str(generate_uuid()))
+    assert member is None
+
+
+def test_fetch_member_batch(reset_db, pause_notification, mock_fetch_member_batch):
+    """
+    GIVEN 0 participants in the database
+    WHEN the fetch_member_batch method is called
+    THEN it should return a batch of members from the Member service
+    """
+
+    batch = participant_service.fetch_member_batch(uuids=[str(pytest.participant_member_uuid)])
+    assert batch is not None
+    assert len(batch) == 1
+    member = batch[0]
+    assert member['user_uuid'] == str(pytest.participant_user_uuid)
+
+
+def test_fetch_member_batch_bad_member_uuid(reset_db, pause_notification, mock_fetch_member_batch):
+    """
+    GIVEN 0 participants in the database
+    WHEN the fetch_member_batch method is called with a bad member_uuid
+    THEN it should return empty list
+    """
+
+    batch = participant_service.fetch_member_batch(uuids=[str(generate_uuid())])
+    assert len(batch) is 0
