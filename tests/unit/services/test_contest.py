@@ -403,7 +403,8 @@ def test_contest_apply_w_bad_field(mock_contest_notification_update):
 ###########
 # Misc
 ###########
-def test_check_contest_status(reset_db, mock_participant_notification_update, seed_contest, seed_owner,
+def test_check_contest_status(reset_db, mock_contest_notification_update, mock_participant_notification_update,
+                              seed_contest, seed_owner,
                               seed_participant):
     """
     GIVEN 1 pending contest instance, 1 active owner participant instance and 1 active participant instance in the database
@@ -436,7 +437,7 @@ def test_check_contest_status_no_change(reset_db, mock_participant_notification_
     assert pytest.contest.status.name == 'pending'
 
 
-def test_check_contest_status_active(reset_db, mock_contest_notification, mock_participant_notification_update,
+def test_check_contest_status_active(reset_db, mock_contest_notification_update, mock_participant_notification_update,
                                      seed_contest, seed_owner,
                                      seed_participant):
     """
@@ -464,9 +465,9 @@ def test_check_contest_status_participant_inactive_owner_active(reset_db, mock_c
                                                                 seed_contest, seed_owner,
                                                                 seed_participant):
     """
-    GIVEN 1 active contest instance, 1 completed owner participant instance and 1 completed participant instance in the database
+    GIVEN 1 pending contest instance, 1 active owner participant instance and 1 inactive participant instance in the database
     WHEN the check_contest_status method is called
-    THEN it should update the contest status from 'active' to 'completed'
+    THEN it should update the contest status from 'pending' to 'inactive'
     """
     services.ParticipantService().apply(instance=pytest.participant, status='inactive')
     contest_service.check_contest_status(uuid=pytest.contest.uuid)
