@@ -472,3 +472,49 @@ def test_check_contest_status_participant_inactive_owner_active(reset_db, mock_c
     services.ParticipantService().apply(instance=pytest.participant, status='inactive')
     contest_service.check_contest_status(uuid=pytest.contest.uuid)
     assert pytest.contest.status.name == 'inactive'
+
+
+def test_check_contest_status_participant_inactive_participant_active_owner_active(reset_db,
+                                                                                   mock_contest_notification_update,
+                                                                                   mock_participant_notification_update,
+                                                                                   seed_contest, seed_owner,
+                                                                                   seed_participant):
+    """
+    GIVEN 1 pending contest instance, 1 active owner participant instance, 1 active participant instance and 1 inactive participant instance in the database
+    WHEN the check_contest_status method is called
+    THEN it should update the contest status from 'pending' to 'ready'
+    """
+    new_participant = services.ParticipantService().create(status='pending',
+                                                           member_uuid=generate_uuid(),
+                                                           contest=pytest.contest)
+    services.ParticipantService().apply(instance=pytest.participant, status='inactive')
+    contest_service.check_contest_status(uuid=pytest.contest.uuid)
+    # we still have one participant that is unaccounted for
+    assert pytest.contest.status.name == 'pending'
+
+    services.ParticipantService().apply(instance=new_participant, status='active')
+    contest_service.check_contest_status(uuid=pytest.contest.uuid)
+    assert pytest.contest.status.name == 'ready'
+
+
+def test_check_contest_status_participants_inactive_owner_active(reset_db,
+                                                                 mock_contest_notification_update,
+                                                                 mock_participant_notification_update,
+                                                                 seed_contest, seed_owner,
+                                                                 seed_participant):
+    """
+    GIVEN 1 pending contest instance, 1 active owner participant instance, 2 inactive participant instance in the database
+    WHEN the check_contest_status method is called
+    THEN it should update the contest status from 'pending' to 'inactive'
+    """
+    new_participant = services.ParticipantService().create(status='pending',
+                                                           member_uuid=generate_uuid(),
+                                                           contest=pytest.contest)
+    services.ParticipantService().apply(instance=pytest.participant, status='inactive')
+    contest_service.check_contest_status(uuid=pytest.contest.uuid)
+    # we still have one participant that is unaccounted for
+    assert pytest.contest.status.name == 'pending'
+
+    services.ParticipantService().apply(instance=new_participant, status='inactive')
+    contest_service.check_contest_status(uuid=pytest.contest.uuid)
+    assert pytest.contest.status.name == 'inactive'
