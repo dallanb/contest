@@ -8,6 +8,7 @@ from ..common import ParticipantStatusEnum
 from ..decorators import participant_notification
 from ..external import Member as MemberExternal
 from ..models import Participant as ParticipantModel
+from ..services import ContestService
 
 
 class Participant(Base):
@@ -23,9 +24,6 @@ class Participant(Base):
     def init(self, **kwargs):
         return self._init(model=self.participant_model, **kwargs)
 
-    def save(self, instance):
-        return self._save(instance=instance)
-
     @participant_notification(operation='create')
     def create(self, **kwargs):
         participant = self._init(model=self.participant_model, **kwargs)
@@ -40,7 +38,7 @@ class Participant(Base):
     @participant_notification(operation='update')
     def apply(self, instance, **kwargs):
         # if contest status is being updated we will trigger a notification
-        _ = self._status_machine(instance.status.name, kwargs['status'])
+        _ = self._status_machine(instance.status.name, kwargs.get('status'))
         participant = self._assign_attr(instance=instance, attr=kwargs)
         return self._save(instance=participant)
 
@@ -51,9 +49,14 @@ class Participant(Base):
 
     def create_batch(self, uuids, contest):
         participants = [str(uuid) for uuid in uuids]
-        self.fetch_member_batch(uuids=participants)
-        for participant in participants:
-            self.create(member_uuid=participant, status='pending', contest=contest)
+        member_batch = self.fetch_member_batch(uuids=participants)
+        for member in member_batch:
+            if member is None:
+                # send a notifications here
+                self.create(member_uuid=None, status='inactive', contest=contest)
+            else:
+                self.create(member_uuid=member['uuid'], status='pending', contest=contest)
+        ContestService().check_contest_status(uuid=contest.uuid)
 
     def create_batch_async(self, uuids, contest):
         thread = threading.Thread(target=self.create_batch, args=(uuids, contest),
@@ -62,8 +65,7 @@ class Participant(Base):
 
     def _status_machine(self, prev_status, new_status):
         # cannot go from active to pending
-        if ParticipantStatusEnum[prev_status] == ParticipantStatusEnum['active'] and ParticipantStatusEnum[
-            new_status] == ParticipantStatusEnum['pending']:
+        if prev_status == 'active' and new_status == 'pending':
             self.error(code=HTTPStatus.BAD_REQUEST)
         return True
 
@@ -96,5 +98,5 @@ class Participant(Base):
 
     def fetch_member_batch(self, uuids):
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            executor.map(self.fetch_member, uuids)
-        return
+            batch = executor.map(self.fetch_member, uuids)
+        return batch

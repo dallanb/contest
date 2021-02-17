@@ -1,3 +1,5 @@
+import uuid
+
 from flask import request, g
 from flask_restful import marshal_with
 
@@ -91,6 +93,9 @@ class ContestsListAPI(Base):
                                                        data['league_uuid']) if data['league_uuid'] else None)
         if owner is None:
             self.throw_error(http_code=self.code.BAD_REQUEST, msg='User not found')
+        # confirm that the owner is not in the passed in participants list
+        if uuid.UUID(owner['uuid']) in data['participants']:
+            self.throw_error(http_code=self.code.BAD_REQUEST, msg='Owner should not be included in the participants')
 
         # create contest
         contest = self.contest.create(status='pending', owner_uuid=owner['user_uuid'], name=data['name'],

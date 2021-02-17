@@ -1,5 +1,5 @@
 from marshmallow import Schema, post_dump
-from marshmallow.validate import Range
+from marshmallow.validate import Range, Length
 from marshmallow_enum import EnumField
 from webargs import fields
 
@@ -14,7 +14,7 @@ class CreateContestSchema(Schema):
     league_uuid = fields.UUID(allow_none=True)
     name = fields.String()
     start_time = fields.Integer(validate=Range(min=time_now()))
-    participants = fields.List(fields.String())
+    participants = fields.List(fields.UUID(), validate=Length(min=1))
     buy_in = fields.Float(validate=Range(min=0))
     payout = fields.List(fields.Float())
 

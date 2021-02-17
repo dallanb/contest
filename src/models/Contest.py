@@ -20,9 +20,9 @@ class Contest(db.Model, BaseMixin):
 
     # Relationship
     contest_status = db.relationship("ContestStatus")
-    avatar = db.relationship("Avatar", back_populates="contest", lazy="noload")
-    participants = db.relationship("Participant", back_populates="contest", lazy="noload")
-    sport = db.relationship("Sport", uselist=False, back_populates="contest")
+    avatar = db.relationship("Avatar", back_populates="contest")
+    participants = db.relationship("Participant", back_populates="contest")
+    sport = db.relationship("Sport", uselist=False, back_populates="contest", lazy="joined")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -24,7 +24,6 @@ class AvatarsAPI(Base):
             self.throw_error(http_code=self.code.NOT_FOUND)
 
         avatar = contests.items[0].avatar
-
         s3_filename = self.avatar.generate_s3_filename(contest_uuid=str(uuid))
         _ = self.avatar.upload_fileobj(file=data['avatar'], filename=s3_filename)
         if not avatar:
