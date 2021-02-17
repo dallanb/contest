@@ -38,7 +38,7 @@ class Participant(Base):
     @participant_notification(operation='update')
     def apply(self, instance, **kwargs):
         # if contest status is being updated we will trigger a notification
-        _ = self._status_machine(instance.status.name, kwargs['status'])
+        _ = self._status_machine(instance.status.name, kwargs.get('status'))
         participant = self._assign_attr(instance=instance, attr=kwargs)
         return self._save(instance=participant)
 
@@ -65,8 +65,7 @@ class Participant(Base):
 
     def _status_machine(self, prev_status, new_status):
         # cannot go from active to pending
-        if ParticipantStatusEnum[prev_status] == ParticipantStatusEnum['active'] and ParticipantStatusEnum[
-            new_status] == ParticipantStatusEnum['pending']:
+        if prev_status == 'active' and new_status == 'pending':
             self.error(code=HTTPStatus.BAD_REQUEST)
         return True
 

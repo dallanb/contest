@@ -226,7 +226,7 @@ def test_contest_create(reset_db, pause_notification):
     assert contest.owner_uuid == pytest.owner_user_uuid
 
 
-def test_contest_create_dup(reset_db, pause_notification):
+def test_contest_create_dup(pause_notification):
     """
     GIVEN 1 contest instance in the database
     WHEN the create method is called with the exact same parameters of an existing contest
@@ -555,7 +555,7 @@ def test_find_by_start_time_range(reset_db, pause_notification, seed_contest):
 
 def test_find_by_start_time_range_bad_uuid():
     """
-    GIVEN 0 contest instance in the database
+    GIVEN 1 contest instance in the database
     WHEN the find_by_start_time_range method is called with an future month and year
     THEN it should return 0 contest
     """

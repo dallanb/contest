@@ -1,5 +1,6 @@
 import logging
 from http import HTTPStatus
+from sqlalchemy.exc import DataError, IntegrityError, StatementError
 
 from ..common import Cache, DB, Event
 from ..common.error import ManualException
@@ -21,6 +22,9 @@ class Base:
             return self.db.find(model=model, **kwargs)
         except AttributeError:
             self.logger.error(f'find error - AttributeError')
+            self.error(code=HTTPStatus.BAD_REQUEST)
+        except StatementError:
+            self.logger.error(f'find error - StatementError')
             self.error(code=HTTPStatus.BAD_REQUEST)
 
     def _init(self, model, **kwargs):
@@ -51,8 +55,37 @@ class Base:
             self.db.rollback()
             self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
 
+    def _commit(self):
+        try:
+            return self.db.commit()
+        except DataError:
+            self.logger.error(f'commit error - DataError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+        except IntegrityError:
+            self.logger.error(f'commit error - IntegrityError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+        except StatementError:
+            self.logger.error(f'commit error - StatementError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+
     def _save(self, instance):
-        return self.db.save(instance=instance)
+        try:
+            return self.db.save(instance=instance)
+        except DataError:
+            self.logger.error(f'save error - DataError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+        except IntegrityError:
+            self.logger.error(f'save error - IntegrityError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+        except StatementError:
+            self.logger.error(f'save error - StatementError')
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def _destroy(self, instance):
         return self.db.destroy(instance=instance)

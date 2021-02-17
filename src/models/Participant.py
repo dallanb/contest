@@ -6,6 +6,9 @@ from ..common import ParticipantStatusEnum
 
 
 class Participant(db.Model, BaseMixin):
+    # Constraints
+    __table_args__ = (db.UniqueConstraint('member_uuid', 'contest_uuid', name='member_contest'),)
+
     member_uuid = db.Column(UUIDType(binary=False))
 
     # FK
