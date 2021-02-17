@@ -9,7 +9,7 @@ from src import app, services
 # Create
 ###########
 def test_create_avatar(reset_db, mock_fetch_member, mock_fetch_member_user, mock_upload_fileobj,
-                       mock_contest_notification_update, seed_contest):
+                       pause_notification, seed_contest):
     """
     GIVEN a Flask application configured for testing
     WHEN the POST endpoint 'avatar' is requested

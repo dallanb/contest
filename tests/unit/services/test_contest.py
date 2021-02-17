@@ -11,7 +11,7 @@ contest_service = services.ContestService()
 ###########
 # Find
 ###########
-def test_contest_find(reset_db, seed_contest):
+def test_contest_find(reset_db, pause_notification, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the find method is called
@@ -73,7 +73,7 @@ def test_contest_find_by_location_uuid():
     assert contest.location_uuid == location_uuid
 
 
-def test_contest_find_include_participants(seed_participant):
+def test_contest_find_include_participants(pause_notification, seed_participant):
     """
     GIVEN 1 contest instance in the database
     WHEN the find method is called with include argument to also return participants
@@ -129,7 +129,7 @@ def test_contest_find_include_participants_include_avatar_include_sport():
     assert contest.sport is not None
 
 
-def test_contest_find_w_pagination(seed_contest):
+def test_contest_find_w_pagination(pause_notification, seed_contest):
     """
     GIVEN 2 contest instance in the database
     WHEN the find method is called with valid pagination
@@ -210,7 +210,7 @@ def test_contest_find_by_non_existent_expand():
 ###########
 # Create
 ###########
-def test_contest_create(reset_db, mock_contest_notification_create):
+def test_contest_create(reset_db, pause_notification):
     """
     GIVEN 0 contest instance in the database
     WHEN the create method is called
@@ -224,7 +224,7 @@ def test_contest_create(reset_db, mock_contest_notification_create):
     assert contest.owner_uuid == pytest.owner_user_uuid
 
 
-def test_contest_create_dup(reset_db, mock_contest_notification_create):
+def test_contest_create_dup(reset_db, pause_notification):
     """
     GIVEN 1 contest instance in the database
     WHEN the create method is called with the exact same parameters of an existing contest
@@ -238,7 +238,7 @@ def test_contest_create_dup(reset_db, mock_contest_notification_create):
     assert contest.owner_uuid == pytest.owner_user_uuid
 
 
-def test_contest_create_w_bad_field(mock_contest_notification_create):
+def test_contest_create_w_bad_field(pause_notification):
     """
     GIVEN 2 contest instance in the database
     WHEN the create method is called with a non existent field
@@ -271,7 +271,7 @@ def test_contest_init(reset_db):
     assert len(contests.items) == 0
 
 
-def test_contest_init_dup(seed_contest):
+def test_contest_init_dup(pause_notification, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the init method is called with duplicate member_uuid and duplicate party
@@ -321,7 +321,7 @@ def test_contest_init_w_bad_field(reset_db):
 ###########
 # Update
 ###########
-def test_contest_update(reset_db, mock_contest_notification_update, seed_contest):
+def test_contest_update(reset_db, pause_notification, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the update method is called
@@ -335,7 +335,7 @@ def test_contest_update(reset_db, mock_contest_notification_update, seed_contest
     assert len(contests.items) == 1
 
 
-def test_contest_update_w_bad_uuid(reset_db, mock_contest_notification_update, seed_contest):
+def test_contest_update_w_bad_uuid(reset_db, pause_notification, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the update method is called with random uuid
@@ -347,7 +347,7 @@ def test_contest_update_w_bad_uuid(reset_db, mock_contest_notification_update, s
         assert ex.code == 404
 
 
-def test_contest_update_w_bad_field(mock_contest_notification_update, ):
+def test_contest_update_w_bad_field(pause_notification):
     """
     GIVEN 1 contest instance in the database
     WHEN the update method is called with bad field
@@ -362,7 +362,7 @@ def test_contest_update_w_bad_field(mock_contest_notification_update, ):
 ###########
 # Apply
 ###########
-def test_contest_apply(reset_db, mock_contest_notification_update, seed_contest):
+def test_contest_apply(reset_db, pause_notification, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the apply method is called
@@ -376,7 +376,7 @@ def test_contest_apply(reset_db, mock_contest_notification_update, seed_contest)
     assert len(contests.items) == 1
 
 
-def test_contest_apply_w_bad_contest(reset_db, mock_contest_notification_update, seed_contest):
+def test_contest_apply_w_bad_contest(reset_db, pause_notification, seed_contest):
     """
     GIVEN 1 contest instance in the database
     WHEN the apply method is called with random uuid
@@ -388,7 +388,7 @@ def test_contest_apply_w_bad_contest(reset_db, mock_contest_notification_update,
         assert ex.code == 400
 
 
-def test_contest_apply_w_bad_field(mock_contest_notification_update):
+def test_contest_apply_w_bad_field(pause_notification):
     """
     GIVEN 1 contest instance in the database
     WHEN the apply method is called with bad field
@@ -403,7 +403,7 @@ def test_contest_apply_w_bad_field(mock_contest_notification_update):
 ###########
 # Misc
 ###########
-def test_check_contest_status(reset_db, mock_contest_notification_update, mock_participant_notification_update,
+def test_check_contest_status(reset_db, pause_notification,
                               seed_contest, seed_owner,
                               seed_participant):
     """
@@ -423,7 +423,7 @@ def test_check_contest_status(reset_db, mock_contest_notification_update, mock_p
     assert pytest.contest.status.name == 'ready'
 
 
-def test_check_contest_status_no_change(reset_db, mock_participant_notification_update, seed_contest, seed_owner,
+def test_check_contest_status_no_change(reset_db, pause_notification, seed_contest, seed_owner,
                                         seed_participant):
     """
     GIVEN 1 pending contest instance, 1 active owner participant instance and 1 pending participant instance in the database
@@ -437,7 +437,7 @@ def test_check_contest_status_no_change(reset_db, mock_participant_notification_
     assert pytest.contest.status.name == 'pending'
 
 
-def test_check_contest_status_active(reset_db, mock_contest_notification_update, mock_participant_notification_update,
+def test_check_contest_status_active(reset_db, pause_notification,
                                      seed_contest, seed_owner,
                                      seed_participant):
     """
@@ -460,8 +460,7 @@ def test_check_contest_status_active(reset_db, mock_contest_notification_update,
     assert pytest.contest.status.name == 'completed'
 
 
-def test_check_contest_status_participant_inactive_owner_active(reset_db, mock_contest_notification_update,
-                                                                mock_participant_notification_update,
+def test_check_contest_status_participant_inactive_owner_active(reset_db, pause_notification,
                                                                 seed_contest, seed_owner,
                                                                 seed_participant):
     """
@@ -474,9 +473,7 @@ def test_check_contest_status_participant_inactive_owner_active(reset_db, mock_c
     assert pytest.contest.status.name == 'inactive'
 
 
-def test_check_contest_status_participant_inactive_participant_active_owner_active(reset_db,
-                                                                                   mock_contest_notification_update,
-                                                                                   mock_participant_notification_update,
+def test_check_contest_status_participant_inactive_participant_active_owner_active(reset_db, pause_notification,
                                                                                    seed_contest, seed_owner,
                                                                                    seed_participant):
     """
@@ -497,9 +494,7 @@ def test_check_contest_status_participant_inactive_participant_active_owner_acti
     assert pytest.contest.status.name == 'ready'
 
 
-def test_check_contest_status_participants_inactive_owner_active(reset_db,
-                                                                 mock_contest_notification_update,
-                                                                 mock_participant_notification_update,
+def test_check_contest_status_participants_inactive_owner_active(reset_db, pause_notification,
                                                                  seed_contest, seed_owner,
                                                                  seed_participant):
     """
@@ -518,3 +513,25 @@ def test_check_contest_status_participants_inactive_owner_active(reset_db,
     services.ParticipantService().apply(instance=new_participant, status='inactive')
     contest_service.check_contest_status(uuid=pytest.contest.uuid)
     assert pytest.contest.status.name == 'inactive'
+
+
+def test_fetch_location(reset_db, pause_notification, mock_fetch_location):
+    """
+    GIVEN 0 contest instance in the database
+    WHEN the fetch_location method is called
+    THEN it should return a location
+    """
+    location_uuid = str(pytest.location_uuid)
+    location = contest_service.fetch_location(uuid=location_uuid)
+    assert location['uuid'] == location_uuid
+
+
+def test_fetch_location_bad_uuid(reset_db, pause_notification, mock_fetch_location):
+    """
+    GIVEN 0 contest instance in the database
+    WHEN the fetch_location method is called with an invalid uuid
+    THEN it should return None
+    """
+    location_uuid = str(generate_uuid())
+    location = contest_service.fetch_location(uuid=location_uuid)
+    assert location is None

@@ -17,3 +17,4 @@ from .seed_contest_materialized import seed_contest_materialized
 from .seed_owner import seed_owner
 from .seed_participant import seed_participant
 from .seed_sport import seed_sport
+from .pause_notification import pause_notification
