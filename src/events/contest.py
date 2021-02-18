@@ -42,6 +42,7 @@ class Contest:
                 )
         elif key == 'contest_ready' or key == 'contest_active' or key == 'contest_inactive' or key == 'contest_completed':
             self.logger.info('contest updated')
+            self.logger.info(key)
             contests = self.contest_service.find(uuid=data['uuid'])
             if contests.total:
                 contest = contests.items[0]

@@ -1,10 +1,7 @@
-import time
-
 import pytest
 
 from src import services, events
 from src.common import time_now
-from tests.helpers import generate_uuid
 
 base_service = services.BaseService()
 
