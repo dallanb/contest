@@ -6,7 +6,6 @@ from src import services, ManualException
 from src.common import time_now
 from tests.helpers import generate_uuid
 
-global_contest = None
 contest_service = services.ContestService()
 
 
