@@ -1,5 +1,4 @@
 from .schema import ContestCompletedSchema
-
 from ..base import Base
 
 
