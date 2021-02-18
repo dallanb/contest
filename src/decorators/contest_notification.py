@@ -1,4 +1,3 @@
-import logging
 from functools import wraps
 
 from src.notifications import contest_created, contest_ready, contest_inactive, contest_active, avatar_created, \

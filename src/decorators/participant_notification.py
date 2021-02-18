@@ -1,4 +1,3 @@
-import logging
 from functools import wraps
 
 from ..notifications import owner_active, participant_active, participant_completed, participant_inactive, \

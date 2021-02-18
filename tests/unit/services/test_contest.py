@@ -89,7 +89,7 @@ def test_contest_find_include_participants(pause_notification, seed_participant)
     assert len(contest.participants) == 1
 
 
-def test_contest_find_include_avatar(seed_avatar):
+def test_contest_find_include_avatar(pause_notification, seed_avatar):
     """
     GIVEN 1 contest instance in the database
     WHEN the find method is called with include argument to also return avatar
@@ -102,7 +102,7 @@ def test_contest_find_include_avatar(seed_avatar):
     assert contest.avatar is not None
 
 
-def test_contest_find_include_sport(seed_sport):
+def test_contest_find_include_sport(pause_notification, seed_sport):
     """
     GIVEN 1 contest instance in the database
     WHEN the find method is called with include argument to also return sport
@@ -256,7 +256,7 @@ def test_contest_create_w_bad_field(pause_notification):
 ###########
 # Init
 ###########
-def test_contest_init(reset_db):
+def test_contest_init(reset_db, pause_notification):
     """
     GIVEN 0 contest instance in the database
     WHEN the init method is called
@@ -289,7 +289,7 @@ def test_contest_init_dup(pause_notification, seed_contest):
     assert contest.uuid is not None
 
 
-def test_contest_init_w_bad_league_uuid(reset_db):
+def test_contest_init_w_bad_league_uuid(reset_db, pause_notification):
     """
     GIVEN 0 contest instance in the database
     WHEN the init method is called with a bad league_uuid
@@ -305,7 +305,7 @@ def test_contest_init_w_bad_league_uuid(reset_db):
     assert len(contests.items) == 0
 
 
-def test_contest_init_w_bad_field(reset_db):
+def test_contest_init_w_bad_field(reset_db, pause_notification):
     """
     GIVEN 0 contest instance in the database
     WHEN the init method is called with a bad league_uuid
@@ -552,7 +552,7 @@ def test_find_by_start_time_range(reset_db, pause_notification, seed_contest):
     assert contests.total == 1
 
 
-def test_find_by_start_time_range_bad_uuid():
+def test_find_by_start_time_range_bad_uuid(pause_notification):
     """
     GIVEN 1 contest instance in the database
     WHEN the find_by_start_time_range method is called with an future month and year
