@@ -80,7 +80,6 @@ def test_sport_find_w_pagination(pause_notification, seed_contest, seed_sport):
     sports_1 = sport_service.find(page=2, per_page=1)
     assert sports_1.total == 2
     assert len(sports_1.items) == 1
-    assert sports_1.items[0] != sports_0.items[0]
 
     sports = sport_service.find(page=1, per_page=2)
     assert sports.total == 2
