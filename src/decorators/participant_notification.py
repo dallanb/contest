@@ -30,17 +30,14 @@ class participant_notification:
 
     @staticmethod
     def create(new_instance):
-        logging.info("YOU FUCKED UP P C")
         participant_invited.from_data(participant=new_instance).notify()
 
     @staticmethod
     def create_owner(new_instance, buy_in, payout):
-        logging.info("YOU FUCKED UP P C O")
         owner_active.from_data(participant=new_instance, buy_in=buy_in, payout=payout).notify()
 
     @staticmethod
     def update(prev_instance, new_instance):
-        logging.info("YOU FUCKED UP P U")
         if prev_instance and prev_instance['status'].name != new_instance.status.name:
             if new_instance.status.name == 'active':
                 participant_active.from_data(participant=new_instance).notify()
