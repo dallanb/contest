@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from sqlalchemy.orm.base import object_mapper
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
@@ -41,7 +42,7 @@ class Cleaner:
         return v
 
     @classmethod
-    def is_int(cls, v, min_count=0, max_count=9999999999):
+    def is_int(cls, v, min_count=-9999999999, max_count=9999999999):
         if v is None:
             return v
         if isinstance(v, str) and v.isdigit():
@@ -55,14 +56,6 @@ class Cleaner:
         return v
 
     @classmethod
-    def is_enum(cls, v, enum_class):
-        if v is None:
-            return v
-        if v in enum_class.__members__ is False:
-            return None
-        return enum_class[v]
-
-    @classmethod
     def is_uuid(cls, v):
         if v is None:
             return v
@@ -71,6 +64,8 @@ class Cleaner:
                 v = str(v)
             uuid_v = UUID(v)
         except ValueError:
+            return None
+        except AttributeError:
             return None
         if not str(uuid_v) == v:
             return None
@@ -93,14 +88,6 @@ class Cleaner:
         return v
 
     @classmethod
-    def is_hash(cls, v):
-        if v is None:
-            return v
-        if not cls.is_int(v, min_count=None, max_count=None):
-            return None
-        return v
-
-    @classmethod
     def is_float(cls, v):
         if v is None:
             return v
@@ -112,6 +99,6 @@ class Cleaner:
     def is_num(cls, v):
         if v is None:
             return v
-        if not cls.is_float(v) and not cls.is_int(v):
+        if cls.is_float(v) is None and cls.is_int(v) is None:
             return None
         return v
