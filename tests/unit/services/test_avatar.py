@@ -1,6 +1,3 @@
-import logging
-import time
-
 import pytest
 
 from src import services, ManualException
@@ -197,14 +194,36 @@ def test_avatar_destroy_w_bad_uuid(reset_db, pause_notification, seed_contest, s
     except ManualException as ex:
         assert ex.code == 404
 
-# def test_avatar_apply_w_bad_field(pause_notification):
-#     """
-#     GIVEN 1 avatar instance in the database
-#     WHEN the apply method is called with bad field
-#     THEN it should return 0 avatar and update 0 avatar instance in the database and ManualException with code 400
-#     """
-#     try:
-#         _ = avatar_service.apply(instance=pytest.avatar, junk='junk')
-#     except ManualException as ex:
-#         assert ex.code == 400
-#
+
+###########
+# Misc
+###########
+def test_upload_file(reset_db, pause_notification, mock_upload_file):
+    """
+    GIVEN 0 avatar instance in the database
+    WHEN the upload_file method is called
+    THEN it should return True and supposedly add a file to AWS S3
+    """
+    file = avatar_service.upload_file(filename='test.jpg')
+    assert file
+
+
+def test_upload_fileobj(reset_db, pause_notification, mock_upload_fileobj):
+    """
+    GIVEN 0 avatar instance in the database
+    WHEN the upload_fileobj method is called
+    THEN it should return True and supposedly add a file to AWS S3
+    """
+    file = avatar_service.upload_fileobj(file='test', filename='test')
+    assert file
+
+
+def test_generate_s3_filename(reset_db, pause_notification):
+    """
+    GIVEN 0 avatar instance in the database
+    WHEN the generate_s3_filename method is called
+    THEN it should return a filename
+    """
+    uuid = generate_uuid()
+    filename = avatar_service.generate_s3_filename(uuid)
+    assert filename == f'{uuid}.jpeg'
