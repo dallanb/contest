@@ -31,3 +31,6 @@ class ContestMaterialized(Base):
     def apply(self, instance, **kwargs):
         materialized_contest = self._assign_attr(instance=instance, attr=kwargs)
         return self._save(instance=materialized_contest)
+
+    def save(self, instance):
+        return self._save(instance=instance)

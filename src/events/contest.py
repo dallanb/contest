@@ -49,22 +49,16 @@ class Contest:
                     uuid=contest.uuid,
                     status=contest.status.name
                 )
-        elif key == 'name_updated':  # TODO: look into making this a direct find and apply towards the materialized service
-            contests = self.contest_service.find(uuid=data['uuid'])
-            if contests.total:
-                contest = contests.items[0]
-                self.contest_materialized_service.update(
-                    uuid=contest.uuid,
-                    name=data['name']
-                )
+        elif key == 'name_updated':
+            self.contest_materialized_service.update(
+                uuid=data['uuid'],
+                name=data['name']
+            )
         elif key == 'start_time_updated':
-            contests = self.contest_service.find(uuid=data['uuid'])
-            if contests.total:
-                contest = contests.items[0]
-                self.contest_materialized_service.update(
-                    uuid=contest.uuid,
-                    start_time=data['start_time']
-                )
+            self.contest_materialized_service.update(
+                uuid=data['uuid'],
+                start_time=data['start_time']
+            )
         elif key == 'participant_active':
             participants = self.participant_service.find(uuid=data['participant_uuid'])
             if participants.total:
@@ -94,10 +88,7 @@ class Contest:
                     self.contest_materialized_service.save(instance=contest)
             self.contest_service.check_contest_status(uuid=data['contest_uuid'])
         elif key == 'avatar_created':
-            contests = self.contest_service.find(uuid=data['contest_uuid'])
-            if contests.total:
-                contest = contests.items[0]
-                self.contest_materialized_service.update(
-                    uuid=contest.uuid,
-                    avatar=data['s3_filename']
-                )
+            self.contest_materialized_service.update(
+                uuid=data['contest_uuid'],
+                avatar=data['s3_filename']
+            )
