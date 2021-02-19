@@ -1,5 +1,3 @@
-from .create_contest import create_contest
-from .create_participant import create_participant
 from .kafka_conn import kafka_conn, kafka_conn_last_msg, kafka_conn_custom_topics
 from .mock_contest_notification import mock_contest_notification_create, mock_contest_notification_update
 from .mock_create_batch_threaded import mock_create_batch_threaded
