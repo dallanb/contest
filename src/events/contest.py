@@ -1,6 +1,6 @@
 import logging
 
-from ..common import ParticipantStatusEnum
+from ..common import ParticipantStatusEnum, ManualException
 from ..services import ContestService, ContestMaterializedService, ParticipantService
 
 
@@ -18,10 +18,16 @@ class Contest:
             if contests.total:
                 contest = contests.items[0]
                 location = self.contest_service.fetch_location(uuid=str(contest.location_uuid))
+                if location is None:
+                    raise ManualException(err=f'contest with uuid: {str(contest.location_uuid)} not found')
+
                 owner = self.participant_service.fetch_member_user(user_uuid=str(contest.owner_uuid),
                                                                    league_uuid=str(
                                                                        data['league_uuid']) if data[
                                                                        'league_uuid'] else None)
+                if owner is None:
+                    raise ManualException(err=f'member_user with user_uuid: {str(contest.owner_uuid)} not found')
+
                 self.contest_materialized_service.create(
                     uuid=contest.uuid,
                     name=contest.name,
@@ -68,6 +74,9 @@ class Contest:
                 if contests.total:
                     contest = contests.items[0]
                     member = self.participant_service.fetch_member(uuid=str(participant.member_uuid))
+                    if member is None:
+                        raise ManualException(err=f'member with uuid: {str(participant.member_uuid)} not found')
+
                     contest.participants[data['member_uuid']] = {
                         'member_uuid': data['member_uuid'],
                         'display_name': member.get('display_name', ''),

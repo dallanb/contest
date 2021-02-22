@@ -13,7 +13,7 @@ from ..common.error import *
 class DB:
     # Helpers
     @classmethod
-    def _query_builder(cls, model, filters=[], expand=[], include=[], search=None, sort_by=None, limit=None,
+    def _query_builder(cls, model, filters, expand=None, include=None, search=None, sort_by=None, limit=None,
                        offset=None):
         query = db.session.query(model)
         for logic_operator, filter_arr in filters:
@@ -185,13 +185,18 @@ class DB:
 
         return filters
 
-    @classmethod
-    def clean_query(cls, model, expand=[], include=[], sort_by=None, nested=None, search=None,
-                    within=None, has_key=None, **kwargs):
-        filters = cls._generate_filters(model=model, nested=nested, within=within, has_key=has_key,
-                                        **kwargs)
-        query = cls._query_builder(model=model, filters=filters, search=search, include=include, expand=expand,
-                                   sort_by=sort_by)
+    def clean_query(self, model, expand=None, include=None, sort_by=None, nested=None,
+                    within=None, has_key=None, search=None, **kwargs):
+        if include is None:
+            include = []
+
+        if expand is None:
+            expand = []
+
+        filters = self._generate_filters(model=model, nested=nested, within=within, has_key=has_key,
+                                         **kwargs)
+        query = self._query_builder(model=model, filters=filters, search=search, include=include, expand=expand,
+                                    sort_by=sort_by)
         return query
 
     @classmethod
