@@ -94,6 +94,7 @@ def test_contest_create(reset_db, pause_notification, seed_contest, mock_fetch_m
 
     assert contest.uuid == pytest.contest.uuid
 
+
 ###########
 # Update
 ###########
@@ -110,6 +111,7 @@ def test_contest_update(reset_db, pause_notification, seed_contest, seed_contest
     assert contests.total == 1
     assert len(contests.items) == 1
 
+
 ###########
 # Apply
 ###########
@@ -125,4 +127,3 @@ def test_contest_apply(reset_db, pause_notification, seed_contest, seed_contest_
     contests = contest_service.find(uuid=contest.uuid)
     assert contests.total == 1
     assert len(contests.items) == 1
-
