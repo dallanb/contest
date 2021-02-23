@@ -1,6 +1,6 @@
 import logging
 
-from src.events import Contest
+from src.events import Contest, Score
 
 
 def new_event_listener(event):
@@ -13,3 +13,9 @@ def new_event_listener(event):
         except Exception as ex:
             logging.error(ex)
             logging.error('contest error')
+    if topic == 'scores_test':
+        try:
+            Score().handle_event(key=key, data=data)
+        except Exception as ex:
+            logging.error(ex)
+            logging.error('score error')

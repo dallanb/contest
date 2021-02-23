@@ -22,16 +22,6 @@ class Avatar(Base):
         avatar = self._init(model=self.avatar_model, **kwargs)
         return self._save(instance=avatar)
 
-    def update(self, uuid, **kwargs):
-        avatars = self.find(uuid=uuid)
-        if not avatars.total:
-            self.error(code=HTTPStatus.NOT_FOUND)
-        return self.apply(instance=avatars.items[0], **kwargs)
-
-    def apply(self, instance, **kwargs):
-        avatar = self._assign_attr(instance=instance, attr=kwargs)
-        return self._save(instance=avatar)
-
     def destroy(self, uuid, ):
         avatars = self.find(uuid=uuid)
         if not avatars.total:

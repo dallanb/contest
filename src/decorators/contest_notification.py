@@ -1,4 +1,3 @@
-import logging
 from functools import wraps
 
 from src.notifications import contest_created, contest_ready, contest_inactive, contest_active, avatar_created, \
@@ -28,12 +27,10 @@ class contest_notification:
 
     @staticmethod
     def create(new_instance):
-        logging.info("YOU FUCKED UP C C")
         contest_created.from_data(contest=new_instance).notify()
 
     @staticmethod
     def update(prev_instance, new_instance, args):
-        logging.info("YOU FUCKED UP C U")
         if prev_instance and prev_instance.get('status') and prev_instance['status'].name != new_instance.status.name:
             if new_instance.status.name == 'ready':
                 contest_ready.from_data(contest=new_instance).notify()

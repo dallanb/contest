@@ -1,6 +1,6 @@
 import logging
 
-from ..common import ParticipantStatusEnum
+from ..common import ParticipantStatusEnum, ManualException
 from ..services import ContestService, ContestMaterializedService, ParticipantService
 
 
@@ -18,10 +18,16 @@ class Contest:
             if contests.total:
                 contest = contests.items[0]
                 location = self.contest_service.fetch_location(uuid=str(contest.location_uuid))
+                if location is None:
+                    raise ManualException(err=f'contest with uuid: {str(contest.location_uuid)} not found')
+
                 owner = self.participant_service.fetch_member_user(user_uuid=str(contest.owner_uuid),
                                                                    league_uuid=str(
                                                                        data['league_uuid']) if data[
                                                                        'league_uuid'] else None)
+                if owner is None:
+                    raise ManualException(err=f'member_user with user_uuid: {str(contest.owner_uuid)} not found')
+
                 self.contest_materialized_service.create(
                     uuid=contest.uuid,
                     name=contest.name,
@@ -42,6 +48,7 @@ class Contest:
                 )
         elif key == 'contest_ready' or key == 'contest_active' or key == 'contest_inactive' or key == 'contest_completed':
             self.logger.info('contest updated')
+            self.logger.info(key)
             contests = self.contest_service.find(uuid=data['uuid'])
             if contests.total:
                 contest = contests.items[0]
@@ -49,22 +56,16 @@ class Contest:
                     uuid=contest.uuid,
                     status=contest.status.name
                 )
-        elif key == 'name_updated':  # TODO: look into making this a direct find and apply towards the materialized service
-            contests = self.contest_service.find(uuid=data['uuid'])
-            if contests.total:
-                contest = contests.items[0]
-                self.contest_materialized_service.update(
-                    uuid=contest.uuid,
-                    name=data['name']
-                )
+        elif key == 'name_updated':
+            self.contest_materialized_service.update(
+                uuid=data['uuid'],
+                name=data['name']
+            )
         elif key == 'start_time_updated':
-            contests = self.contest_service.find(uuid=data['uuid'])
-            if contests.total:
-                contest = contests.items[0]
-                self.contest_materialized_service.update(
-                    uuid=contest.uuid,
-                    start_time=data['start_time']
-                )
+            self.contest_materialized_service.update(
+                uuid=data['uuid'],
+                start_time=data['start_time']
+            )
         elif key == 'participant_active':
             participants = self.participant_service.find(uuid=data['participant_uuid'])
             if participants.total:
@@ -73,6 +74,9 @@ class Contest:
                 if contests.total:
                     contest = contests.items[0]
                     member = self.participant_service.fetch_member(uuid=str(participant.member_uuid))
+                    if member is None:
+                        raise ManualException(err=f'member with uuid: {str(participant.member_uuid)} not found')
+
                     contest.participants[data['member_uuid']] = {
                         'member_uuid': data['member_uuid'],
                         'display_name': member.get('display_name', ''),
@@ -94,10 +98,7 @@ class Contest:
                     self.contest_materialized_service.save(instance=contest)
             self.contest_service.check_contest_status(uuid=data['contest_uuid'])
         elif key == 'avatar_created':
-            contests = self.contest_service.find(uuid=data['contest_uuid'])
-            if contests.total:
-                contest = contests.items[0]
-                self.contest_materialized_service.update(
-                    uuid=contest.uuid,
-                    avatar=data['s3_filename']
-                )
+            self.contest_materialized_service.update(
+                uuid=data['contest_uuid'],
+                avatar=data['s3_filename']
+            )

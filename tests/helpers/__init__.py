@@ -11,4 +11,5 @@ from .new_event_listener import new_event_listener
 from .participant_notification_create import participant_notification_create
 from .participant_notification_create_owner import participant_notification_create_owner
 from .participant_notification_update import participant_notification_update
+from .upload_file import upload_file
 from .upload_fileobj import upload_fileobj

@@ -3,9 +3,9 @@ from webargs import fields
 
 
 class ContestCompletedSchema(Schema):
-    uuid = fields.UUID(attribute='uuid')
-    league_uuid = fields.UUID(attribute='league_uuid', missing=None)
-    owner_uuid = fields.UUID(attribute='owner_uuid')
+    uuid = fields.UUID(attribute='contest.uuid')
+    league_uuid = fields.UUID(attribute='contest.league_uuid', missing=None)
+    owner_uuid = fields.UUID(attribute='contest.owner_uuid')
     message = fields.String()
 
     @pre_dump

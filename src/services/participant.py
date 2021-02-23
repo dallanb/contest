@@ -58,7 +58,7 @@ class Participant(Base):
                 self.create(member_uuid=member['uuid'], status='pending', contest=contest)
         ContestService().check_contest_status(uuid=contest.uuid)
 
-    def create_batch_async(self, uuids, contest):
+    def create_batch_threaded(self, uuids, contest):
         thread = threading.Thread(target=self.create_batch, args=(uuids, contest),
                                   daemon=True)
         thread.start()

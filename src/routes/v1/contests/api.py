@@ -109,7 +109,7 @@ class ContestsListAPI(Base):
                                           payout=data['payout'])
 
         # create other participants in a separate thread cause it is not critical if they are created right away
-        self.participant.create_batch_async(uuids=data['participants'], contest=contest)
+        self.participant.create_batch_threaded(uuids=data['participants'], contest=contest)
         return DataResponse(
             data={
                 'contests': self.dump(
