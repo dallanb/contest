@@ -93,9 +93,9 @@ class ContestsListAPI(Base):
                                                        data['league_uuid']) if data['league_uuid'] else None)
         if owner is None:
             self.throw_error(http_code=self.code.BAD_REQUEST, msg='User not found')
-        # confirm that the owner is not in the passed in participants list
-        if uuid.UUID(owner['uuid']) in data['participants']:
-            self.throw_error(http_code=self.code.BAD_REQUEST, msg='Owner should not be included in the participants')
+        # confirm that the owner is in the passed in participants list
+        if uuid.UUID(owner['uuid']) not in data['participants']:
+            self.throw_error(http_code=self.code.BAD_REQUEST, msg='Owner should be included in the participants')
 
         # create contest
         contest = self.contest.create(status='pending', owner_uuid=owner['user_uuid'], name=data['name'],
@@ -105,6 +105,8 @@ class ContestsListAPI(Base):
         _ = self.sport.create(sport_uuid=data['sport_uuid'], contest=contest)
 
         # create owner
+        # remove the owner from the participants
+        data['participants'].remove(uuid.UUID(owner['uuid']))
         _ = self.participant.create_owner(member_uuid=owner['uuid'], contest=contest, buy_in=data['buy_in'],
                                           payout=data['payout'])
 

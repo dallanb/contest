@@ -32,7 +32,7 @@ def test_create_contest(reset_db, mock_fetch_member_user, mock_fetch_member, moc
         'location_uuid': pytest.location_uuid,
         'league_uuid': pytest.league_uuid,
         'name': pytest.name,
-        'participants': pytest.participants,
+        'participants': [pytest.owner_member_uuid, *pytest.participants],
         'start_time': pytest.start_time,
         'buy_in': pytest.buy_in,
         'payout': pytest.payout
@@ -253,7 +253,7 @@ def test_create_contest_fail(reset_db, mock_fetch_member_user, mock_fetch_member
         'league_uuid': pytest.league_uuid,
         'name': pytest.name,
         'start_time': pytest.start_time,
-        'participants': pytest.participants,
+        'participants': [pytest.owner_member_uuid, *pytest.participants],
         'buy_in': pytest.buy_in,
         'payout': pytest.payout
     }
@@ -268,7 +268,7 @@ def test_create_contest_fail(reset_db, mock_fetch_member_user, mock_fetch_member
     assert response.status_code == 400
 
     response = app.test_client().post('/contests', headers=headers, json={**payload, 'participants': [generate_uuid()]})
-    assert response.status_code == 200
+    assert response.status_code == 400
 
     response = app.test_client().post('/contests', headers=headers, json={**payload, 'start_time': time_now() - 10000})
     assert response.status_code == 400
