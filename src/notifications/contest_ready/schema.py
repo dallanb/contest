@@ -11,6 +11,5 @@ class ContestReadySchema(Schema):
     @pre_dump
     def prepare(self, data, **kwargs):
         contest = data['contest']
-        name = contest.get('name', '')
-        data['message'] = f"{name} is ready"
+        data['message'] = f"{contest.name} is ready"
         return data
