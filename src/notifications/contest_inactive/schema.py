@@ -10,5 +10,6 @@ class ContestInactiveSchema(Schema):
 
     @pre_dump
     def prepare(self, data, **kwargs):
-        data["message"] = ""
+        contest = data['contest']
+        data['message'] = f"{contest.name} is inactive"
         return data

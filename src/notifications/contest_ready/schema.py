@@ -10,6 +10,6 @@ class ContestReadySchema(Schema):
 
     @pre_dump
     def prepare(self, data, **kwargs):
-        name = data.get('name', '')
-        data['message'] = f"{name} is ready"
+        contest = data['contest']
+        data['message'] = f"{contest.name} is ready"
         return data
