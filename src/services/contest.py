@@ -51,7 +51,10 @@ class Contest(Base):
 
         if contest.status.name == 'pending' and not counts.get(ParticipantStatusEnum['pending']):
             # the contest does not have enough active participants to proceed
-            self.apply(instance=contest, status='ready')
+            if counts.get(ParticipantStatusEnum['active']) < 2:
+                self.apply(instance=contest, status='inactive')
+            else:
+                self.apply(instance=contest, status='ready')
         elif contest.status.name == 'active' and not counts.get(ParticipantStatusEnum['active']):
             self.apply(instance=contest, status='completed')
 
