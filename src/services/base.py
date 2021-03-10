@@ -55,6 +55,17 @@ class Base:
             self.db.rollback()
             self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
 
+    def _update(self, query, **kwargs):
+        try:
+            update = query.update({**kwargs})
+            self._commit()
+            return update
+        except InvalidRequestError as ex:
+            self.logger.error(f'update error - InvalidRequestError')
+            self.logger.error(ex)
+            self.db.rollback()
+            self.error(code=HTTPStatus.INTERNAL_SERVER_ERROR)
+
     def _commit(self):
         try:
             return self.db.commit()
