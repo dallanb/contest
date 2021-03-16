@@ -5,7 +5,7 @@ from http import HTTPStatus
 from sqlalchemy import func
 
 from .base import Base
-from ..common import ParticipantStatusEnum, ContestStatusEnum
+from ..common import ParticipantStatusEnum
 from ..decorators import contest_notification
 from ..external import Course as CourseExternal
 from ..models import Contest as ContestModel, Participant as ParticipantModel
@@ -18,12 +18,15 @@ class Contest(Base):
         self.contest_model = ContestModel
 
     def find(self, **kwargs):
-        return Base.find(self, model=self.contest_model, **kwargs)
+        return self._find(model=self.contest_model, **kwargs)
+
+    def init(self, **kwargs):
+        return self._init(model=self.contest_model, **kwargs)
 
     @contest_notification(operation='create')
     def create(self, **kwargs):
-        contest = self.init(model=self.contest_model, **kwargs)
-        return self.save(instance=contest)
+        contest = self._init(model=self.contest_model, **kwargs)
+        return self._save(instance=contest)
 
     def update(self, uuid, **kwargs):
         contests = self.find(uuid=uuid)
@@ -34,8 +37,8 @@ class Contest(Base):
     @contest_notification(operation='update')
     def apply(self, instance, **kwargs):
         # if contest status is being updated we will trigger a notification
-        contest = self.assign_attr(instance=instance, attr=kwargs)
-        return self.save(instance=contest)
+        contest = self._assign_attr(instance=instance, attr=kwargs)
+        return self._save(instance=contest)
 
     # Check and update contest status if all participants associated with the contest have responded
     def check_contest_status(self, uuid):
@@ -46,21 +49,27 @@ class Contest(Base):
         contests = self.find(uuid=uuid)
         contest = contests.items[0]
 
-        if ContestStatusEnum[contest.status.name] == ContestStatusEnum['pending'] and not counts.get(
-                ParticipantStatusEnum[contest.status.name]):
-            self.apply(instance=contest, status=ContestStatusEnum.ready.name)
-        elif ContestStatusEnum[contest.status.name] == ContestStatusEnum[
-            'active'] and not counts.get(ParticipantStatusEnum[contest.status.name]):
-            self.apply(instance=contest, status=ContestStatusEnum.completed.name)
+        if contest.status.name == 'pending' and not counts.get(ParticipantStatusEnum['pending']):
+            # the contest does not have enough active participants to proceed
+            if counts.get(ParticipantStatusEnum['active']) < 2:
+                self.apply(instance=contest, status='inactive')
+            else:
+                self.apply(instance=contest, status='ready')
+        elif contest.status.name == 'active' and not counts.get(ParticipantStatusEnum['active']):
+            self.apply(instance=contest, status='completed')
 
     def fetch_location(self, uuid):
         hit = self.cache.get(uuid)
         if hit:
             return hit
-        res = CourseExternal().fetch_course(uuid=uuid)
-        location = res['data']['courses']
-        self.cache.set(uuid, location, 3600)
-        return location
+        try:
+            res = CourseExternal().fetch_course(uuid=uuid)
+            location = res['data']['courses']
+            self.cache.set(uuid, location, 3600)
+            return location
+        except TypeError:
+            self.logger.error(f'fetch location failed for uuid: {uuid}')
+            return None
 
     def find_by_start_time_range(self, month, year, **kwargs):
         query = self.db.clean_query(model=self.contest_model, **kwargs)

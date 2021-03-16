@@ -33,7 +33,7 @@ COPY src ./src
 COPY bin ./bin
 
 # copy build bin
-COPY build/bin ./build/bin
+COPY build/bin/entrypoint.test.sh ./build/bin/entrypoint.sh
 
 # copy migrations
 COPY migrations ./migrations
@@ -54,4 +54,4 @@ COPY manage.py .
 COPY setup.py .
 
 ## run entrypoint.sh
-ENTRYPOINT ["sh", "./build/bin/entrypoint.test.sh"]
+ENTRYPOINT ["sh", "./build/bin/entrypoint.sh"]

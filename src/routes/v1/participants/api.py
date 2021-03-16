@@ -92,9 +92,9 @@ class ParticipantsListAPI(Base):
 
     @marshal_with(DataResponse.marshallable())
     @check_user
-    def post(self, uuid):
+    def post(self, contest_uuid):
         data = self.clean(schema=create_schema, instance=request.get_json())
-        contests = self.contest.find(uuid=uuid)
+        contests = self.contest.find(uuid=contest_uuid)
         if not contests.total:
             self.throw_error(http_code=self.code.NOT_FOUND)
         self.participant.fetch_member(uuid=str(data['member_uuid']))

@@ -1,16 +1,16 @@
 from functools import wraps
 
+from src.notifications import contest_created, contest_ready, contest_inactive, contest_active, avatar_created, \
+    name_updated, start_time_updated, contest_completed
+
 
 class contest_notification:
     def __init__(self, operation):
         self.operation = operation
-        self.topic = 'contests'
-        self._service = None
 
     def __call__(self, f):
         @wraps(f)
         def wrap(*args, **kwargs):
-            self.service = args[0]
             prev_instance = {**kwargs.get('instance').__dict__} if kwargs.get('instance') else None
             new_instance = f(*args, **kwargs)
 
@@ -25,65 +25,24 @@ class contest_notification:
         wrap.__name__ = f.__name__
         return wrap
 
-    @property
-    def service(self):
-        return self._service
-
-    @service.setter
-    def service(self, service):
-        self._service = service
-
-    def create(self, new_instance):
-        key = 'contest_created'
-        value = {
-            'uuid': str(new_instance.uuid),
-            'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
-            'owner_uuid': str(new_instance.owner_uuid)}
-        self.service.notify(topic=self.topic, value=value, key=key, )
-
-    def update(self, prev_instance, new_instance, args):
-        if prev_instance and prev_instance.get('status') and prev_instance['status'].name != new_instance.status.name:
-            key = f'contest_{new_instance.status.name}'
-            value = {
-                'uuid': str(new_instance.uuid),
-                'owner_uuid': str(new_instance.owner_uuid),
-                'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
-                'message': self.generate_message(key=key, contest=new_instance)
-            }
-            self.service.notify(topic=self.topic, value=value, key=key)
-        if args.get('avatar'):
-            key = 'avatar_created'
-            value = {
-                'uuid': str(args['avatar'].uuid),
-                'contest_uuid': str(new_instance.uuid),
-                'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
-                's3_filename': str(args['avatar'].s3_filename)
-            }
-            self.service.notify(topic=self.topic, value=value, key=key)
-        if prev_instance and prev_instance.get('name') and prev_instance['name'] != new_instance.name:
-            key = 'name_updated'
-            value = {
-                'uuid': str(new_instance.uuid),
-                'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
-                'name': new_instance.name
-            }
-            self.service.notify(topic=self.topic, value=value, key=key)
-        if prev_instance and prev_instance.get('start_time') and prev_instance['start_time'] != new_instance.start_time:
-            key = 'start_time_updated'
-            value = {
-                'uuid': str(new_instance.uuid),
-                'league_uuid': str(new_instance.league_uuid) if new_instance.league_uuid else None,
-                'start_time': new_instance.start_time
-            }
-            self.service.notify(topic=self.topic, value=value, key=key)
+    @staticmethod
+    def create(new_instance):
+        contest_created.from_data(contest=new_instance).notify()
 
     @staticmethod
-    def generate_message(key, **kwargs):
-        if key == 'contest_ready':
-            contest = kwargs.get('contest')
-            return f"{contest.name} is ready"
-        elif key == 'contest_active':
-            contest = kwargs.get('contest')
-            return f"{contest.name} is active"
-        else:
-            return ''
+    def update(prev_instance, new_instance, args):
+        if prev_instance and prev_instance.get('status') and prev_instance['status'].name != new_instance.status.name:
+            if new_instance.status.name == 'ready':
+                contest_ready.from_data(contest=new_instance).notify()
+            elif new_instance.status.name == 'active':
+                contest_active.from_data(contest=new_instance).notify()
+            elif new_instance.status.name == 'completed':
+                contest_completed.from_data(contest=new_instance).notify()
+            elif new_instance.status.name == 'inactive':
+                contest_inactive.from_data(contest=new_instance).notify()
+        if args.get('avatar'):
+            avatar_created.from_data(contest=new_instance, avatar=args['avatar']).notify()
+        if prev_instance and prev_instance.get('name') and prev_instance['name'] != new_instance.name:
+            name_updated.from_data(contest=new_instance).notify()
+        if prev_instance and prev_instance.get('start_time') and prev_instance['start_time'] != new_instance.start_time:
+            start_time_updated.from_data(contest=new_instance).notify()
