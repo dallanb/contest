@@ -15,6 +15,7 @@ class Config(object):
     WAGER_URL = os.getenv("WAGER_URL")
     KAFKA_URL = os.getenv("KAFKA_URL")
     KAFKA_TOPICS = os.getenv("KAFKA_TOPICS").split(",")
+    KAFKA_GROUP_ID = os.getenv("KAFKA_GROUP_ID")
     S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY")
     S3_SECRET_KEY = os.getenv("S3_SECRET_KEY")
     S3_BUCKET = os.getenv("S3_BUCKET")
