@@ -5,7 +5,7 @@ from http import HTTPStatus
 
 from .base import Base
 from ..common import ParticipantStatusEnum
-from ..decorators import participant_notification
+from ..decorators.notifications import participant_notification
 from ..external import Member as MemberExternal
 from ..models import Participant as ParticipantModel
 from ..services import ContestService

@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from .base import Base
 from ..common import ParticipantStatusEnum
-from ..decorators import contest_notification
+from ..decorators.notifications import contest_notification
 from ..external import Course as CourseExternal
 from ..models import Contest as ContestModel, Participant as ParticipantModel
 
