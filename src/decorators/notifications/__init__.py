@@ -1,2 +1,3 @@
+from .avatar_notification import avatar_notification
 from .contest_notification import contest_notification
 from .participant_notification import participant_notification

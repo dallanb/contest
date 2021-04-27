@@ -1,10 +1,10 @@
-from .schema import AvatarCreatedSchema
+from .schema import AvatarDeletedSchema
 from ..base import Base
 
 
-class avatar_created(Base):
-    key = 'avatar_created'
-    schema = AvatarCreatedSchema()
+class avatar_deleted(Base):
+    key = 'avatar_deleted'
+    schema = AvatarDeletedSchema()
 
     def __init__(self, data):
         super().__init__(key=self.key, data=data)
@@ -12,4 +12,4 @@ class avatar_created(Base):
     @classmethod
     def from_data(cls, avatar):
         data = cls.schema.dump({'avatar': avatar})
-        return avatar_created(data=data)
+        return avatar_deleted(data=data)
