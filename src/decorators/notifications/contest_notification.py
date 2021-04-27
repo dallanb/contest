@@ -1,6 +1,6 @@
 from functools import wraps
 
-from src.notifications import contest_created, contest_ready, contest_inactive, contest_active, avatar_created, \
+from ...notifications import contest_created, contest_ready, contest_inactive, contest_active, avatar_created, \
     name_updated, start_time_updated, contest_completed
 
 
