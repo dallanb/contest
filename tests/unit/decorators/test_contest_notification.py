@@ -52,14 +52,6 @@ def test_contest_notification_contest_inactive(kafka_conn_last_msg):
     assert msg.value['uuid'] == str(pytest.contest.uuid)
 
 
-def test_contest_notification_avatar_created(kafka_conn_last_msg, seed_avatar):
-    msg = kafka_conn_last_msg('contests')
-    assert msg.key is not None
-    assert msg.key == 'avatar_created'
-    assert msg.value is not None
-    assert msg.value['uuid'] == str(pytest.avatar.uuid)
-
-
 def test_contest_notification_name_updated(kafka_conn_last_msg):
     name = 'Oingo Boingo'
     pytest.contest = services.ContestService().update(uuid=pytest.contest.uuid, name=name)

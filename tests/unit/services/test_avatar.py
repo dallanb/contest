@@ -188,23 +188,11 @@ def test_avatar_destroy(reset_db, pause_notification, seed_contest, seed_avatar)
     WHEN the destroy method is called
     THEN it should return True and remove 1 avatar instance in the database
     """
-    avatar = avatar_service.destroy(uuid=pytest.avatar.uuid)
+    avatar = avatar_service.destroy(instance=pytest.avatar)
     assert avatar
 
     avatars = avatar_service.find()
     assert avatars.total == 0
-
-
-def test_avatar_destroy_w_bad_uuid(reset_db, pause_notification, seed_contest, seed_avatar):
-    """
-    GIVEN 1 avatar instance in the database
-    WHEN the destroy method is called with random uuid
-    THEN it should return ManualException with code 404
-    """
-    try:
-        _ = avatar_service.destroy(uuid=generate_uuid())
-    except ManualException as ex:
-        assert ex.code == 404
 
 
 ###########

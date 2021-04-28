@@ -8,7 +8,6 @@ from ....common.response import DataResponse, MessageResponse
 from ....services import AvatarService, ContestService
 
 
-
 class AvatarsAPI(Base):
     def __init__(self):
         Base.__init__(self)
@@ -21,7 +20,7 @@ class AvatarsAPI(Base):
         return MessageResponse()
 
 
-class AvatarsAPI(Base):
+class AvatarsListAPI(Base):
     def __init__(self):
         Base.__init__(self)
         self.avatar = AvatarService()

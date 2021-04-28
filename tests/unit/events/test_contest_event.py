@@ -344,3 +344,26 @@ def test_contest_avatar_created_sync(pause_notification, mock_upload_fileobj, se
 
     assert contests.total == 1
     assert contests.items[0].avatar == pytest.avatar.s3_filename
+
+
+def test_contest_avatar_deleted_sync(pause_notification, mock_upload_fileobj, seed_avatar):
+    """
+    GIVEN 1 contest instance, 1 owner participant instance and 1 participant instance in the database
+    WHEN directly calling event contest handle_event avatar_deleted
+    THEN it should update 1 contest_materialized instance to the database
+    """
+    key = 'avatar_deleted'
+    value = {
+        'contest_uuid': str(pytest.contest.uuid),
+        'league_uuid': str(pytest.league_uuid),
+        'owner_uuid': str(pytest.owner_user_uuid),
+        'uuid': str(pytest.avatar.uuid),
+        's3_filename': pytest.avatar.s3_filename
+    }
+
+    events.Contest().handle_event(key=key, data=value)
+
+    contests = services.ContestMaterializedService().find()
+
+    assert contests.total == 1
+    assert contests.items[0].avatar is None
