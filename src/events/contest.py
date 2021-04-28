@@ -97,7 +97,14 @@ class Contest:
                     self.contest_materialized_service.save(instance=contest)
             self.contest_service.check_contest_status(uuid=data['contest_uuid'])
         elif key == 'avatar_created':
+            self.logger.info('avatar created')
             self.contest_materialized_service.update(
                 uuid=data['contest_uuid'],
                 avatar=data['s3_filename']
+            )
+        elif key == 'avatar_deleted':
+            self.logger.info('avatar deleted')
+            self.contest_materialized_service.update(
+                uuid=data['contest_uuid'],
+                avatar=None
             )

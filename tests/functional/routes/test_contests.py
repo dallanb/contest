@@ -270,5 +270,5 @@ def test_create_contest_fail(reset_db, mock_fetch_member_user, mock_fetch_member
     response = app.test_client().post('/contests', headers=headers, json={**payload, 'participants': [generate_uuid()]})
     assert response.status_code == 400
 
-    response = app.test_client().post('/contests', headers=headers, json={**payload, 'start_time': time_now() - 10000})
+    response = app.test_client().post('/contests', headers=headers, json={**payload, 'start_time': time_now() - 10000000})
     assert response.status_code == 400

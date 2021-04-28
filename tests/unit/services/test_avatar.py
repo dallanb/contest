@@ -47,22 +47,6 @@ def test_avatar_find_expand_contest():
     assert avatar.contest.uuid is not None
 
 
-def test_avatar_find_expand_contest():
-    """
-    GIVEN 1 avatar instance in the database
-    WHEN the find method is called with uuid and with expand argument to also return contest
-    THEN it should return 1 avatar
-    """
-
-    avatars = avatar_service.find(uuid=pytest.avatar.uuid, expand=['contest'])
-
-    assert avatars.total == 1
-    assert len(avatars.items) == 1
-    avatar = avatars.items[0]
-    assert avatar.contest is not None
-    assert avatar.contest.uuid is not None
-
-
 def test_avatar_find_w_pagination(pause_notification):
     """
     GIVEN 2 avatar instance in the database
@@ -165,6 +149,34 @@ def test_avatar_create_w_bad_field(reset_db, pause_notification, seed_contest):
         _ = avatar_service.create(s3_filename=s3_filename, contest=pytest.contest, junk='junk')
     except ManualException as ex:
         assert ex.code == 500
+
+
+###########
+# Delete
+###########
+def test_avatar_delete(reset_db, pause_notification, seed_contest, seed_avatar):
+    """
+    GIVEN 1 avatar instance in the database
+    WHEN the delete method is called
+    THEN it should return True and remove 1 avatar instance in the database
+    """
+    avatar = avatar_service.delete(uuid=pytest.avatar.uuid)
+    assert avatar
+
+    avatars = avatar_service.find()
+    assert avatars.total == 0
+
+
+def test_avatar_delete_w_bad_uuid(reset_db, pause_notification, seed_contest, seed_avatar):
+    """
+    GIVEN 1 avatar instance in the database
+    WHEN the delete method is called with random uuid
+    THEN it should return ManualException with code 404
+    """
+    try:
+        _ = avatar_service.delete(uuid=generate_uuid())
+    except ManualException as ex:
+        assert ex.code == 404
 
 
 ###########

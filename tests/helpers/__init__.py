@@ -1,3 +1,6 @@
+from .avatar_notification_create import avatar_notification_create
+from .avatar_notification_delete import avatar_notification_delete
+from .avatar_notification_update import avatar_notification_update
 from .contest_notification_create import contest_notification_create
 from .contest_notification_update import contest_notification_update
 from .fetch_location import fetch_location
