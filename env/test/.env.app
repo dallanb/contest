@@ -15,5 +15,5 @@ WAGER_URL=http://10.0.0.150:30005
 KAFKA_URL=kafka:9092
 KAFKA_TOPICS=sports,contests,scores
 KAFKA_GROUP_ID=app
-S3_FILEPATH=contest/avatars/
+S3_FILEPATH=qaw/contest/avatars/
 ALLOWED_EXTENSIONS=png,jpg,jpeg
