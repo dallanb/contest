@@ -1,7 +1,7 @@
 from functools import wraps
 
-from src.notifications import contest_created, contest_ready, contest_inactive, contest_active, avatar_created, \
-    name_updated, start_time_updated, contest_completed
+from ...notifications import contest_created, contest_ready, contest_inactive, contest_active, name_updated, \
+    start_time_updated, contest_completed
 
 
 class contest_notification:
@@ -40,8 +40,6 @@ class contest_notification:
                 contest_completed.from_data(contest=new_instance).notify()
             elif new_instance.status.name == 'inactive':
                 contest_inactive.from_data(contest=new_instance).notify()
-        if args.get('avatar'):
-            avatar_created.from_data(contest=new_instance, avatar=args['avatar']).notify()
         if prev_instance and prev_instance.get('name') and prev_instance['name'] != new_instance.name:
             name_updated.from_data(contest=new_instance).notify()
         if prev_instance and prev_instance.get('start_time') and prev_instance['start_time'] != new_instance.start_time:

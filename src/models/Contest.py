@@ -20,7 +20,7 @@ class Contest(db.Model, BaseMixin):
 
     # Relationship
     contest_status = db.relationship("ContestStatus")
-    avatar = db.relationship("Avatar", back_populates="contest")
+    avatar = db.relationship("Avatar")
     participants = db.relationship("Participant", back_populates="contest")
     sport = db.relationship("Sport", uselist=False, back_populates="contest", lazy="joined")
 

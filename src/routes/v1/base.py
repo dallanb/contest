@@ -6,6 +6,7 @@ from flask_restful import Resource
 from marshmallow import ValidationError
 
 from ...common.error import ManualException
+from ...decorators import log_trace
 from ...services import BaseService
 
 
@@ -49,6 +50,7 @@ class Base(Resource):
         self.service.notify(topic=topic, value=value, key=key)
 
     @staticmethod
+    @log_trace
     def throw_error(http_code, **kwargs):
         if http_code is None:
             raise ManualException()

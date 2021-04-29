@@ -2,7 +2,7 @@ from marshmallow import Schema, pre_dump
 from webargs import fields
 
 
-class AvatarCreatedSchema(Schema):
+class AvatarUpdatedSchema(Schema):
     league_uuid = fields.UUID(missing=None, attribute='contest.league_uuid')
     owner_uuid = fields.UUID(attribute='contest.owner_uuid')
     contest_uuid = fields.UUID(attribute='contest.uuid')

@@ -1,4 +1,6 @@
 from .kafka_conn import kafka_conn, kafka_conn_last_msg, kafka_conn_custom_topics
+from .mock_avatar_notification import mock_avatar_notification_create, mock_avatar_notification_delete, \
+    mock_avatar_notification_update
 from .mock_contest_notification import mock_contest_notification_create, mock_contest_notification_update
 from .mock_create_batch_threaded import mock_create_batch_threaded
 from .mock_fetch_location import mock_fetch_location

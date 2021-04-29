@@ -6,7 +6,7 @@ services:
     image: adminer:latest
     restart: always
     ports:
-      - 8080:8080
+      - 8070:8080
     networks:
       - app-net
   contest:
@@ -21,6 +21,7 @@ services:
       - ${HUNCHO_DIR}/services/contest/tests:/home/app/tests
       - ${HUNCHO_DIR}/services/contest/seeds:/home/app/seeds
       - ${HUNCHO_DIR}/services/contest/src:/home/app/src
+      - ${HUNCHO_DIR}/services/contest/logs:/home/app/logs
       - ${HUNCHO_DIR}/services/contest/statics:/home/app/statics
       - ${HUNCHO_DIR}/services/contest/manage.py:/home/app/manage.py
       - ${HUNCHO_DIR}/services/contest/setup.py:/home/app/setup.py

@@ -66,3 +66,29 @@ def test_update_avatar(mock_upload_fileobj):
     # ensure that we still only have one avatar instance in the database
     avatar = services.AvatarService().find()
     assert avatar.total == 1
+
+
+def test_delete_avatar(mock_upload_fileobj, pause_notification):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the DELETE endpoint 'avatar' is requested
+    THEN check that the response is valid
+    """
+    avatar = services.AvatarService().find().items[0]
+    avatar_uuid = avatar.uuid
+
+    # Headers
+    headers = {'X-Consumer-Custom-ID': pytest.owner_user_uuid}
+
+    # Request
+    response = app.test_client().delete(f'/avatars/{avatar_uuid}', headers=headers)
+
+    # Response
+    assert response.status_code == 200
+    response = json.loads(response.data)
+    assert response['msg'] == "OK"
+
+    member = services.ContestService().find().items[0]
+    assert member.avatar is None
+
+    assert services.AvatarService().find().total == 0

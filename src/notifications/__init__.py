@@ -1,4 +1,6 @@
 from .avatar_created import avatar_created
+from .avatar_deleted import avatar_deleted
+from .avatar_updated import avatar_updated
 from .contest_active import contest_active
 from .contest_completed import contest_completed
 from .contest_created import contest_created
