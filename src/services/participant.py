@@ -26,6 +26,8 @@ class Participant(Base):
 
     @participant_notification(operation='create')
     def create(self, **kwargs):
+        # self.logger.info(kwargs)
+        # self.logger.info("HERE DOOD")
         participant = self._init(model=self.participant_model, **kwargs)
         return self._save(instance=participant)
 
@@ -55,6 +57,7 @@ class Participant(Base):
                 # send a notifications here
                 self.create(member_uuid=None, status='inactive', contest=contest)
             else:
+                # self.logger.info(member)
                 self.create(member_uuid=member['uuid'], status='pending', contest=contest)
         ContestService().check_contest_status(uuid=contest.uuid)
 

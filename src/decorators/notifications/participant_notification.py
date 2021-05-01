@@ -1,4 +1,5 @@
 from functools import wraps
+import logging
 
 from ...notifications import owner_active, participant_active, participant_completed, participant_inactive, \
     participant_invited
@@ -14,6 +15,7 @@ class participant_notification:
             prev_instance = {**kwargs['instance'].__dict__} if kwargs.get('instance') else None
             new_instance = f(*args, **kwargs)
             if self.operation == 'create':
+                logging.info(new_instance)
                 self.create(new_instance=new_instance)
             elif self.operation == 'create_owner':
                 buy_in = kwargs.pop('buy_in', None)
