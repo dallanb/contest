@@ -1,6 +1,5 @@
 from marshmallow import Schema, pre_dump
 from webargs import fields
-import logging
 
 from src import services, Contest
 from src.common import DB, ManualException
@@ -17,9 +16,6 @@ class ParticipantInvitedSchema(Schema):
 
     @pre_dump
     def prepare(self, data, **kwargs):
-        logging.info(data['participant'])
-        logging.info(data['participant'].contest_uuid)
-        logging.info('HERE BOY')
         contests = DB().find(model=Contest, uuid=str(data['participant'].contest_uuid))
         contest = contests.items[0]
         member = services.ParticipantService().fetch_member(uuid=str(data['participant'].member_uuid))
