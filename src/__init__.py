@@ -17,7 +17,7 @@ cache = Cache(app, config=app.config['REDIS_CONFIG'])
 # cors
 CORS(app, supports_credentials=True)
 # db
-db = SQLAlchemy(app, session_options={"expire_on_commit": False})
+db = SQLAlchemy(app)
 make_searchable(db.metadata)
 # migrate
 migrate = Migrate(app, db, compare_type=True)
