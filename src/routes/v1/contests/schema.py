@@ -1,5 +1,3 @@
-import logging
-
 from marshmallow import Schema, post_dump
 from marshmallow.validate import Range, Length
 from marshmallow_enum import EnumField

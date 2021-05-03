@@ -1,14 +1,14 @@
 version: "3.2"
 
 services:
-#  adminer:
-#    container_name: adminer
-#    image: adminer:latest
-#    restart: always
-#    ports:
-#      - 8070:8080
-#    networks:
-#      - app-net
+  adminer:
+    container_name: adminer
+    image: adminer:latest
+    restart: always
+    ports:
+      - 8070:8080
+    networks:
+      - app-net
   contest:
     container_name: contest
     build:
@@ -25,10 +25,8 @@ services:
       - ${HUNCHO_DIR}/services/contest/statics:/home/app/statics
       - ${HUNCHO_DIR}/services/contest/manage.py:/home/app/manage.py
       - ${HUNCHO_DIR}/services/contest/setup.py:/home/app/setup.py
-#    ports:
-#      - 20001:5000
     ports:
-      - 50002:5000
+      - 20001:5000
     env_file:
       - env/.env.contest
       - ${HUNCHO_DIR}/secrets/s3/credentials.txt
@@ -37,79 +35,75 @@ services:
       interval: 300s
       timeout: 5s
       retries: 5
-#    depends_on:
-#      - contest_cache
-#      - contest_db
-#    networks:
-#      - app-net
-#  contest_cache:
-#    container_name: contest_cache
-#    image: redis:6
-#    restart: unless-stopped
-#    volumes:
-#      - contest_cache:/var/libs/redis
-#    env_file:
-#      - env/.env.contest_cache
-#    healthcheck:
-#      test: [ "CMD", "redis-cli","ping" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
-#    networks:
-#      - app-net
-#  contest_db:
-#    container_name: contest_db
-#    image: postgres:9.6
-#    volumes:
-#      - contest_data:/var/libs/postgresql/data/
-#    env_file:
-#      - env/.env.contest_db
-#    healthcheck:
-#      test: [ "CMD-SHELL", "pg_isready -U contest" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 20
-#    networks:
-#      - app-net
-#  contest_kafka:
-#    container_name: contest_kafka
-#    image: wurstmeister/kafka:latest
-#    restart: on-failure
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    env_file:
-#      - env/.env.contest_kafka
-#    depends_on:
-#      - contest_zookeeper
-#    networks:
-#      - app-net
-#  contest_zookeeper:
-#    container_name: contest_zookeeper
-#    image: wurstmeister/zookeeper:latest
-#    restart: on-failure
-#    env_file:
-#      - env/.env.contest_zookeeper
-#    networks:
-#      - app-net
-#  redis-commander:
-#    container_name: redis-commander
-#    image: rediscommander/redis-commander:latest
-#    restart: unless-stopped
-#    ports:
-#      - 8082:8081
-#    env_file:
-#      - env/.env.contest-redis-commander
-#    depends_on:
-#      - contest_cache
-#    networks:
-#      - app-net
-#volumes:
-#  contest_data:
-#  contest_cache:
-#networks:
-#  app-net:
-#    driver: bridge
+    depends_on:
+      - contest_cache
+      - contest_db
+    networks:
+      - app-net
+  contest_cache:
+    container_name: contest_cache
+    image: redis:6
+    restart: unless-stopped
+    volumes:
+      - contest_cache:/var/libs/redis
+    env_file:
+      - env/.env.contest_cache
+    healthcheck:
+      test: [ "CMD", "redis-cli","ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - app-net
+  contest_db:
+    container_name: contest_db
+    image: postgres:9.6
+    volumes:
+      - contest_data:/var/libs/postgresql/data/
+    env_file:
+      - env/.env.contest_db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U contest" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks:
+      - app-net
+  contest_kafka:
+    container_name: contest_kafka
+    image: wurstmeister/kafka:latest
+    restart: on-failure
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - env/.env.contest_kafka
+    depends_on:
+      - contest_zookeeper
+    networks:
+      - app-net
+  contest_zookeeper:
+    container_name: contest_zookeeper
+    image: wurstmeister/zookeeper:latest
+    restart: on-failure
+    env_file:
+      - env/.env.contest_zookeeper
+    networks:
+      - app-net
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: unless-stopped
+    ports:
+      - 8082:8081
+    env_file:
+      - env/.env.contest-redis-commander
+    depends_on:
+      - contest_cache
+    networks:
+      - app-net
+volumes:
+  contest_data:
+  contest_cache:
 networks:
-  default:
-    external:
-      name: api_app-net
+  app-net:
+    driver: bridge
