@@ -1,10 +1,10 @@
 import concurrent.futures
 import logging
 import threading
+import time
 from http import HTTPStatus
 
 from .base import Base
-from .. import app
 from ..decorators.notifications import participant_notification
 from ..external import Member as MemberExternal
 from ..models import Participant as ParticipantModel
@@ -59,11 +59,9 @@ class Participant(Base):
         ContestService().check_contest_status(uuid=contest.uuid)
 
     def create_batch_threaded(self, uuids, contest):
-        # use with app_context so that the thread doesnt have issues with the sqlalchemy db session
-        with app.app_context():
-            thread = threading.Thread(target=self.create_batch, args=(uuids, contest),
-                                      daemon=True)
-            thread.start()
+        thread = threading.Thread(target=self.create_batch, args=(uuids, contest),
+                                  daemon=True)
+        thread.start()
 
     def _status_machine(self, prev_status, new_status):
         # cannot go from active to pending

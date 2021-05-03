@@ -50,7 +50,7 @@ def clear_db():
 
 
 def clear_cache():
-    common.cache.clear()
+    common.cache.cache.clear()
 
 
 def initialize_statuses():

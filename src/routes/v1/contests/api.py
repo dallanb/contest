@@ -5,6 +5,7 @@ from flask_restful import marshal_with
 
 from .schema import *
 from ..base import Base
+from .... import app
 from ....common.auth import check_user
 from ....common.response import DataResponse
 from ....services import ContestService, SportService, ParticipantService, ContestMaterializedService
@@ -111,7 +112,9 @@ class ContestsListAPI(Base):
                                           payout=data['payout'])
 
         # create other participants in a separate thread cause it is not critical if they are created right away
-        self.participant.create_batch_threaded(uuids=data['participants'], contest=contest)
+        # use with app_context so that the thread doesnt have issues with the sqlalchemy db session
+        with app.app_context():
+            self.participant.create_batch_threaded(uuids=data['participants'], contest=contest)
         return DataResponse(
             data={
                 'contests': self.dump(
