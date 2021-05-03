@@ -111,10 +111,9 @@ class ContestsListAPI(Base):
         _ = self.participant.create_owner(member_uuid=owner['uuid'], contest=contest, buy_in=data['buy_in'],
                                           payout=data['payout'])
 
-        # create other participants in a separate thread cause it is not critical if they are created right away
-        # use with app_context so that the thread doesnt have issues with the sqlalchemy db session
-        with app.app_context():
-            self.participant.create_batch_threaded(uuids=data['participants'], contest=contest)
+        # # create other participants in a separate thread cause it is not critical if they are created right away
+        # self.participant.create_batch_threaded(uuids=data['participants'], contest=contest)
+        self.participant.create_batch(uuids=data['participants'], contest=contest)
         return DataResponse(
             data={
                 'contests': self.dump(

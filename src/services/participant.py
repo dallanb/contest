@@ -5,6 +5,7 @@ import time
 from http import HTTPStatus
 
 from .base import Base
+from .. import app
 from ..decorators.notifications import participant_notification
 from ..external import Member as MemberExternal
 from ..models import Participant as ParticipantModel
@@ -50,7 +51,9 @@ class Participant(Base):
     def create_batch(self, uuids, contest):
         participants = [str(uuid) for uuid in uuids]
         member_batch = self.fetch_member_batch(uuids=participants)
-        for member in member_batch:
+        self.logger.info("convert map result to list so we know all results are returned")
+        members = list(member_batch)
+        for member in members:
             if member is None:
                 # send a notifications here
                 self.create(member_uuid=None, status='inactive', contest=contest)
@@ -59,6 +62,8 @@ class Participant(Base):
         ContestService().check_contest_status(uuid=contest.uuid)
 
     def create_batch_threaded(self, uuids, contest):
+        # use with app_context so that the thread doesnt have issues with the sqlalchemy db session
+        # with app.app_context():
         thread = threading.Thread(target=self.create_batch, args=(uuids, contest),
                                   daemon=True)
         thread.start()
