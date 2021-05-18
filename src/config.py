@@ -9,6 +9,12 @@ class Config(object):
     TESTING = os.getenv("TESTING", False)
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite://")
     SQLALCHEMY_TRACK_MODIFICATIONS = True  # Update to true for search
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": os.getenv("POOL_PRE_PING", True),
+        "pool_size": os.getenv("POOL_SIZE", 5),
+        "pool_recycle": os.getenv("POOL_RECYCLE", 1800),
+        "max_overflow": os.getenv("MAX_OVERFLOW", 20),
+    }
     SECRET_KEY = os.getenv("SECRET_KEY")
     MEMBER_URL = os.getenv("MEMBER_URL")
     COURSE_URL = os.getenv("COURSE_URL")
